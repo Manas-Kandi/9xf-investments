@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 9xf labs
+
+**One-tap crowd investing platform** - Own small pieces of early-stage companies with the same simplicity as buying a coffee.
+
+## Overview
+
+9xf labs is a consumer-facing platform where regular users can invest small amounts ($50–$250) into selected startups. The platform handles onboarding, KYC, and investment flows while partners manage the legal/regulatory infrastructure.
+
+## Tech Stack
+
+- **Frontend**: Next.js 14 (App Router) + TypeScript
+- **UI**: [Carbon Design System](https://carbondesignsystem.com/) by IBM
+- **State**: Zustand with persistence
+- **Backend**: Supabase (Auth, Database, Storage)
+- **Styling**: SCSS with Carbon tokens
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Supabase account (for production)
+
+### Installation
 
 ```bash
+# Install dependencies
+npm install
+
+# Copy environment variables
+cp .env.local.example .env.local
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file with:
 
-## Learn More
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Database Setup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Run the SQL schema in your Supabase SQL editor:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Located at: supabase/schema.sql
+```
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── auth/              # Sign in/up pages
+│   ├── campaigns/         # Campaign listing and details
+│   ├── invest/            # Investment flow
+│   ├── investments/       # User portfolio
+│   ├── onboarding/        # KYC, funding, terms
+│   ├── founders/          # Founder application
+│   ├── admin/             # Admin console
+│   └── account/           # User settings
+├── components/            # Reusable components
+├── lib/                   # Utilities and stores
+│   ├── supabase/         # Supabase clients
+│   ├── store.ts          # Zustand store
+│   └── mock-data.ts      # Demo data
+└── types/                 # TypeScript types
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Key Features
+
+### For Investors
+- **One-time onboarding**: KYC, bank linking, risk acknowledgment
+- **One-tap investing**: Select amount → Confirm → Done
+- **Portfolio view**: Track all investments
+
+### For Founders
+- **Application form**: Submit to raise with 9xf labs
+- **Campaign page**: Showcase company story, team, traction
+
+### For Admins
+- **Campaign management**: Create, edit, toggle status
+- **Application review**: Approve/reject founder applications
+- **Metrics dashboard**: Track platform performance
+
+## MVP Phases
+
+1. **Phase 1** (Current): Static demo with mock data
+2. **Phase 2**: Real Supabase integration, sandbox payments
+3. **Phase 3**: First live campaign with real money
+4. **Phase 4**: Mobile app, scale
+
+## Key Screens
+
+| Screen | Route | Description |
+|--------|-------|-------------|
+| Landing | `/` | Hero, how it works, featured campaign |
+| Campaigns | `/campaigns` | Browse all campaigns |
+| Campaign Detail | `/campaigns/[slug]` | Full campaign info |
+| Sign Up | `/auth/signup` | Create account |
+| Onboarding | `/onboarding` | KYC → Funding → Terms |
+| Invest | `/invest/[slug]` | Amount → Confirm → Success |
+| My Investments | `/investments` | Portfolio view |
+| Admin | `/admin` | Campaign & application management |
+
+## Design System
+
+Using [Carbon Design System](https://carbondesignsystem.com/) for:
+- Consistent, accessible UI components
+- Professional, clean aesthetic
+- Responsive grid system
+- Built-in dark mode support
+
+## License
+
+Private - All rights reserved

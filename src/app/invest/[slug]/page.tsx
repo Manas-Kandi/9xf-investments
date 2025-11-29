@@ -3,9 +3,10 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Grid, Column, Tile, Button, InlineLoading, Checkbox, NumberInput } from '@carbon/react';
-import { ArrowRight, ArrowLeft, Checkmark, Warning } from '@carbon/icons-react';
+import { ArrowRight, ArrowLeft, Checkmark } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
+import { RiskDisclosureNotice } from '@/components/legal/RiskDisclosureNotice';
 import { useAppStore } from '@/lib/store';
 import { getCampaignBySlug } from '@/lib/mock-data';
 
@@ -199,14 +200,7 @@ export default function InvestPage({ params }: InvestPageProps) {
                   </Tile>
 
                   {/* Risk Warning */}
-                  <Tile style={{ background: '#fff8e1', padding: '1rem', marginBottom: '1.5rem', border: '1px solid #f1c21b' }}>
-                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                      <Warning size={20} style={{ color: '#8a6d3b', flexShrink: 0, marginTop: '2px' }} />
-                      <p style={{ color: '#8a6d3b', fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>
-                        This is a high-risk, long-term investment. You may lose all of this money, and you may not be able to sell for many years.
-                      </p>
-                    </div>
-                  </Tile>
+                  <RiskDisclosureNotice title="Please confirm you understand the risks" />
 
                   {/* Confirmation Checkbox */}
                   <Checkbox

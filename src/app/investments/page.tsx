@@ -7,6 +7,7 @@ import { ArrowRight, Wallet } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { RiskDisclosureNotice } from '@/components/legal/RiskDisclosureNotice';
 import { useAppStore } from '@/lib/store';
 
 export default function InvestmentsPage() {
@@ -88,6 +89,9 @@ export default function InvestmentsPage() {
                 </Tile>
               </Column>
             </Grid>
+            <div style={{ marginTop: '1.5rem' }}>
+              <RiskDisclosureNotice title="Investing in startups involves risk" />
+            </div>
           </div>
         </section>
 

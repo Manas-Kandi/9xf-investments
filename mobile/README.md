@@ -54,12 +54,9 @@ mobile/
 │   └── index.ts
 ├── constants/
 │   └── theme.ts           # Colors, spacing, typography
-├── data/
-│   └── mockData.ts        # Mock campaigns and VCs
 ├── store/
 │   └── index.ts           # Zustand store
-├── types/
-│   └── index.ts           # TypeScript types
+├── shared/                # Shared types & mock data live in ../../src/lib/shared
 ├── app.json               # Expo configuration
 ├── package.json
 └── tsconfig.json

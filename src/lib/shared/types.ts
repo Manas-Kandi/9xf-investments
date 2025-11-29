@@ -1,9 +1,9 @@
-// Database types matching the web app
 export type KycStatus = 'pending' | 'verified' | 'failed';
 export type FundingSourceType = 'bank' | 'card';
 export type FundingSourceStatus = 'active' | 'inactive';
 export type CampaignStatus = 'draft' | 'live' | 'paused' | 'closed';
 export type InvestmentStatus = 'initiated' | 'processing' | 'confirmed' | 'failed';
+export type ApplicationStatus = 'new' | 'in_review' | 'approved' | 'rejected';
 export type VCApplicationStatus = 'pending' | 'approved' | 'rejected';
 
 export interface User {
@@ -132,5 +132,67 @@ export interface VCDeal {
   updated_at: string;
 }
 
-// Onboarding step tracking
+export interface FounderApplication {
+  id: string;
+  company_name: string;
+  website?: string;
+  logo_url?: string;
+  contact_name: string;
+  contact_email: string;
+  stage: string;
+  description: string;
+  desired_crowd_raise: number;
+  existing_investors?: string;
+  status: ApplicationStatus;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EventLog {
+  id: string;
+  user_id?: string;
+  campaign_id?: string;
+  event_type: string;
+  metadata?: Record<string, unknown>;
+  created_at: string;
+}
+
 export type OnboardingStep = 'account' | 'kyc' | 'funding' | 'terms' | 'complete';
+
+export interface Database {
+  public: {
+    Tables: {
+      users: {
+        Row: User;
+        Insert: Omit<User, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<User, 'id' | 'created_at'>>;
+      };
+      funding_sources: {
+        Row: FundingSource;
+        Insert: Omit<FundingSource, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<FundingSource, 'id' | 'created_at'>>;
+      };
+      campaigns: {
+        Row: Campaign;
+        Insert: Omit<Campaign, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Campaign, 'id' | 'created_at'>>;
+      };
+      investment_intents: {
+        Row: InvestmentIntent;
+        Insert: Omit<InvestmentIntent, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<InvestmentIntent, 'id' | 'created_at'>>;
+      };
+      founder_applications: {
+        Row: FounderApplication;
+        Insert: Omit<FounderApplication, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<FounderApplication, 'id' | 'created_at'>>;
+      };
+      event_logs: {
+        Row: EventLog;
+        Insert: Omit<EventLog, 'id' | 'created_at'>;
+        Update: never;
+      };
+    };
+  };
+}

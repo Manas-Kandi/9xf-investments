@@ -1,6 +1,10 @@
 'use client';
 
-import { Tile, Tag, Button, ProgressBar } from '@carbon/react';
+import Image from 'next/image';
+import Button from '@carbon/react/es/components/Button/Button.js';
+import ProgressBar from '@carbon/react/es/components/ProgressBar/ProgressBar.js';
+import Tag from '@carbon/react/es/components/Tag/Tag.js';
+import { Tile } from '@carbon/react/es/components/Tile/Tile.js';
 import { ArrowRight } from '@carbon/icons-react';
 import Link from 'next/link';
 import type { Campaign } from '@/types/database';
@@ -36,6 +40,29 @@ export function CampaignCard({ campaign, featured = false }: CampaignCardProps) 
         flexDirection: 'column',
       }}
     >
+      {campaign.cover_image_url && (
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            aspectRatio: '4 / 3',
+            marginBottom: '1rem',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            background: '#262626',
+          }}
+        >
+          <Image
+            src={campaign.cover_image_url}
+            alt={`${campaign.company_name} cover`}
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            style={{ objectFit: 'cover' }}
+            priority={featured}
+          />
+        </div>
+      )}
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
         <div
           style={{

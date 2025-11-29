@@ -1,6 +1,6 @@
 'use client';
 
-import { Grid, Column, Button, Tile } from '@carbon/react';
+import { Grid, Column, Button, Tile, ClickableTile, Tag } from '@carbon/react';
 import { ArrowRight, Wallet, Security, Time } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
@@ -15,33 +15,21 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main style={{ marginTop: '48px' }}>
+      <main className="main-content">
         {/* Hero Section */}
-        <section className="hero">
-          <div className="container">
-            <h1 className="hero-title">
+        <section style={{ background: '#262626', padding: '4rem 0', textAlign: 'center' }}>
+          <div className="page-container">
+            <h1 style={{ fontSize: '2.5rem', fontWeight: 300, marginBottom: '1rem', color: '#f4f4f4' }}>
               Own a piece of the future
             </h1>
-            <p className="hero-subtitle">
-              Invest small amounts in startups you believe in. 
-              Simple onboarding, one-tap investing, from just $50.
+            <p style={{ fontSize: '1.125rem', color: '#c6c6c6', marginBottom: '2rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
+              Invest small amounts in startups you believe in. Simple onboarding, one-tap investing, from just $50.
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Button
-                as={Link}
-                href="/campaigns"
-                kind="primary"
-                size="lg"
-                renderIcon={ArrowRight}
-              >
+              <Button as={Link} href="/campaigns" kind="primary" size="lg" renderIcon={ArrowRight}>
                 Browse campaigns
               </Button>
-              <Button
-                as={Link}
-                href="/how-it-works"
-                kind="tertiary"
-                size="lg"
-              >
+              <Button as={Link} href="/how-it-works" kind="secondary" size="lg">
                 How it works
               </Button>
             </div>
@@ -49,30 +37,24 @@ export default function Home() {
         </section>
 
         {/* How it works */}
-        <section className="section" style={{ background: '#f4f4f4' }}>
-          <div className="container">
-            <h2 style={{ textAlign: 'center', marginBottom: '3rem', fontSize: '2rem', fontWeight: 300 }}>
+        <section className="section" style={{ background: '#161616' }}>
+          <div className="page-container">
+            <h2 style={{ textAlign: 'center', marginBottom: '3rem', fontSize: '1.75rem', fontWeight: 400, color: '#f4f4f4' }}>
               Investing made simple
             </h2>
             <Grid>
               <Column lg={5} md={4} sm={4}>
                 <Tile style={{ height: '100%', textAlign: 'center', padding: '2rem' }}>
                   <div style={{ 
-                    width: '64px', 
-                    height: '64px', 
-                    background: '#0f62fe', 
-                    borderRadius: '50%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    margin: '0 auto 1.5rem'
+                    width: '64px', height: '64px', background: '#0f62fe', borderRadius: '50%', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'
                   }}>
-                    <Security size={32} style={{ color: 'white' }} />
+                    <Security size={32} style={{ fill: 'white' }} />
                   </div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
                     1. Verify once
                   </h3>
-                  <p style={{ color: '#525252' }}>
+                  <p style={{ color: '#c6c6c6' }}>
                     Complete a simple identity check. You only need to do this once.
                   </p>
                 </Tile>
@@ -80,21 +62,15 @@ export default function Home() {
               <Column lg={5} md={4} sm={4}>
                 <Tile style={{ height: '100%', textAlign: 'center', padding: '2rem' }}>
                   <div style={{ 
-                    width: '64px', 
-                    height: '64px', 
-                    background: '#0f62fe', 
-                    borderRadius: '50%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    margin: '0 auto 1.5rem'
+                    width: '64px', height: '64px', background: '#0f62fe', borderRadius: '50%', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'
                   }}>
-                    <Wallet size={32} style={{ color: 'white' }} />
+                    <Wallet size={32} style={{ fill: 'white' }} />
                   </div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
                     2. Link your bank
                   </h3>
-                  <p style={{ color: '#525252' }}>
+                  <p style={{ color: '#c6c6c6' }}>
                     Connect your bank account securely. Funds are only moved when you invest.
                   </p>
                 </Tile>
@@ -102,21 +78,15 @@ export default function Home() {
               <Column lg={5} md={4} sm={4}>
                 <Tile style={{ height: '100%', textAlign: 'center', padding: '2rem' }}>
                   <div style={{ 
-                    width: '64px', 
-                    height: '64px', 
-                    background: '#0f62fe', 
-                    borderRadius: '50%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    margin: '0 auto 1.5rem'
+                    width: '64px', height: '64px', background: '#0f62fe', borderRadius: '50%', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'
                   }}>
-                    <Time size={32} style={{ color: 'white' }} />
+                    <Time size={32} style={{ fill: 'white' }} />
                   </div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
                     3. Invest in seconds
                   </h3>
-                  <p style={{ color: '#525252' }}>
+                  <p style={{ color: '#c6c6c6' }}>
                     Pick an amount, tap confirm. That&apos;s it. You&apos;re now an investor.
                   </p>
                 </Tile>
@@ -127,9 +97,9 @@ export default function Home() {
 
         {/* Featured Campaign */}
         {featuredCampaign && (
-          <section className="section">
-            <div className="container">
-              <h2 style={{ textAlign: 'center', marginBottom: '3rem', fontSize: '2rem', fontWeight: 300 }}>
+          <section className="section" style={{ background: '#1a1a1a' }}>
+            <div className="page-container">
+              <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.75rem', fontWeight: 400, color: '#f4f4f4' }}>
                 Featured campaign
               </h2>
               <Grid>
@@ -141,11 +111,11 @@ export default function Home() {
           </section>
         )}
 
-        {/* All Live Campaigns */}
+        {/* Live Campaigns */}
         {liveCampaigns.length > 1 && (
-          <section className="section" style={{ background: '#f4f4f4' }}>
-            <div className="container">
-              <h2 style={{ textAlign: 'center', marginBottom: '3rem', fontSize: '2rem', fontWeight: 300 }}>
+          <section className="section" style={{ background: '#161616' }}>
+            <div className="page-container">
+              <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.75rem', fontWeight: 400, color: '#f4f4f4' }}>
                 More opportunities
               </h2>
               <Grid>
@@ -160,20 +130,18 @@ export default function Home() {
         )}
 
         {/* Risk Disclaimer */}
-        <section className="section">
-          <div className="container">
+        <section className="section" style={{ background: '#1a1a1a' }}>
+          <div className="page-container">
             <Tile style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-              <h3 style={{ marginBottom: '1rem', fontWeight: 600 }}>Important information</h3>
-              <p style={{ color: '#525252', lineHeight: 1.6, marginBottom: '1rem' }}>
+              <h3 style={{ marginBottom: '1rem', fontWeight: 600, color: '#f4f4f4' }}>Important information</h3>
+              <p style={{ color: '#c6c6c6', lineHeight: 1.6, marginBottom: '1rem' }}>
                 Investing in startups involves significant risk. You could lose all of your investment. 
                 These are long-term, illiquid investments—you may not be able to sell your shares for many years.
               </p>
-              <p style={{ color: '#525252', lineHeight: 1.6 }}>
+              <p style={{ color: '#c6c6c6', lineHeight: 1.6 }}>
                 9xf labs does not provide investment advice. Past performance is not indicative of future results.
                 Please read our{' '}
-                <Link href="/risk-disclosure" style={{ color: '#0f62fe' }}>
-                  full risk disclosure
-                </Link>{' '}
+                <Link href="/risk-disclosure" style={{ color: '#78a9ff' }}>full risk disclosure</Link>{' '}
                 before investing.
               </p>
             </Tile>
@@ -181,21 +149,15 @@ export default function Home() {
         </section>
 
         {/* CTA for Founders */}
-        <section style={{ background: '#161616', color: 'white', padding: '4rem 0' }}>
-          <div className="container" style={{ textAlign: 'center' }}>
-            <h2 style={{ fontSize: '2rem', fontWeight: 300, marginBottom: '1rem' }}>
+        <section style={{ background: '#262626', padding: '4rem 0' }}>
+          <div className="page-container" style={{ textAlign: 'center' }}>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 400, marginBottom: '1rem', color: '#f4f4f4' }}>
               Are you a founder?
             </h2>
-            <p style={{ opacity: 0.8, marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
+            <p style={{ color: '#c6c6c6', marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
               Turn your customers and fans into investors. Allocate a small slice of your round to the crowd.
             </p>
-            <Button
-              as={Link}
-              href="/founders"
-              kind="tertiary"
-              size="lg"
-              renderIcon={ArrowRight}
-            >
+            <Button as={Link} href="/founders" kind="tertiary" size="lg" renderIcon={ArrowRight}>
               Raise with 9xf labs
             </Button>
           </div>

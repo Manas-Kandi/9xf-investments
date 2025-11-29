@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Grid, Column, Tile, TextInput, Button, InlineLoading } from '@carbon/react';
-import { ArrowRight, UserFollow } from '@carbon/icons-react';
+import { ArrowRight } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { useAppStore } from '@/lib/store';
@@ -37,11 +37,8 @@ export default function SignUpPage() {
     }
 
     setIsLoading(true);
-
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Create user and start onboarding
     setUser({
       id: '1',
       email,
@@ -56,68 +53,21 @@ export default function SignUpPage() {
     setIsLoading(false);
   };
 
-  const handleOAuth = async (provider: 'google' | 'apple') => {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    setUser({
-      id: '1',
-      email: `user@${provider}.com`,
-      kyc_status: 'pending',
-      terms_accepted: false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-    setOnboardingStep('kyc');
-    router.push('/onboarding');
-  };
-
   return (
     <>
       <Header />
-      <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', background: '#f4f4f4', display: 'flex', alignItems: 'center' }}>
-        <div className="container" style={{ padding: '4rem 1rem' }}>
+      <main className="main-content" style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="page-container" style={{ padding: '4rem 1rem' }}>
           <Grid>
             <Column lg={{ span: 6, offset: 5 }} md={{ span: 6, offset: 1 }} sm={4}>
               <Tile style={{ padding: '2.5rem' }}>
-                <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem', color: '#f4f4f4' }}>
                   Create your account
                 </h1>
-                <p style={{ color: '#525252', marginBottom: '2rem' }}>
+                <p style={{ color: '#c6c6c6', marginBottom: '2rem' }}>
                   Start investing in startups you believe in
                 </p>
 
-                {/* OAuth Buttons */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                  <Button
-                    kind="tertiary"
-                    size="lg"
-                    renderIcon={UserFollow}
-                    onClick={() => handleOAuth('google')}
-                    disabled={isLoading}
-                    style={{ width: '100%' }}
-                  >
-                    Continue with Google
-                  </Button>
-                  <Button
-                    kind="tertiary"
-                    size="lg"
-                    renderIcon={UserFollow}
-                    onClick={() => handleOAuth('apple')}
-                    disabled={isLoading}
-                    style={{ width: '100%' }}
-                  >
-                    Continue with Apple
-                  </Button>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1.5rem 0' }}>
-                  <div style={{ flex: 1, height: '1px', background: '#e0e0e0' }} />
-                  <span style={{ color: '#525252', fontSize: '0.875rem' }}>or</span>
-                  <div style={{ flex: 1, height: '1px', background: '#e0e0e0' }} />
-                </div>
-
-                {/* Email/Password Form */}
                 <form onSubmit={handleSignUp}>
                   <TextInput
                     id="email"
@@ -167,9 +117,9 @@ export default function SignUpPage() {
                   )}
                 </form>
 
-                <p style={{ marginTop: '1.5rem', textAlign: 'center', color: '#525252' }}>
+                <p style={{ marginTop: '1.5rem', textAlign: 'center', color: '#c6c6c6' }}>
                   Already have an account?{' '}
-                  <Link href="/auth/signin" style={{ color: '#0f62fe', fontWeight: 500 }}>
+                  <Link href="/auth/signin" style={{ color: '#78a9ff', fontWeight: 500 }}>
                     Sign in
                   </Link>
                 </p>

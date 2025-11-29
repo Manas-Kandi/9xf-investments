@@ -8,13 +8,13 @@ import {
   HeaderGlobalBar,
   HeaderGlobalAction,
 } from '@carbon/react';
-import { UserAvatar, Login } from '@carbon/icons-react';
+import { UserAvatar, Login, Portfolio } from '@carbon/icons-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 
 export function Header() {
-  const { isAuthenticated } = useAppStore();
+  const { user } = useAppStore();
   const router = useRouter();
 
   return (
@@ -34,15 +34,14 @@ export function Header() {
         </HeaderMenuItem>
       </HeaderNavigation>
       <HeaderGlobalBar>
-        {isAuthenticated ? (
+        {user ? (
           <>
             <HeaderGlobalAction
-              aria-label="My investments"
+              aria-label="Portfolio"
               onClick={() => router.push('/investments')}
+              tooltipAlignment="center"
             >
-              <span style={{ fontSize: '0.875rem', marginRight: '0.5rem' }}>
-                My investments
-              </span>
+              <Portfolio size={20} />
             </HeaderGlobalAction>
             <HeaderGlobalAction
               aria-label="Account"

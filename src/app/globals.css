@@ -1,195 +1,63 @@
-/* Import Carbon styles via CSS */
+/* Carbon Design System - g100 Dark Theme */
 @import '@carbon/styles/css/styles.min.css';
 
-/* Google Font for IBM Plex Sans */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
-
-/* Custom 9xf theme overrides */
-:root {
-  --9xf-primary: #0f62fe;
-  --9xf-success: #24a148;
-  --9xf-warning: #f1c21b;
-  --9xf-danger: #da1e28;
-  --9xf-background: #ffffff;
-  --9xf-background-secondary: #f4f4f4;
-  --9xf-text-primary: #161616;
-  --9xf-text-secondary: #525252;
+/* Apply g100 (dark) theme globally */
+html {
+  background-color: #161616;
 }
 
-html, body {
+body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* Utility classes */
-.container {
+/* Force dark theme on all Carbon components */
+.cds--white,
+.cds--g10,
+.cds--g90,
+.cds--g100 {
+  --cds-background: #161616;
+  --cds-background-hover: #262626;
+  --cds-background-active: #393939;
+  --cds-layer-01: #262626;
+  --cds-layer-02: #393939;
+  --cds-layer-hover-01: #333333;
+  --cds-layer-hover-02: #474747;
+  --cds-text-primary: #f4f4f4;
+  --cds-text-secondary: #c6c6c6;
+  --cds-text-placeholder: #6f6f6f;
+  --cds-text-helper: #8d8d8d;
+  --cds-link-primary: #78a9ff;
+  --cds-link-primary-hover: #a6c8ff;
+  --cds-border-subtle-00: #393939;
+  --cds-border-subtle-01: #525252;
+  --cds-border-strong-01: #6f6f6f;
+  --cds-support-error: #ff8389;
+  --cds-support-success: #42be65;
+  --cds-support-warning: #f1c21b;
+  --cds-support-info: #4589ff;
+  --cds-button-primary: #0f62fe;
+  --cds-button-primary-hover: #0353e9;
+  --cds-focus: #ffffff;
+  --cds-icon-primary: #f4f4f4;
+  --cds-icon-secondary: #c6c6c6;
+}
+
+/* Layout utilities */
+.page-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
 .section {
-  padding: 4rem 0;
+  padding: 3rem 0;
 }
 
-.text-center {
-  text-align: center;
-}
-
-/* Investment amount buttons */
-.amount-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin: 1.5rem 0;
-}
-
-.amount-button {
-  padding: 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-  border: 2px solid #e0e0e0;
-  background: white;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.amount-button:hover {
-  border-color: var(--9xf-primary);
-  background: #f4f4f4;
-}
-
-.amount-button.selected {
-  border-color: var(--9xf-primary);
-  background: #e0e0ff;
-}
-
-/* Progress bar */
-.progress-container {
-  background: #e0e0e0;
-  border-radius: 4px;
-  height: 8px;
-  overflow: hidden;
-  margin: 1rem 0;
-}
-
-.progress-bar {
-  background: var(--9xf-primary);
-  height: 100%;
-  transition: width 0.3s ease;
-}
-
-/* Card styles */
-.campaign-card {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: box-shadow 0.2s ease;
-}
-
-.campaign-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* Hero section */
-.hero {
-  background: linear-gradient(135deg, #161616 0%, #393939 100%);
-  color: white;
-  padding: 6rem 0;
-  text-align: center;
-}
-
-.hero-title {
-  font-size: 3rem;
-  font-weight: 300;
-  margin-bottom: 1.5rem;
-  line-height: 1.2;
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  opacity: 0.8;
-  max-width: 600px;
-  margin: 0 auto 2rem;
-}
-
-/* Status badges */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.status-badge.live {
-  background: #defbe6;
-  color: #0e6027;
-}
-
-.status-badge.coming-soon {
-  background: #fff8e1;
-  color: #8a6d3b;
-}
-
-.status-badge.closed {
-  background: #f4f4f4;
-  color: #525252;
-}
-
-/* Onboarding steps */
-.step-indicator {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-}
-
-.step-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #e0e0e0;
-}
-
-.step-dot.active {
-  background: var(--9xf-primary);
-}
-
-.step-dot.completed {
-  background: var(--9xf-success);
-}
-
-/* Risk warning box */
-.risk-warning {
-  background: #fff8e1;
-  border-left: 4px solid var(--9xf-warning);
-  padding: 1rem 1.5rem;
-  margin: 1.5rem 0;
-  border-radius: 0 4px 4px 0;
-}
-
-/* Investment summary */
-.investment-summary {
-  background: #f4f4f4;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin: 1.5rem 0;
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.summary-row:last-child {
-  border-bottom: none;
-  font-weight: 600;
+/* Main content area - accounts for header */
+.main-content {
+  margin-top: 48px;
+  min-height: calc(100vh - 48px);
+  background: #161616;
 }

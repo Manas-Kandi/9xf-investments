@@ -1,10 +1,4 @@
-import { init } from '@sentry/nextjs';
-
+// Sentry instrumentation disabled - package not installed
 export async function register() {
-  init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV,
-    enabled: Boolean(process.env.SENTRY_DSN),
-    tracesSampleRate: 0.2,
-  });
+  // Monitoring disabled for now
 }

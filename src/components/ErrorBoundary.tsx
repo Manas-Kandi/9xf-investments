@@ -1,7 +1,6 @@
 'use client';
 
 import { Component, ReactNode } from 'react';
-import { captureException } from '@sentry/nextjs';
 import { InlineNotification, Button } from '@carbon/react';
 
 interface ErrorBoundaryProps {
@@ -22,9 +21,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    captureException(error, {
-      extra: { componentStack: info.componentStack },
-    });
+    console.error('[ErrorBoundary]', error, info.componentStack);
   }
 
   handleRetry = () => {
@@ -43,8 +40,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               'We ran into a problem while loading this section. Please try again or refresh the page.'
             }
             lowContrast
-            actions={<Button size="sm" onClick={this.handleRetry}>Try again</Button>}
           />
+          <Button size="sm" onClick={this.handleRetry} style={{ marginTop: '1rem' }}>Try again</Button>
         </div>
       );
     }

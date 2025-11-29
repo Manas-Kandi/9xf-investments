@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { CmsContentType, CmsEditorialContext, CmsResolution } from '../cms/types';
 

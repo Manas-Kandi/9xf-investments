@@ -4,19 +4,16 @@ import { Suspense, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import Accordion from '@carbon/react/es/components/Accordion/Accordion.js';
-import AccordionItem from '@carbon/react/es/components/Accordion/AccordionItem.js';
 import Button from '@carbon/react/es/components/Button/Button.js';
 import Column from '@carbon/react/es/components/Grid/Column.js';
 import { Grid } from '@carbon/react/es/components/Grid/Grid.js';
 import ProgressBar from '@carbon/react/es/components/ProgressBar/ProgressBar.js';
 import Tag from '@carbon/react/es/components/Tag/Tag.js';
-import { Tile } from '@carbon/react/es/components/Tile/Tile.js';
 import { ArrowRight, Warning } from '@carbon/icons-react';
+import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { getCampaignBySlug } from '@/lib/mock-data';
-import { useCmsContent } from '@/lib/hooks/useCmsContent';
-import { buildCampaignFallbackContent, editorialGuidelines } from '@/lib/cms/fallback-content';
+import type { Campaign } from '@/types/database';
 
 interface CampaignPageProps {
   params: { slug: string };
@@ -24,9 +21,9 @@ interface CampaignPageProps {
 
 function CampaignSkeleton() {
   return (
-    <main style={{ marginTop: '48px' }}>
-      <section style={{ background: '#161616', color: 'white', padding: '4rem 0' }}>
-        <div className="container">
+    <main className="main-content">
+      <section className="hero-gradient" style={{ padding: '4rem 0' }}>
+        <div className="page-container">
           <Grid>
             <Column lg={10} md={6} sm={4}>
               <div className="skeleton-line" style={{ width: '240px', height: '18px', marginBottom: '1rem' }} />
@@ -39,20 +36,6 @@ function CampaignSkeleton() {
           </Grid>
         </div>
       </section>
-
-      <section className="section">
-        <div className="container">
-          <Grid>
-            <Column lg={10} md={5} sm={4}>
-              <div className="card-skeleton" style={{ height: '620px' }} />
-            </Column>
-            <Column lg={6} md={3} sm={4}>
-              <div className="card-skeleton" style={{ height: '280px', marginBottom: '1rem' }} />
-              <div className="card-skeleton" style={{ height: '260px' }} />
-            </Column>
-          </Grid>
-        </div>
-      </section>
     </main>
   );
 }
@@ -60,16 +43,14 @@ function CampaignSkeleton() {
 function CampaignContent({ campaign }: { campaign: Campaign }) {
   const progress = Math.round((campaign.amount_raised / campaign.target_amount) * 100);
   const isLive = campaign.status === 'live';
-  const story = useCmsContent('campaignStory', {
-    slug,
-    initialData: buildCampaignFallbackContent(campaign),
-    initialContext: editorialGuidelines,
-  });
 
   return (
-    <main style={{ marginTop: '48px' }}>
-      <section style={{ background: '#161616', color: 'white', padding: '4rem 0' }}>
-        <div className="container">
+    <main className="main-content">
+      {/* Hero Section */}
+      <section className="hero-gradient" style={{ padding: '4rem 0', position: 'relative', overflow: 'hidden' }}>
+        <div className="glow-orb glow-orb-1" />
+        <div className="glow-orb glow-orb-3" />
+        <div className="page-container" style={{ position: 'relative', zIndex: 1 }}>
           <Grid>
             <Column lg={10} md={6} sm={4}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1.5rem' }}>
@@ -77,13 +58,15 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
                   style={{
                     width: '80px',
                     height: '80px',
-                    background: '#393939',
-                    borderRadius: '12px',
+                    background: 'var(--9xf-gradient-primary)',
+                    borderRadius: '16px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '2rem',
                     fontWeight: 700,
+                    color: 'white',
+                    boxShadow: 'var(--9xf-glow-primary)',
                   }}
                 >
                   {campaign.company_name.charAt(0)}
@@ -92,16 +75,33 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
                   <Tag type={isLive ? 'green' : 'warm-gray'} style={{ marginBottom: '0.5rem' }}>
                     {isLive ? 'Raising now' : 'Coming soon'}
                   </Tag>
-                  <h1 style={{ fontSize: '2rem', fontWeight: 600, margin: 0 }}>
+                  <h1 style={{ 
+                    fontSize: '2.5rem', 
+                    fontWeight: 700, 
+                    margin: 0,
+                    color: 'var(--9xf-text-primary)',
+                    letterSpacing: '-0.02em',
+                  }}>
                     {campaign.company_name}
                   </h1>
                 </div>
               </div>
-              <p style={{ fontSize: '1.25rem', opacity: 0.9, marginBottom: '2rem' }}>
+              <p style={{ 
+                fontSize: '1.25rem', 
+                color: 'var(--9xf-text-secondary)', 
+                marginBottom: '2rem',
+                lineHeight: 1.6,
+              }}>
                 {campaign.tagline}
               </p>
               {campaign.cover_image_url && (
-                <div style={{ borderRadius: '12px', overflow: 'hidden', marginTop: '1rem', background: '#262626' }}>
+                <div style={{ 
+                  borderRadius: '20px', 
+                  overflow: 'hidden', 
+                  marginTop: '1rem', 
+                  background: 'var(--9xf-bg-elevated)',
+                  border: '1px solid var(--9xf-border)',
+                }}>
                   <Image
                     src={campaign.cover_image_url}
                     alt={`${campaign.company_name} campaign banner`}
@@ -115,21 +115,36 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
             </Column>
             <Column lg={6} md={2} sm={4}>
               {isLive && (
-                <Tile style={{ background: '#262626', padding: '1.5rem' }}>
+                <div className="glass-card" style={{ padding: '2rem' }}>
                   <ProgressBar
                     value={progress}
                     max={100}
                     label={`$${campaign.amount_raised.toLocaleString()} raised`}
                     helperText={`${progress}% of $${campaign.target_amount.toLocaleString()} goal`}
                   />
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: '1fr 1fr', 
+                    gap: '1.5rem', 
+                    marginTop: '2rem',
+                    paddingTop: '1.5rem',
+                    borderTop: '1px solid var(--9xf-border)',
+                  }}>
                     <div>
-                      <p style={{ fontSize: '0.75rem', opacity: 0.7 }}>Min investment</p>
-                      <p style={{ fontSize: '1.25rem', fontWeight: 600 }}>${campaign.min_investment}</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--9xf-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Min investment
+                      </p>
+                      <p style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--9xf-text-primary)' }}>
+                        ${campaign.min_investment}
+                      </p>
                     </div>
                     <div>
-                      <p style={{ fontSize: '0.75rem', opacity: 0.7 }}>Crowd allocation</p>
-                      <p style={{ fontSize: '1.25rem', fontWeight: 600 }}>{campaign.crowd_percentage}%</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--9xf-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Crowd allocation
+                      </p>
+                      <p style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--9xf-text-primary)' }}>
+                        {campaign.crowd_percentage}%
+                      </p>
                     </div>
                   </div>
                   <Button
@@ -138,35 +153,42 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
                     kind="primary"
                     size="lg"
                     renderIcon={ArrowRight}
-                    style={{ width: '100%', marginTop: '1.5rem' }}
+                    style={{ width: '100%', marginTop: '1.5rem', justifyContent: 'center' }}
                   >
                     Invest from ${campaign.min_investment}
                   </Button>
-                </Tile>
+                </div>
               )}
             </Column>
           </Grid>
         </div>
       </section>
 
-      <section className="section">
-        <div className="container">
+      {/* Main Content */}
+      <section className="section" style={{ background: 'var(--9xf-bg-secondary)' }}>
+        <div className="page-container">
           <Grid>
             <Column lg={10} md={5} sm={4}>
-              <Tile style={{ marginBottom: '2rem', padding: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>
+              {/* About */}
+              <div className="glass-card" style={{ marginBottom: '2rem', padding: '2rem' }}>
+                <h2 style={{ 
+                  fontSize: '1.5rem', 
+                  fontWeight: 700, 
+                  marginBottom: '1.5rem',
+                  color: 'var(--9xf-text-primary)',
+                }}>
                   About {campaign.company_name}
                 </h2>
-                <p style={{ lineHeight: 1.8, marginBottom: '1.5rem' }}>
+                <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: 'var(--9xf-text-secondary)' }}>
                   {campaign.description}
                 </p>
 
                 {campaign.problem && (
                   <>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--9xf-text-primary)' }}>
                       The problem
                     </h3>
-                    <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: '#525252' }}>
+                    <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: 'var(--9xf-text-secondary)' }}>
                       {campaign.problem}
                     </p>
                   </>
@@ -174,10 +196,10 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
 
                 {campaign.solution && (
                   <>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--9xf-text-primary)' }}>
                       Our solution
                     </h3>
-                    <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: '#525252' }}>
+                    <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: 'var(--9xf-text-secondary)' }}>
                       {campaign.solution}
                     </p>
                   </>
@@ -185,34 +207,24 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
 
                 {campaign.traction && (
                   <>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: 'var(--9xf-text-primary)' }}>
                       Traction
                     </h3>
-                    <p style={{ lineHeight: 1.8, color: '#525252' }}>
+                    <p style={{ lineHeight: 1.8, color: 'var(--9xf-text-secondary)' }}>
                       {campaign.traction}
                     </p>
                   </>
                 )}
+              </div>
 
-                {campaign.media_urls?.length ? (
-                  <div style={{ display: 'grid', gap: '1rem', marginTop: '2rem' }}>
-                    {campaign.media_urls.map((mediaUrl) => (
-                      <div key={mediaUrl} style={{ borderRadius: '12px', overflow: 'hidden', background: '#f4f4f4' }}>
-                        <Image
-                          src={mediaUrl}
-                          alt={`${campaign.company_name} media asset`}
-                          width={1200}
-                          height={720}
-                          style={{ width: '100%', height: 'auto' }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-              </Tile>
-
-              <Tile style={{ marginBottom: '2rem', padding: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>
+              {/* Founder */}
+              <div className="glass-card" style={{ marginBottom: '2rem', padding: '2rem' }}>
+                <h2 style={{ 
+                  fontSize: '1.5rem', 
+                  fontWeight: 700, 
+                  marginBottom: '1.5rem',
+                  color: 'var(--9xf-text-primary)',
+                }}>
                   Meet the founder
                 </h2>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
@@ -220,95 +232,52 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
                     style={{
                       width: '60px',
                       height: '60px',
-                      background: '#e0e0e0',
+                      background: 'var(--9xf-gradient-accent)',
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '1.5rem',
                       fontWeight: 600,
-                      color: '#525252',
+                      color: 'white',
                       flexShrink: 0,
                     }}
                   >
                     {campaign.founder_name.charAt(0)}
                   </div>
                   <div>
-                    <h3 style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{campaign.founder_name}</h3>
-                    <p style={{ color: '#525252', lineHeight: 1.6 }}>{campaign.founder_bio}</p>
+                    <h3 style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--9xf-text-primary)' }}>
+                      {campaign.founder_name}
+                    </h3>
+                    <p style={{ color: 'var(--9xf-text-secondary)', lineHeight: 1.6 }}>
+                      {campaign.founder_bio}
+                    </p>
                   </div>
                 </div>
-              </Tile>
+              </div>
+            </Column>
 
-        {/* Main Content */}
-        <section className="section">
-          <div className="container">
-            <Grid>
-              <Column lg={10} md={5} sm={4}>
-                {/* Story */}
-                <Tile style={{ marginBottom: '2rem', padding: '2rem' }}>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>
-                    About {campaign.company_name}
-                  </h2>
-                  {story.source === 'fallback' && (
-                    <div style={{ marginBottom: '1rem' }}>
-                      <Tag type="warm-gray">CMS fallback</Tag>
-                      {story.context.fallbackMessage && (
-                        <p style={{ color: '#525252', marginTop: '0.5rem' }}>{story.context.fallbackMessage}</p>
-                      )}
-                      <ul style={{ color: '#525252', lineHeight: 1.6, paddingLeft: '1.25rem', marginTop: '0.5rem' }}>
-                        {story.context.guidelines.map((rule) => (
-                          <li key={rule}>{rule}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  <p style={{ lineHeight: 1.8, marginBottom: '1.5rem' }}>
-                    {story.data.description}
-                  </p>
-
-                  {story.data.problem && (
-                    <>
-                      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
-                        The problem
-                      </h3>
-                      <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: '#525252' }}>
-                        {story.data.problem}
-                      </p>
-                    </>
-                  )}
-
-                  {story.data.solution && (
-                    <>
-                      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
-                        Our solution
-                      </h3>
-                      <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: '#525252' }}>
-                        {story.data.solution}
-                      </p>
-                    </>
-                  )}
-
-                  {story.data.traction && (
-                    <>
-                      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
-                        Traction
-                      </h3>
-                      <p style={{ lineHeight: 1.8, color: '#525252' }}>
-                        {story.data.traction}
-                      </p>
-                    </>
-                  )}
-                </Tile>
-
-              <Tile style={{ padding: '1.5rem', background: '#fff8e1', border: '1px solid #f1c21b' }}>
+            <Column lg={6} md={3} sm={4}>
+              {/* Risk Warning */}
+              <div className="border-gradient" style={{ padding: '1.5rem' }}>
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                  <Warning size={24} style={{ color: '#8a6d3b', flexShrink: 0 }} />
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    background: 'rgba(245, 158, 11, 0.15)',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <Warning size={20} style={{ color: 'var(--9xf-accent-amber)' }} />
+                  </div>
                   <div>
-                    <h3 style={{ fontWeight: 600, marginBottom: '0.5rem', color: '#8a6d3b' }}>
+                    <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', color: 'var(--9xf-text-primary)' }}>
                       Investment risks
                     </h3>
-                    <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#8a6d3b', lineHeight: 1.6 }}>
+                    <ul style={{ margin: 0, paddingLeft: '1.25rem', color: 'var(--9xf-text-secondary)', lineHeight: 1.8 }}>
                       <li>You could lose all of your money</li>
                       <li>This is a long-term, illiquid investment</li>
                       <li>This is not a deposit or savings account</li>
@@ -316,34 +285,27 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
                     </ul>
                     <Link
                       href="/risk-disclosure"
-                      style={{ color: '#8a6d3b', fontWeight: 600, display: 'inline-block', marginTop: '1rem' }}
+                      style={{ 
+                        color: 'var(--9xf-primary-light)', 
+                        fontWeight: 500, 
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        marginTop: '1rem' 
+                      }}
                     >
-                      {campaign.founder_name.charAt(0)}
-                    </div>
-                    <div>
-                      <h3 style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{campaign.founder_name}</h3>
-                      <p style={{ color: '#525252', lineHeight: 1.6 }}>{story.data.founderBio || campaign.founder_bio}</p>
-                    </div>
+                      Read full risk disclosure <ArrowRight size={16} />
+                    </Link>
                   </div>
                 </div>
-              </Tile>
-
-                {/* FAQ */}
-                <Tile style={{ padding: '2rem' }}>
-                  <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>
-                    Frequently asked questions
-                  </h2>
-                  <Accordion>
-                    {story.data.faqs?.map((faq) => (
-                      <AccordionItem key={faq.question} title={faq.question}>
-                        <p style={{ lineHeight: 1.6 }}>
-                          {faq.answer}
-                        </p>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </Tile>
-              </Column>
+              </div>
+            </Column>
+          </Grid>
+        </div>
+      </section>
+    </main>
+  );
+}
 
 function CampaignPageContent({ slug }: { slug: string }) {
   const campaign = use(getCampaignBySlug(slug));

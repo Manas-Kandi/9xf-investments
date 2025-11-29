@@ -1,16 +1,14 @@
 import { type NextRequest } from 'next/server';
-import { wrapMiddlewareWithSentry } from '@sentry/nextjs';
 import { updateSession } from '@/lib/supabase/middleware';
-import { logServerError } from '@/lib/monitoring/server';
 
-export const middleware = wrapMiddlewareWithSentry(async function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   try {
     return await updateSession(request);
   } catch (error) {
-    logServerError(error, request);
+    console.error('[Middleware Error]', error);
     throw error;
   }
-});
+}
 
 export const config = {
   matcher: [

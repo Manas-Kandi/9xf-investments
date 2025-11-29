@@ -4,8 +4,17 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   productionBrowserSourceMaps: true,
-  experimental: {
-    instrumentationHook: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      },
+    ],
   },
 };
 

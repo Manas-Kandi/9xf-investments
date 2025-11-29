@@ -6,16 +6,10 @@ const workspaceRoot = path.resolve(__dirname, '..');
 
 const config = getDefaultConfig(projectRoot);
 
-// Allow importing from the parent workspace (for @shared alias)
-config.watchFolders = [workspaceRoot];
+// Watch the shared lib folder for changes (not the entire parent workspace)
+config.watchFolders = [path.resolve(workspaceRoot, 'src/lib/shared')];
 
-// Ensure Metro can find node_modules in both locations
-config.resolver.nodeModulesPaths = [
-  path.resolve(projectRoot, 'node_modules'),
-  path.resolve(workspaceRoot, 'node_modules'),
-];
-
-// Allow resolving packages from parent workspace
+// Allow resolving @shared alias to parent workspace
 config.resolver.extraNodeModules = {
   '@shared': path.resolve(workspaceRoot, 'src/lib/shared'),
 };

@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { getCampaignBySlug } from '@/lib/mock-data';
+import { useCmsContent } from '@/lib/hooks/useCmsContent';
+import { buildCampaignFallbackContent, editorialGuidelines } from '@/lib/cms/fallback-content';
 
 interface CampaignPageProps {
   params: Promise<{ slug: string }>;
@@ -23,6 +25,11 @@ export default function CampaignPage({ params }: CampaignPageProps) {
 
   const progress = Math.round((campaign.amount_raised / campaign.target_amount) * 100);
   const isLive = campaign.status === 'live';
+  const story = useCmsContent('campaignStory', {
+    slug,
+    initialData: buildCampaignFallbackContent(campaign),
+    initialContext: editorialGuidelines,
+  });
 
   return (
     <>
@@ -108,39 +115,52 @@ export default function CampaignPage({ params }: CampaignPageProps) {
                   <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>
                     About {campaign.company_name}
                   </h2>
+                  {story.source === 'fallback' && (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <Tag type="warm-gray">CMS fallback</Tag>
+                      {story.context.fallbackMessage && (
+                        <p style={{ color: '#525252', marginTop: '0.5rem' }}>{story.context.fallbackMessage}</p>
+                      )}
+                      <ul style={{ color: '#525252', lineHeight: 1.6, paddingLeft: '1.25rem', marginTop: '0.5rem' }}>
+                        {story.context.guidelines.map((rule) => (
+                          <li key={rule}>{rule}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <p style={{ lineHeight: 1.8, marginBottom: '1.5rem' }}>
-                    {campaign.description}
+                    {story.data.description}
                   </p>
-                  
-                  {campaign.problem && (
+
+                  {story.data.problem && (
                     <>
                       <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
                         The problem
                       </h3>
                       <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: '#525252' }}>
-                        {campaign.problem}
+                        {story.data.problem}
                       </p>
                     </>
                   )}
 
-                  {campaign.solution && (
+                  {story.data.solution && (
                     <>
                       <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
                         Our solution
                       </h3>
                       <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: '#525252' }}>
-                        {campaign.solution}
+                        {story.data.solution}
                       </p>
                     </>
                   )}
 
-                  {campaign.traction && (
+                  {story.data.traction && (
                     <>
                       <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
                         Traction
                       </h3>
                       <p style={{ lineHeight: 1.8, color: '#525252' }}>
-                        {campaign.traction}
+                        {story.data.traction}
                       </p>
                     </>
                   )}
@@ -171,7 +191,7 @@ export default function CampaignPage({ params }: CampaignPageProps) {
                     </div>
                     <div>
                       <h3 style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{campaign.founder_name}</h3>
-                      <p style={{ color: '#525252', lineHeight: 1.6 }}>{campaign.founder_bio}</p>
+                      <p style={{ color: '#525252', lineHeight: 1.6 }}>{story.data.founderBio || campaign.founder_bio}</p>
                     </div>
                   </div>
                 </Tile>
@@ -182,30 +202,13 @@ export default function CampaignPage({ params }: CampaignPageProps) {
                     Frequently asked questions
                   </h2>
                   <Accordion>
-                    <AccordionItem title="What exactly am I buying?">
-                      <p style={{ lineHeight: 1.6 }}>
-                        You are investing in a pooled investment vehicle (like an SPV) that holds shares in {campaign.company_name}. 
-                        This means you own a piece of the vehicle, which in turn owns equity in the company.
-                      </p>
-                    </AccordionItem>
-                    <AccordionItem title="How do I earn returns?">
-                      <p style={{ lineHeight: 1.6 }}>
-                        If {campaign.company_name} is acquired or goes public, the proceeds are distributed to investors 
-                        proportionally. There are no dividends or regular payouts—this is a long-term investment.
-                      </p>
-                    </AccordionItem>
-                    <AccordionItem title="What if the company fails?">
-                      <p style={{ lineHeight: 1.6 }}>
-                        If the company fails, you could lose your entire investment. Startup investing is high-risk. 
-                        Only invest money you can afford to lose.
-                      </p>
-                    </AccordionItem>
-                    <AccordionItem title="When can I get my money back?">
-                      <p style={{ lineHeight: 1.6 }}>
-                        This is an illiquid investment. You typically cannot sell your shares until there is an exit event 
-                        (acquisition or IPO), which could take 5-10+ years or may never happen.
-                      </p>
-                    </AccordionItem>
+                    {story.data.faqs?.map((faq) => (
+                      <AccordionItem key={faq.question} title={faq.question}>
+                        <p style={{ lineHeight: 1.6 }}>
+                          {faq.answer}
+                        </p>
+                      </AccordionItem>
+                    ))}
                   </Accordion>
                 </Tile>
               </Column>

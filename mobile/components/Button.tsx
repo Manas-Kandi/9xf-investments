@@ -7,10 +7,12 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { colors, shape, typography, components } from '../constants/theme';
+import { colors } from '../constants/theme';
+import { useComponentTokens } from '../design-system';
 
-// Material Design 3 Button variants
-type ButtonVariant = 'filled' | 'outlined' | 'text' | 'elevated' | 'tonal';
+// Material Design 3 Button variants with legacy aliases
+type ButtonVariant = 'filled' | 'outlined' | 'text' | 'elevated' | 'tonal' | 'ghost' | 'primary' | 'secondary';
+type ButtonSize = 'md' | 'lg';
 
 interface ButtonProps {
   title: string;
@@ -23,6 +25,7 @@ interface ButtonProps {
   iconPosition?: 'left' | 'right';
   style?: ViewStyle;
   textStyle?: TextStyle;
+  size?: ButtonSize;
 }
 
 export function Button({
@@ -36,43 +39,66 @@ export function Button({
   iconPosition = 'left',
   style,
   textStyle,
+  size = 'lg',
 }: ButtonProps) {
+  const buttonSpec = useComponentTokens('button');
   const isDisabled = disabled || loading;
+
+  const resolvedVariant: ButtonVariant = (() => {
+    if (variant === 'primary') return 'filled';
+    if (variant === 'secondary') return 'tonal';
+    return variant;
+  })();
 
   const getBackgroundColor = () => {
     if (isDisabled) {
-      return variant === 'filled' || variant === 'elevated' || variant === 'tonal'
+      return resolvedVariant === 'filled' || resolvedVariant === 'elevated' || resolvedVariant === 'tonal'
         ? colors.textMuted
         : colors.transparent;
     }
-    switch (variant) {
-      case 'filled': return colors.primary;
+    switch (resolvedVariant) {
+      case 'filled': return buttonSpec.variants.filled.container;
       case 'elevated': return colors.surfaceElevated;
-      case 'tonal': return colors.surfaceCard;
-      case 'outlined': return colors.transparent;
-      case 'text': return colors.transparent;
-      default: return colors.primary;
+      case 'tonal': return buttonSpec.variants.tonal.container;
+      case 'outlined': return buttonSpec.variants.outlined.container;
+      case 'text': return buttonSpec.variants.text.container;
+      case 'ghost': return buttonSpec.variants.ghost.container;
+      default: return buttonSpec.variants.filled.container;
     }
   };
 
   const getTextColor = () => {
     if (isDisabled) return colors.textTertiary;
-    switch (variant) {
-      case 'filled': return colors.black;
+    switch (resolvedVariant) {
+      case 'filled': return buttonSpec.variants.filled.content;
       case 'elevated': return colors.textPrimary;
-      case 'tonal': return colors.textPrimary;
-      case 'outlined': return colors.textPrimary;
-      case 'text': return colors.accent;
-      default: return colors.black;
+      case 'tonal': return buttonSpec.variants.tonal.content;
+      case 'outlined': return buttonSpec.variants.outlined.content;
+      case 'ghost': return buttonSpec.variants.ghost.content;
+      case 'text': return buttonSpec.variants.text.content;
+      default: return buttonSpec.variants.filled.content;
     }
+  };
+
+  const getBorderColor = () => {
+    if (resolvedVariant === 'outlined' || resolvedVariant === 'ghost') {
+      return buttonSpec.variants[resolvedVariant].border || colors.border;
+    }
+    return undefined;
   };
 
   return (
     <TouchableOpacity
       style={[
         styles.base,
-        { backgroundColor: getBackgroundColor() },
-        variant === 'outlined' && styles.outlined,
+        {
+          backgroundColor: getBackgroundColor(),
+          height: buttonSpec.height[size],
+          paddingHorizontal: buttonSpec.paddingX,
+          borderRadius: buttonSpec.radius,
+          borderColor: getBorderColor(),
+          borderWidth: getBorderColor() ? 1 : 0,
+        },
         fullWidth && styles.fullWidth,
         style,
       ]}
@@ -85,7 +111,14 @@ export function Button({
       ) : (
         <>
           {icon && iconPosition === 'left' && icon}
-          <Text style={[styles.label, { color: getTextColor() }, textStyle]}>
+          <Text
+            style={[
+              styles.label,
+              buttonSpec.text,
+              { color: getTextColor() },
+              textStyle,
+            ]}
+          >
             {title}
           </Text>
           {icon && iconPosition === 'right' && icon}
@@ -97,23 +130,15 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    height: components.button.height,
-    paddingHorizontal: components.button.paddingHorizontal,
-    borderRadius: components.button.borderRadius,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
   },
-  outlined: {
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
   fullWidth: {
     width: '100%',
   },
   label: {
-    ...typography.labelLarge,
     fontWeight: '600',
   },
 });

@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
+import { colors, spacing, fontSize } from '../constants/theme';
+import { useComponentTokens } from '../design-system';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -30,6 +31,7 @@ export function Input({
   style,
   ...props
 }: InputProps) {
+  const inputSpec = useComponentTokens('input');
   const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -43,8 +45,16 @@ export function Input({
       <View
         style={[
           styles.inputContainer,
-          isFocused && styles.inputFocused,
-          error && styles.inputError,
+          {
+            backgroundColor: inputSpec.background,
+            borderRadius: inputSpec.radius,
+            minHeight: inputSpec.height,
+            borderColor: error
+              ? inputSpec.errorBorder
+              : isFocused
+              ? inputSpec.focusBorder
+              : inputSpec.border,
+          },
         ]}
       >
         {leftIcon && (
@@ -107,17 +117,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    borderRadius: borderRadius.sm,
-    minHeight: 48,
-  },
-  inputFocused: {
-    borderColor: colors.primary,
-  },
-  inputError: {
-    borderColor: colors.error,
   },
   input: {
     flex: 1,

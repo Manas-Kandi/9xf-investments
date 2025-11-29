@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, fontSize, borderRadius, shadows } from '../constants/theme';
+import { useComponentTokens } from '../design-system';
 import type { Campaign } from '../types';
 
 interface DealCardProps {
@@ -11,12 +12,23 @@ interface DealCardProps {
 }
 
 export function DealCard({ campaign, onPress, featured = false }: DealCardProps) {
+  const cardSpec = useComponentTokens('card');
   const progress = (campaign.amount_raised / campaign.target_amount) * 100;
   const isLive = campaign.status === 'live';
 
   return (
     <TouchableOpacity
-      style={[styles.container, featured && styles.featured, shadows.md]}
+      style={[
+        styles.container,
+        {
+          borderRadius: cardSpec.radius,
+          padding: cardSpec.padding,
+          backgroundColor: featured ? cardSpec.elevatedBackground : cardSpec.background,
+          borderColor: featured ? colors.primary : cardSpec.border,
+        },
+        featured && styles.featured,
+        shadows.md,
+      ]}
       onPress={onPress}
       activeOpacity={0.8}
     >
@@ -100,14 +112,10 @@ export function DealCard({ campaign, onPress, featured = false }: DealCardProps)
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
     marginBottom: spacing.md,
   },
   featured: {
     borderWidth: 1,
-    borderColor: colors.primary,
   },
   header: {
     flexDirection: 'row',

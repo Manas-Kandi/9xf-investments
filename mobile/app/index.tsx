@@ -13,6 +13,7 @@ import { useRouter, useRootNavigationState } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { space, radius } from '../constants/design-system';
+import { colors } from '../constants/theme';
 import { useAppStore } from '../store';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -423,7 +424,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: colors.background,
   },
 
   // Galaxy Background
@@ -469,7 +470,7 @@ const styles = StyleSheet.create({
   // Floating particles
   floatingParticle: {
     position: 'absolute',
-    backgroundColor: 'rgba(147, 51, 234, 0.6)',
+    backgroundColor: colors.primary + '66',
     borderRadius: 50,
   },
   particle1: { width: 3, height: 3, left: '15%' },
@@ -565,7 +566,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     height: 54,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.primary,
     borderRadius: 27,
     alignItems: 'center',
     justifyContent: 'center',
@@ -573,7 +574,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#000000',
+    color: colors.onPrimary,
     letterSpacing: 0.3,
   },
   ghostButton: {
@@ -584,6 +585,6 @@ const styles = StyleSheet.create({
   ghostButtonText: {
     fontSize: 15,
     fontWeight: '400',
-    color: 'rgba(255,255,255,0.6)',
+    color: colors.textSecondary,
   },
 });

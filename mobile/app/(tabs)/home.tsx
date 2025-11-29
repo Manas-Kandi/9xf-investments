@@ -54,18 +54,32 @@ export default function HomeScreen() {
           </View>
         </FadeIn>
 
-        {/* Hero stat card */}
+        {/* Investment Performance Chart */}
         <SlideUp delay={100}>
-          <View style={styles.heroCard}>
-            <Text style={styles.heroValue}>
-              {campaigns.length}
-              <Text style={styles.heroUnit}> deals</Text>
-            </Text>
-            <View style={styles.heroMeta}>
-              <View style={styles.heroTag}>
-                <MaterialCommunityIcons name="arrow-up" size={14} color={color.accent} />
-                <Text style={styles.heroTagText}>Live now</Text>
-              </View>
+          <View style={{ backgroundColor: color.bgCard, borderRadius: 20, padding: space.large, marginBottom: space.large }}>
+            <Text style={{ color: color.textSecondary, fontSize: 12, marginBottom: 4 }}>Total Value</Text>
+            <Text style={{ color: color.textPrimary, fontSize: 32, fontWeight: '700', marginBottom: 8 }}>$16,750</Text>
+            <Text style={{ color: color.success, fontSize: 16, fontWeight: '600' }}>+67.50% from $10,000 invested</Text>
+            
+            {/* Simple bar chart */}
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', height: 120, marginTop: 24, paddingHorizontal: 8 }}>
+              {[10000, 10500, 11200, 10800, 11500, 12300, 12800, 13200, 14100, 13800, 15200, 16750].map((value, index) => {
+                const maxVal = 16750;
+                const minVal = 10000;
+                const height = ((value - minVal) / (maxVal - minVal)) * 100 + 10;
+                return (
+                  <View key={index} style={{ flex: 1, alignItems: 'center' }}>
+                    <View style={{ width: '60%', height, backgroundColor: color.success, borderRadius: 4, opacity: 0.8 }} />
+                  </View>
+                );
+              })}
+            </View>
+            
+            {/* Labels */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8, paddingHorizontal: 4 }}>
+              {['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'].map((label, index) => (
+                <Text key={index} style={{ color: color.textTertiary, fontSize: 10, flex: 1, textAlign: 'center' }}>{label}</Text>
+              ))}
             </View>
           </View>
         </SlideUp>
@@ -183,36 +197,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.round,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-
-  // Hero stat card
-  heroCard: {
-    backgroundColor: color.bgCard,
-    borderRadius: radius.xl,
-    padding: space.large,
-    marginBottom: space.large,
-  },
-  heroValue: {
-    ...type.displayLarge,
-    color: color.textPrimary,
-  },
-  heroUnit: {
-    ...type.headlineSmall,
-    fontWeight: '400',
-    color: color.textSecondary,
-  },
-  heroMeta: {
-    flexDirection: 'row',
-    marginTop: space.small,
-  },
-  heroTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.micro,
-  },
-  heroTagText: {
-    ...type.bodySmall,
-    color: color.accent,
   },
 
   // Section

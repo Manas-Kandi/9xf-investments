@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "9xflabs",
+    "scheme": "nxflabs",
     "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
@@ -15,7 +15,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.9xflabs.app",
+      "bundleIdentifier": "com.nxflabs.app",
       "associatedDomains": ["applinks:9xflabs.com"]
     },
     "android": {
@@ -27,9 +27,10 @@
       "intentFilters": [
         {
           "action": "VIEW",
+          "autoVerify": true,
           "data": [
             { "scheme": "https", "host": "9xflabs.com", "pathPrefix": "/invest" },
-            { "scheme": "9xflabs", "host": "*" }
+            { "scheme": "nxflabs", "host": "*" }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
         }

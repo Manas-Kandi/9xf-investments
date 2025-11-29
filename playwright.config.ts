@@ -1,17 +1,17 @@
-import { defineConfig } from '@playwright/test';
-
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  timeout: 60_000,
-  testDir: './e2e',
-  fullyParallel: true,
-  reporter: 'list',
+  testDir: 'tests/e2e',
+  reporter: [
+    ['github'],
+    ['html', { outputFolder: 'playwright-report' }],
+    ['junit', { outputFile: 'reports/playwright/results.xml' }],
+  ],
   use: {
-    baseURL,
-    headless: true,
-    viewport: { width: 1280, height: 720 },
-    trace: 'retain-on-failure',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    trace: 'on-first-retry',
   },
-  workers: process.env.CI ? 2 : undefined,
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
 });

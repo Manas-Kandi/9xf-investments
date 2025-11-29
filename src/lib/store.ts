@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { User, FundingSource, Campaign, InvestmentIntent } from '@/types/database';
+import type { User, FundingSource, InvestmentIntent } from '@/types/database';
 
 // Onboarding step tracking
 export type OnboardingStep = 'account' | 'kyc' | 'funding' | 'terms' | 'complete';
@@ -9,6 +9,7 @@ interface AppState {
   // Auth state
   user: User | null;
   isAuthenticated: boolean;
+  analyticsConsent: 'granted' | 'denied' | null;
   
   // Onboarding
   onboardingStep: OnboardingStep;
@@ -22,6 +23,7 @@ interface AppState {
   
   // Actions
   setUser: (user: User | null) => void;
+  setAnalyticsConsent: (consent: 'granted' | 'denied') => void;
   setOnboardingStep: (step: OnboardingStep) => void;
   setFundingSource: (source: FundingSource | null) => void;
   addInvestment: (investment: InvestmentIntent) => void;
@@ -35,6 +37,7 @@ export const useAppStore = create<AppState>()(
       // Initial state
       user: null,
       isAuthenticated: false,
+      analyticsConsent: null,
       onboardingStep: 'account',
       isOnboarded: false,
       fundingSource: null,
@@ -46,6 +49,11 @@ export const useAppStore = create<AppState>()(
           user,
           isAuthenticated: !!user,
           isOnboarded: user?.kyc_status === 'verified' && user?.terms_accepted,
+        }),
+
+      setAnalyticsConsent: (consent) =>
+        set({
+          analyticsConsent: consent,
         }),
 
       setOnboardingStep: (step) =>
@@ -82,6 +90,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        analyticsConsent: state.analyticsConsent,
         onboardingStep: state.onboardingStep,
         isOnboarded: state.isOnboarded,
         fundingSource: state.fundingSource,

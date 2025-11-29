@@ -1,14 +1,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { 
-  User, 
-  FundingSource, 
-  InvestmentIntent, 
+import type {
+  User,
+  FundingSource,
+  InvestmentIntent,
   OnboardingStep,
   VCApplication,
-  VCDeal 
-} from '../types';
+  VCDeal,
+} from '@shared/types';
 
 interface AppState {
   // Auth state

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Theme } from "@carbon/react";
 import "./globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "9xf labs | Invest in startups you believe in",
@@ -16,7 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Theme theme="g100">
-          {children}
+          <Providers>{children}</Providers>
         </Theme>
       </body>
     </html>

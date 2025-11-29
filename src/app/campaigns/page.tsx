@@ -1,14 +1,13 @@
-'use client';
-
 import { Grid, Column, Tag } from '@carbon/react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { CampaignCard } from '@/components/CampaignCard';
-import { mockCampaigns } from '@/lib/mock-data';
+import { fetchCampaigns } from '@/lib/supabase/queries';
 
-export default function CampaignsPage() {
-  const liveCampaigns = mockCampaigns.filter((c) => c.status === 'live');
-  const upcomingCampaigns = mockCampaigns.filter((c) => c.status === 'draft');
+export default async function CampaignsPage() {
+  const campaigns = await fetchCampaigns();
+  const liveCampaigns = campaigns.filter((c) => c.status === 'live');
+  const upcomingCampaigns = campaigns.filter((c) => c.status === 'draft');
 
   return (
     <>

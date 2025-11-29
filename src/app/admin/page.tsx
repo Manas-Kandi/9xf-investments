@@ -28,44 +28,17 @@ import {
 } from '@carbon/react';
 import { Add, Edit, View } from '@carbon/icons-react';
 import { Header } from '@/components/Header';
-import { mockCampaigns } from '@/lib/mock-data';
-import type { Campaign, FounderApplication } from '@/types/database';
-
-// Mock founder applications
-const mockApplications: FounderApplication[] = [
-  {
-    id: '1',
-    company_name: 'TechStartup Inc',
-    website: 'https://techstartup.com',
-    contact_name: 'John Doe',
-    contact_email: 'john@techstartup.com',
-    stage: 'seed',
-    description: 'AI-powered productivity tools for remote teams',
-    desired_crowd_raise: 100000,
-    status: 'new',
-    created_at: '2024-02-20T00:00:00Z',
-    updated_at: '2024-02-20T00:00:00Z',
-  },
-  {
-    id: '2',
-    company_name: 'GreenEnergy Co',
-    website: 'https://greenenergy.co',
-    contact_name: 'Jane Smith',
-    contact_email: 'jane@greenenergy.co',
-    stage: 'pre-seed',
-    description: 'Sustainable energy solutions for small businesses',
-    desired_crowd_raise: 75000,
-    status: 'in_review',
-    created_at: '2024-02-18T00:00:00Z',
-    updated_at: '2024-02-19T00:00:00Z',
-  },
-];
+import { useApplicationStatusMutation, useCampaigns, useFounderApplications, useUpsertCampaign } from '@/lib/supabase/hooks';
+import type { CampaignModel, FounderApplicationModel } from '@/types/models';
 
 export default function AdminPage() {
-  const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
-  const [applications, setApplications] = useState<FounderApplication[]>(mockApplications);
+  const { data: campaigns = [], isLoading: campaignsLoading } = useCampaigns();
+  const { data: applications = [], isLoading: applicationsLoading } = useFounderApplications();
+  const upsertCampaignMutation = useUpsertCampaign();
+  const updateApplicationStatus = useApplicationStatusMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
+  const [editingCampaign, setEditingCampaign] = useState<CampaignModel | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Campaign form state
   const [formData, setFormData] = useState({
@@ -77,10 +50,10 @@ export default function AdminPage() {
     max_investment_per_person: 1000,
     target_amount: 100000,
     crowd_percentage: 5,
-    status: 'draft' as Campaign['status'],
+    status: 'draft' as CampaignModel['status'],
   });
 
-  const handleEditCampaign = (campaign: Campaign) => {
+  const handleEditCampaign = (campaign: CampaignModel) => {
     setEditingCampaign(campaign);
     setFormData({
       company_name: campaign.company_name,
@@ -97,35 +70,38 @@ export default function AdminPage() {
   };
 
   const handleSaveCampaign = () => {
-    if (editingCampaign) {
-      setCampaigns(campaigns.map(c => 
-        c.id === editingCampaign.id 
-          ? { ...c, ...formData, updated_at: new Date().toISOString() }
-          : c
-      ));
-    } else {
-      const newCampaign: Campaign = {
-        id: Date.now().toString(),
-        ...formData,
-        logo_url: undefined,
-        cover_image_url: undefined,
-        media_urls: [],
-        founder_bio: '',
-        amount_raised: 0,
-        slug: formData.company_name.toLowerCase().replace(/\s+/g, '-'),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      setCampaigns([...campaigns, newCampaign]);
-    }
-    setIsModalOpen(false);
-    setEditingCampaign(null);
+    setErrorMessage(null);
+    const baseSlug = formData.company_name.toLowerCase().replace(/\s+/g, '-');
+    const payload: CampaignModel = {
+      id: editingCampaign?.id ?? crypto.randomUUID(),
+      ...formData,
+      slug: editingCampaign?.slug ?? baseSlug,
+      amount_raised: editingCampaign?.amount_raised ?? 0,
+      media_urls: editingCampaign?.media_urls ?? [],
+      logo_url: editingCampaign?.logo_url,
+      cover_image_url: editingCampaign?.cover_image_url,
+      founder_bio: editingCampaign?.founder_bio,
+      partner_campaign_id: editingCampaign?.partner_campaign_id,
+      partner_type: editingCampaign?.partner_type,
+      partner_url: editingCampaign?.partner_url,
+      created_at: editingCampaign?.created_at ?? new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    upsertCampaignMutation.mutate(payload, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+        setEditingCampaign(null);
+      },
+      onError: (error) => setErrorMessage(error.message),
+    });
   };
 
-  const handleUpdateApplicationStatus = (id: string, status: FounderApplication['status']) => {
-    setApplications(applications.map(app =>
-      app.id === id ? { ...app, status, updated_at: new Date().toISOString() } : app
-    ));
+  const handleUpdateApplicationStatus = (id: string, status: FounderApplicationModel['status']) => {
+    setErrorMessage(null);
+    updateApplicationStatus.mutate({ id, payload: { status } }, {
+      onError: (error) => setErrorMessage(error.message),
+    });
   };
 
   const campaignHeaders = [
@@ -164,6 +140,12 @@ export default function AdminPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h1 style={{ fontSize: '2rem', fontWeight: 300 }}>Admin Console</h1>
           </div>
+
+          {errorMessage && (
+            <Tile style={{ marginBottom: '1rem', border: '1px solid #f1c21b', background: '#fff8e1' }}>
+              <p style={{ margin: 0, color: '#8a6d3b' }}>{errorMessage}</p>
+            </Tile>
+          )}
 
           <Tabs>
             <TabList aria-label="Admin tabs">
@@ -328,14 +310,16 @@ export default function AdminPage() {
                   <Column lg={4} md={4} sm={4}>
                     <Tile style={{ textAlign: 'center', padding: '2rem' }}>
                       <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Total Campaigns</p>
-                      <p style={{ fontSize: '3rem', fontWeight: 600 }}>{campaigns.length}</p>
+                      <p style={{ fontSize: '3rem', fontWeight: 600 }}>
+                        {campaignsLoading ? '—' : campaigns.length}
+                      </p>
                     </Tile>
                   </Column>
                   <Column lg={4} md={4} sm={4}>
                     <Tile style={{ textAlign: 'center', padding: '2rem' }}>
                       <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Live Campaigns</p>
                       <p style={{ fontSize: '3rem', fontWeight: 600 }}>
-                        {campaigns.filter(c => c.status === 'live').length}
+                        {campaignsLoading ? '—' : campaigns.filter(c => c.status === 'live').length}
                       </p>
                     </Tile>
                   </Column>
@@ -343,7 +327,9 @@ export default function AdminPage() {
                     <Tile style={{ textAlign: 'center', padding: '2rem' }}>
                       <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Total Raised</p>
                       <p style={{ fontSize: '3rem', fontWeight: 600 }}>
-                        ${campaigns.reduce((sum, c) => sum + c.amount_raised, 0).toLocaleString()}
+                        ${campaignsLoading
+                          ? '0'
+                          : campaigns.reduce((sum, c) => sum + c.amount_raised, 0).toLocaleString()}
                       </p>
                     </Tile>
                   </Column>
@@ -351,7 +337,7 @@ export default function AdminPage() {
                     <Tile style={{ textAlign: 'center', padding: '2rem' }}>
                       <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Pending Applications</p>
                       <p style={{ fontSize: '3rem', fontWeight: 600 }}>
-                        {applications.filter(a => a.status === 'new' || a.status === 'in_review').length}
+                        {applicationsLoading ? '—' : applications.filter(a => a.status === 'new' || a.status === 'in_review').length}
                       </p>
                     </Tile>
                   </Column>
@@ -423,7 +409,7 @@ export default function AdminPage() {
               id="status"
               labelText="Status"
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as Campaign['status'] })}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as CampaignModel['status'] })}
             >
               <SelectItem value="draft" text="Draft" />
               <SelectItem value="live" text="Live" />

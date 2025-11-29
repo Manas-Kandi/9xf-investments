@@ -1,25 +1,12 @@
-'use client';
-
-import { use } from 'react';
-import { notFound } from 'next/navigation';
 import { Grid, Column, Button, Tile, Tag, ProgressBar, Accordion, AccordionItem } from '@carbon/react';
 import { ArrowRight, Warning } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { getCampaignBySlug } from '@/lib/mock-data';
+import { fetchCampaignBySlug } from '@/lib/supabase/queries';
 
-interface CampaignPageProps {
-  params: Promise<{ slug: string }>;
-}
-
-export default function CampaignPage({ params }: CampaignPageProps) {
-  const { slug } = use(params);
-  const campaign = getCampaignBySlug(slug);
-
-  if (!campaign) {
-    notFound();
-  }
+export default async function CampaignPage({ params }: { params: { slug: string } }) {
+  const campaign = await fetchCampaignBySlug(params.slug);
 
   const progress = Math.round((campaign.amount_raised / campaign.target_amount) * 100);
   const isLive = campaign.status === 'live';

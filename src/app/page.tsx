@@ -1,16 +1,14 @@
-'use client';
-
-import { Grid, Column, Button, Tile, ClickableTile, Tag } from '@carbon/react';
+import { Grid, Column, Button, Tile, Tag } from '@carbon/react';
 import { ArrowRight, Wallet, Security, Time } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { CampaignCard } from '@/components/CampaignCard';
-import { getLiveCampaigns, getFeaturedCampaign } from '@/lib/mock-data';
+import { fetchCampaigns } from '@/lib/supabase/queries';
 
-export default function Home() {
-  const featuredCampaign = getFeaturedCampaign();
-  const liveCampaigns = getLiveCampaigns();
+export default async function Home() {
+  const liveCampaigns = await fetchCampaigns();
+  const featuredCampaign = liveCampaigns.find((campaign) => campaign.status === 'live');
 
   return (
     <>

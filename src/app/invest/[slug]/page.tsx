@@ -1,29 +1,31 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Grid, Column, Tile, Button, InlineLoading, Checkbox, NumberInput } from '@carbon/react';
 import { ArrowRight, ArrowLeft, Checkmark, Warning } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { useAppStore } from '@/lib/store';
-import { getCampaignBySlug } from '@/lib/mock-data';
+import { useCampaign, useInvestmentMutation } from '@/lib/supabase/hooks';
 
 interface InvestPageProps {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }
 
 type InvestStep = 'amount' | 'confirm' | 'processing' | 'success' | 'error';
 
 export default function InvestPage({ params }: InvestPageProps) {
-  const { slug } = use(params);
+  const { slug } = params;
   const router = useRouter();
   const { user, isOnboarded, fundingSource, addInvestment } = useAppStore();
   const [step, setStep] = useState<InvestStep>('amount');
   const [amount, setAmount] = useState<number>(0);
   const [confirmed, setConfirmed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const campaign = getCampaignBySlug(slug);
+  const { data: campaign, isLoading, isError } = useCampaign(slug);
+  const investmentMutation = useInvestmentMutation(user);
 
   useEffect(() => {
     if (!user) {
@@ -35,7 +37,18 @@ export default function InvestPage({ params }: InvestPageProps) {
     }
   }, [user, isOnboarded, router, slug]);
 
-  if (!campaign) {
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <InlineLoading description="Loading campaign..." />
+        </main>
+      </>
+    );
+  }
+
+  if (!campaign || isError) {
     return (
       <>
         <Header />
@@ -67,23 +80,25 @@ export default function InvestPage({ params }: InvestPageProps) {
     if (!confirmed) return;
 
     setStep('processing');
+    setErrorMessage(null);
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const result = await investmentMutation.mutateAsync({
+        amount,
+        campaign_id: campaign.id,
+        user_id: user?.id || '1',
+        status: 'initiated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
 
-    // Create investment record
-    addInvestment({
-      id: Date.now().toString(),
-      user_id: user?.id || '1',
-      campaign_id: campaign.id,
-      amount,
-      status: 'confirmed',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      campaign,
-    });
-
-    setStep('success');
+      addInvestment({ ...result, campaign });
+      setStep('success');
+    } catch (error) {
+      console.error(error);
+      setErrorMessage('We could not confirm your investment. Please try again.');
+      setStep('error');
+    }
   };
 
   if (!user || !isOnboarded) return null;
@@ -221,10 +236,10 @@ export default function InvestPage({ params }: InvestPageProps) {
                     kind="primary"
                     size="lg"
                     onClick={handleConfirmInvestment}
-                    disabled={!confirmed}
+                    disabled={!confirmed || investmentMutation.isPending}
                     style={{ width: '100%' }}
                   >
-                    Confirm investment
+                    {investmentMutation.isPending ? 'Processing…' : 'Confirm investment'}
                   </Button>
                 </Tile>
               )}
@@ -239,6 +254,32 @@ export default function InvestPage({ params }: InvestPageProps) {
                   <p style={{ color: '#525252', marginTop: '1rem' }}>
                     Please wait while we process your investment.
                   </p>
+                </Tile>
+              )}
+
+              {step === 'error' && (
+                <Tile style={{ padding: '3rem 2.5rem', textAlign: 'center' }}>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    background: '#fff8e1',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 1.5rem',
+                  }}>
+                    <Warning size={40} style={{ color: '#8a6d3b' }} />
+                  </div>
+                  <h1 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    Something went wrong
+                  </h1>
+                  <p style={{ color: '#525252', marginBottom: '1.5rem' }}>
+                    {errorMessage ?? 'Please try again in a few moments.'}
+                  </p>
+                  <Button kind="primary" size="lg" onClick={() => setStep('confirm')} style={{ width: '100%' }}>
+                    Back to confirmation
+                  </Button>
                 </Tile>
               )}
 

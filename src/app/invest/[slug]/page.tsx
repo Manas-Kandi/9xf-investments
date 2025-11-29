@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { useAppStore } from '@/lib/store';
 import { getCampaignBySlug } from '@/lib/mock-data';
+import styles from './page.module.scss';
 
 interface InvestPageProps {
   params: Promise<{ slug: string }>;
@@ -22,6 +23,9 @@ export default function InvestPage({ params }: InvestPageProps) {
   const [step, setStep] = useState<InvestStep>('amount');
   const [amount, setAmount] = useState<number>(0);
   const [confirmed, setConfirmed] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [statusTone, setStatusTone] = useState<'info' | 'success' | 'error'>('info');
+  const [amountError, setAmountError] = useState('');
 
   const campaign = getCampaignBySlug(slug);
 
@@ -39,10 +43,10 @@ export default function InvestPage({ params }: InvestPageProps) {
     return (
       <>
         <Header />
-        <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Tile style={{ padding: '2rem', textAlign: 'center' }}>
+        <main className={`${styles.pageMain} ${styles.notFoundMain}`} id="main-content">
+          <Tile className={`${styles.contentTile} ${styles.centeredTile}`}>
             <h1>Campaign not found</h1>
-            <Button as={Link} href="/campaigns" kind="primary" style={{ marginTop: '1rem' }}>
+            <Button as={Link} href="/campaigns" kind="primary">
               Browse campaigns
             </Button>
           </Tile>
@@ -55,25 +59,43 @@ export default function InvestPage({ params }: InvestPageProps) {
 
   const handleAmountSelect = (value: number) => {
     setAmount(value);
+    setAmountError('');
+    setStatusMessage('');
   };
 
   const handleContinue = () => {
-    if (amount >= campaign.min_investment && amount <= campaign.max_investment_per_person) {
-      setStep('confirm');
+    if (amount < campaign.min_investment || amount > campaign.max_investment_per_person) {
+      setAmountError(
+        `Please enter an amount between $${campaign.min_investment} and $${campaign.max_investment_per_person.toLocaleString()}`
+      );
+      setStatusTone('error');
+      setStatusMessage('Investment amount is outside the allowed range.');
+      return;
     }
+
+    setAmountError('');
+    setStatusTone('info');
+    setStatusMessage('Review your investment details.');
+    setStep('confirm');
   };
 
   const handleConfirmInvestment = async () => {
-    if (!confirmed) return;
+    if (!confirmed) {
+      setStatusTone('error');
+      setStatusMessage('Please confirm you understand the risks before investing.');
+      return;
+    }
 
     setStep('processing');
+    setStatusTone('info');
+    setStatusMessage('Processing your investment...');
 
     // Simulate payment processing
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Create investment record
     addInvestment({
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       user_id: user?.id || '1',
       campaign_id: campaign.id,
       amount,
@@ -84,6 +106,8 @@ export default function InvestPage({ params }: InvestPageProps) {
     });
 
     setStep('success');
+    setStatusTone('success');
+    setStatusMessage('Investment confirmed.');
   };
 
   if (!user || !isOnboarded) return null;
@@ -91,47 +115,38 @@ export default function InvestPage({ params }: InvestPageProps) {
   return (
     <>
       <Header />
-      <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', background: '#f4f4f4' }}>
-        <div className="container" style={{ padding: '3rem 1rem' }}>
+      <main className={styles.pageMain} id="main-content">
+        <div className={`page-container ${styles.sectionContainer}`}>
           <Grid>
             <Column lg={{ span: 8, offset: 4 }} md={8} sm={4}>
               {/* Amount Selection */}
               {step === 'amount' && (
-                <Tile style={{ padding: '2.5rem' }}>
+                <Tile className={styles.contentTile} aria-labelledby="amount-heading">
                   <Button
                     kind="ghost"
                     size="sm"
                     renderIcon={ArrowLeft}
                     as={Link}
                     href={`/campaigns/${slug}`}
-                    style={{ marginBottom: '1.5rem', marginLeft: '-1rem' }}
+                    className={styles.backButton}
                   >
                     Back to campaign
                   </Button>
 
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  <h1 id="amount-heading" className={styles.heading}>
                     Invest in {campaign.company_name}
                   </h1>
-                  <p style={{ color: '#525252', marginBottom: '2rem' }}>
-                    How much would you like to invest?
-                  </p>
+                  <p className={styles.subheading}>How much would you like to invest?</p>
 
                   {/* Preset Amounts */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div className={styles.presetGrid}>
                     {presetAmounts.map((preset) => (
                       <button
                         key={preset}
                         onClick={() => handleAmountSelect(preset)}
-                        style={{
-                          padding: '1.5rem',
-                          fontSize: '1.5rem',
-                          fontWeight: 600,
-                          border: amount === preset ? '2px solid #0f62fe' : '2px solid #e0e0e0',
-                          background: amount === preset ? '#e0e0ff' : 'white',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                        }}
+                        className={`${styles.presetButton} ${amount === preset ? styles.presetSelected : ''}`}
+                        aria-pressed={amount === preset}
+                        type="button"
                       >
                         ${preset}
                       </button>
@@ -147,7 +162,8 @@ export default function InvestPage({ params }: InvestPageProps) {
                     value={amount}
                     onChange={(_, { value }) => setAmount(Number(value) || 0)}
                     helperText={`Min: $${campaign.min_investment} · Max: $${campaign.max_investment_per_person.toLocaleString()}`}
-                    style={{ marginBottom: '2rem' }}
+                    invalid={!!amountError}
+                    invalidText={amountError || undefined}
                   />
 
                   <Button
@@ -156,56 +172,64 @@ export default function InvestPage({ params }: InvestPageProps) {
                     renderIcon={ArrowRight}
                     onClick={handleContinue}
                     disabled={amount < campaign.min_investment || amount > campaign.max_investment_per_person}
-                    style={{ width: '100%' }}
+                    className={styles.fullWidthButton}
                   >
                     Continue with ${amount}
                   </Button>
+                  {statusMessage && (
+                    <p
+                      className={styles.statusText}
+                      role="status"
+                      aria-live="polite"
+                      data-status={statusTone}
+                    >
+                      {statusMessage}
+                    </p>
+                  )}
                 </Tile>
               )}
 
               {/* Confirmation */}
               {step === 'confirm' && (
-                <Tile style={{ padding: '2.5rem' }}>
+                <Tile className={styles.contentTile} aria-labelledby="confirm-heading">
                   <Button
                     kind="ghost"
                     size="sm"
                     renderIcon={ArrowLeft}
                     onClick={() => setStep('amount')}
-                    style={{ marginBottom: '1.5rem', marginLeft: '-1rem' }}
+                    className={styles.backButton}
                   >
                     Change amount
                   </Button>
 
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '2rem' }}>
+                  <h1 id="confirm-heading" className={styles.heading}>
                     Confirm your investment
                   </h1>
 
                   {/* Summary */}
-                  <Tile style={{ background: '#f4f4f4', padding: '1.5rem', marginBottom: '1.5rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e0e0e0' }}>
-                      <span style={{ color: '#525252' }}>Company</span>
-                      <span style={{ fontWeight: 600 }}>{campaign.company_name}</span>
+                  <Tile className={styles.summaryTile} role="group" aria-label="Investment summary">
+                    <div className={styles.summaryRow}>
+                      <span>Company</span>
+                      <span className={styles.summaryValue}>{campaign.company_name}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e0e0e0' }}>
-                      <span style={{ color: '#525252' }}>Investment amount</span>
-                      <span style={{ fontWeight: 600, fontSize: '1.25rem' }}>${amount.toLocaleString()}</span>
+                    <div className={styles.summaryRow}>
+                      <span>Investment amount</span>
+                      <span className={styles.summaryValue}>${amount.toLocaleString()}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#525252' }}>Funding source</span>
-                      <span style={{ fontWeight: 600 }}>
+                    <div className={styles.summaryRow}>
+                      <span>Funding source</span>
+                      <span className={styles.summaryValue}>
                         {fundingSource?.institution_name} ••••{fundingSource?.last4}
                       </span>
                     </div>
                   </Tile>
 
                   {/* Risk Warning */}
-                  <Tile style={{ background: '#fff8e1', padding: '1rem', marginBottom: '1.5rem', border: '1px solid #f1c21b' }}>
-                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                      <Warning size={20} style={{ color: '#8a6d3b', flexShrink: 0, marginTop: '2px' }} />
-                      <p style={{ color: '#8a6d3b', fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>
-                        This is a high-risk, long-term investment. You may lose all of this money, and you may not be able to sell for many years.
-                      </p>
-                    </div>
+                  <Tile className={styles.riskTile} role="note">
+                    <Warning size={20} aria-hidden="true" />
+                    <p className={styles.riskCopy}>
+                      This is a high-risk, long-term investment. You may lose all of this money, and you may not be able to sell for many years.
+                    </p>
                   </Tile>
 
                   {/* Confirmation Checkbox */}
@@ -214,7 +238,6 @@ export default function InvestPage({ params }: InvestPageProps) {
                     labelText="I confirm this investment and understand the risks."
                     checked={confirmed}
                     onChange={(_, { checked }) => setConfirmed(checked)}
-                    style={{ marginBottom: '2rem' }}
                   />
 
                   <Button
@@ -222,65 +245,67 @@ export default function InvestPage({ params }: InvestPageProps) {
                     size="lg"
                     onClick={handleConfirmInvestment}
                     disabled={!confirmed}
-                    style={{ width: '100%' }}
+                    className={styles.fullWidthButton}
                   >
                     Confirm investment
                   </Button>
+                  {statusMessage && (
+                    <p
+                      className={styles.statusText}
+                      role="status"
+                      aria-live="polite"
+                      data-status={statusTone}
+                    >
+                      {statusMessage}
+                    </p>
+                  )}
                 </Tile>
               )}
 
               {/* Processing */}
               {step === 'processing' && (
-                <Tile style={{ padding: '4rem 2.5rem', textAlign: 'center' }}>
-                  <InlineLoading
-                    description="Processing your investment..."
-                    style={{ justifyContent: 'center' }}
-                  />
-                  <p style={{ color: '#525252', marginTop: '1rem' }}>
-                    Please wait while we process your investment.
+                <Tile className={`${styles.contentTile} ${styles.centeredTile}`} role="status" aria-live="polite">
+                  <InlineLoading description={statusMessage || 'Processing your investment...'} />
+                  <p className={styles.statusText} data-status={statusTone}>
+                    {statusMessage || 'Please wait while we process your investment.'}
                   </p>
                 </Tile>
               )}
 
               {/* Success */}
               {step === 'success' && (
-                <Tile style={{ padding: '3rem 2.5rem', textAlign: 'center' }}>
-                  <div style={{
-                    width: '80px',
-                    height: '80px',
-                    background: '#defbe6',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 1.5rem',
-                  }}>
-                    <Checkmark size={40} style={{ color: '#0e6027' }} />
+                <Tile className={`${styles.contentTile} ${styles.centeredTile}`} role="status" aria-live="polite">
+                  <div className={styles.successIcon}>
+                    <Checkmark size={40} />
                   </div>
 
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                    Investment confirmed!
-                  </h1>
-                  <p style={{ color: '#525252', marginBottom: '2rem' }}>
+                  <h1 className={styles.heading}>Investment confirmed!</h1>
+                  <p className={styles.subheading}>
                     You&apos;ve invested ${amount.toLocaleString()} in {campaign.company_name}.
                   </p>
 
-                  <Tile style={{ background: '#f4f4f4', padding: '1.5rem', marginBottom: '2rem', textAlign: 'left' }}>
-                    <h3 style={{ fontWeight: 600, marginBottom: '1rem' }}>What happens next?</h3>
-                    <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#525252', lineHeight: 1.8 }}>
+                  {statusMessage && (
+                    <p className={styles.statusText} data-status={statusTone}>
+                      {statusMessage}
+                    </p>
+                  )}
+
+                  <Tile className={styles.listTile}>
+                    <h3 className={styles.listHeading}>What happens next?</h3>
+                    <ul className={styles.nextList}>
                       <li>You&apos;ll receive a confirmation email shortly.</li>
                       <li>Funds will be debited from your bank account within 3-5 business days.</li>
                       <li>You can view your investment in your portfolio at any time.</li>
                     </ul>
                   </Tile>
 
-                  <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+                  <div className={styles.actionStack}>
                     <Button
                       as={Link}
                       href="/investments"
                       kind="primary"
                       size="lg"
-                      style={{ width: '100%' }}
+                      className={styles.fullWidthButton}
                     >
                       View my investments
                     </Button>
@@ -289,7 +314,7 @@ export default function InvestPage({ params }: InvestPageProps) {
                       href="/campaigns"
                       kind="tertiary"
                       size="lg"
-                      style={{ width: '100%' }}
+                      className={styles.fullWidthButton}
                     >
                       Browse more campaigns
                     </Button>

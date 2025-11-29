@@ -1,0 +1,43 @@
+.hero {
+  background: var(--cds-layer-02);
+  padding: 3rem 0;
+}
+
+.heroTitle {
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 0.75rem;
+  color: var(--cds-text-primary);
+}
+
+.heroCopy {
+  color: var(--cds-text-secondary);
+  max-width: 37.5rem;
+  margin: 0;
+}
+
+.sectionLayer {
+  background: var(--cds-background);
+}
+
+.sectionAlt {
+  background: var(--cds-layer-01);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--cds-text-primary);
+  margin: 0;
+}
+
+.emptyCopy {
+  color: var(--cds-text-secondary);
+}

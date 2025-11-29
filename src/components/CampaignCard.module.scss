@@ -1,0 +1,94 @@
+.card {
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--cds-layer-01);
+  border: 1px solid var(--cds-border-subtle-01);
+}
+
+.featured {
+  padding: 2rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  background: var(--cds-layer-02);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cds-text-secondary);
+}
+
+.logoFeatured {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--cds-text-primary);
+}
+
+.titleFeatured {
+  font-size: 1.5rem;
+}
+
+.tagline {
+  color: var(--cds-text-secondary);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.taglineFeatured {
+  font-size: 1rem;
+}
+
+.statRow {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--cds-text-secondary);
+  margin: 0;
+}
+
+.statValue {
+  font-weight: 600;
+  color: var(--cds-text-primary);
+}
+
+.footerActions {
+  margin-top: auto;
+}
+
+.statusText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

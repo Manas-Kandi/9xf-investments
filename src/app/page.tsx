@@ -1,12 +1,13 @@
 'use client';
 
-import { Grid, Column, Button, Tile, ClickableTile, Tag } from '@carbon/react';
+import { Grid, Column, Button, Tile } from '@carbon/react';
 import { ArrowRight, Wallet, Security, Time } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { CampaignCard } from '@/components/CampaignCard';
 import { getLiveCampaigns, getFeaturedCampaign } from '@/lib/mock-data';
+import styles from './page.module.scss';
 
 export default function Home() {
   const featuredCampaign = getFeaturedCampaign();
@@ -15,21 +16,21 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="main-content">
+      <main className="main-content" id="main-content">
         {/* Hero Section */}
-        <section style={{ background: '#262626', padding: '4rem 0', textAlign: 'center' }}>
+        <section className={styles.heroSection} aria-labelledby="hero-heading">
           <div className="page-container">
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 300, marginBottom: '1rem', color: '#f4f4f4' }}>
+            <h1 id="hero-heading" className={styles.heroHeading}>
               Own a piece of the future
             </h1>
-            <p style={{ fontSize: '1.125rem', color: '#c6c6c6', marginBottom: '2rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
+            <p className={styles.heroSubtitle}>
               Invest small amounts in startups you believe in. Simple onboarding, one-tap investing, from just $50.
             </p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Button as={Link} href="/campaigns" kind="primary" size="lg" renderIcon={ArrowRight}>
+            <div className={styles.heroActions}>
+              <Button as={Link} href="/campaigns" kind="primary" size="lg" renderIcon={ArrowRight} aria-label="Browse campaigns">
                 Browse campaigns
               </Button>
-              <Button as={Link} href="/how-it-works" kind="secondary" size="lg">
+              <Button as={Link} href="/how-it-works" kind="secondary" size="lg" aria-label="Learn how investing works">
                 How it works
               </Button>
             </div>
@@ -37,56 +38,65 @@ export default function Home() {
         </section>
 
         {/* How it works */}
-        <section className="section" style={{ background: '#161616' }}>
+        <section className={`section ${styles.sectionLayer}`} aria-labelledby="investing-simple-heading">
           <div className="page-container">
-            <h2 style={{ textAlign: 'center', marginBottom: '3rem', fontSize: '1.75rem', fontWeight: 400, color: '#f4f4f4' }}>
+            <h2 id="investing-simple-heading" className={styles.sectionTitle}>
               Investing made simple
             </h2>
             <Grid>
               <Column lg={5} md={4} sm={4}>
-                <Tile style={{ height: '100%', textAlign: 'center', padding: '2rem' }}>
-                  <div style={{ 
-                    width: '64px', height: '64px', background: '#0f62fe', borderRadius: '50%', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'
-                  }}>
-                    <Security size={32} style={{ fill: 'white' }} />
+                <Tile
+                  className={styles.stepTile}
+                  role="article"
+                  tabIndex={0}
+                  aria-labelledby="step-verify"
+                  aria-describedby="step-verify-copy"
+                >
+                  <div className={styles.iconCircle} aria-hidden="true">
+                    <Security size={32} />
                   </div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
+                  <h3 id="step-verify" className={styles.stepTitle}>
                     1. Verify once
                   </h3>
-                  <p style={{ color: '#c6c6c6' }}>
+                  <p id="step-verify-copy" className={styles.stepCopy}>
                     Complete a simple identity check. You only need to do this once.
                   </p>
                 </Tile>
               </Column>
               <Column lg={5} md={4} sm={4}>
-                <Tile style={{ height: '100%', textAlign: 'center', padding: '2rem' }}>
-                  <div style={{ 
-                    width: '64px', height: '64px', background: '#0f62fe', borderRadius: '50%', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'
-                  }}>
-                    <Wallet size={32} style={{ fill: 'white' }} />
+                <Tile
+                  className={styles.stepTile}
+                  role="article"
+                  tabIndex={0}
+                  aria-labelledby="step-bank"
+                  aria-describedby="step-bank-copy"
+                >
+                  <div className={styles.iconCircle} aria-hidden="true">
+                    <Wallet size={32} />
                   </div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
+                  <h3 id="step-bank" className={styles.stepTitle}>
                     2. Link your bank
                   </h3>
-                  <p style={{ color: '#c6c6c6' }}>
+                  <p id="step-bank-copy" className={styles.stepCopy}>
                     Connect your bank account securely. Funds are only moved when you invest.
                   </p>
                 </Tile>
               </Column>
               <Column lg={5} md={4} sm={4}>
-                <Tile style={{ height: '100%', textAlign: 'center', padding: '2rem' }}>
-                  <div style={{ 
-                    width: '64px', height: '64px', background: '#0f62fe', borderRadius: '50%', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem'
-                  }}>
-                    <Time size={32} style={{ fill: 'white' }} />
+                <Tile
+                  className={styles.stepTile}
+                  role="article"
+                  tabIndex={0}
+                  aria-labelledby="step-invest"
+                  aria-describedby="step-invest-copy"
+                >
+                  <div className={styles.iconCircle} aria-hidden="true">
+                    <Time size={32} />
                   </div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem', color: '#f4f4f4' }}>
+                  <h3 id="step-invest" className={styles.stepTitle}>
                     3. Invest in seconds
                   </h3>
-                  <p style={{ color: '#c6c6c6' }}>
+                  <p id="step-invest-copy" className={styles.stepCopy}>
                     Pick an amount, tap confirm. That&apos;s it. You&apos;re now an investor.
                   </p>
                 </Tile>
@@ -97,9 +107,9 @@ export default function Home() {
 
         {/* Featured Campaign */}
         {featuredCampaign && (
-          <section className="section" style={{ background: '#1a1a1a' }}>
+          <section className={`section ${styles.featuredSection}`} aria-labelledby="featured-campaign-heading">
             <div className="page-container">
-              <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.75rem', fontWeight: 400, color: '#f4f4f4' }}>
+              <h2 id="featured-campaign-heading" className={styles.sectionTitle}>
                 Featured campaign
               </h2>
               <Grid>
@@ -113,9 +123,9 @@ export default function Home() {
 
         {/* Live Campaigns */}
         {liveCampaigns.length > 1 && (
-          <section className="section" style={{ background: '#161616' }}>
+          <section className={`section ${styles.moreSection}`} aria-labelledby="more-opportunities-heading">
             <div className="page-container">
-              <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.75rem', fontWeight: 400, color: '#f4f4f4' }}>
+              <h2 id="more-opportunities-heading" className={styles.sectionTitle}>
                 More opportunities
               </h2>
               <Grid>
@@ -130,18 +140,22 @@ export default function Home() {
         )}
 
         {/* Risk Disclaimer */}
-        <section className="section" style={{ background: '#1a1a1a' }}>
+        <section className={`section ${styles.sectionAlt}`} aria-labelledby="risk-heading">
           <div className="page-container">
-            <Tile style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-              <h3 style={{ marginBottom: '1rem', fontWeight: 600, color: '#f4f4f4' }}>Important information</h3>
-              <p style={{ color: '#c6c6c6', lineHeight: 1.6, marginBottom: '1rem' }}>
-                Investing in startups involves significant risk. You could lose all of your investment. 
+            <Tile className={styles.disclaimerTile} role="note" aria-labelledby="risk-heading">
+              <h3 id="risk-heading" className={styles.disclaimerHeading}>
+                Important information
+              </h3>
+              <p className={styles.disclaimerCopy}>
+                Investing in startups involves significant risk. You could lose all of your investment.
                 These are long-term, illiquid investments—you may not be able to sell your shares for many years.
               </p>
-              <p style={{ color: '#c6c6c6', lineHeight: 1.6 }}>
+              <p className={styles.disclaimerCopy}>
                 9xf labs does not provide investment advice. Past performance is not indicative of future results.
                 Please read our{' '}
-                <Link href="/risk-disclosure" style={{ color: '#78a9ff' }}>full risk disclosure</Link>{' '}
+                <Link href="/risk-disclosure" className={styles.disclaimerLink}>
+                  full risk disclosure
+                </Link>{' '}
                 before investing.
               </p>
             </Tile>
@@ -149,15 +163,15 @@ export default function Home() {
         </section>
 
         {/* CTA for Founders */}
-        <section style={{ background: '#262626', padding: '4rem 0' }}>
-          <div className="page-container" style={{ textAlign: 'center' }}>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 400, marginBottom: '1rem', color: '#f4f4f4' }}>
+        <section className={styles.founderSection} aria-labelledby="founder-heading">
+          <div className="page-container">
+            <h2 id="founder-heading" className={styles.founderTitle}>
               Are you a founder?
             </h2>
-            <p style={{ color: '#c6c6c6', marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
+            <p className={styles.founderCopy}>
               Turn your customers and fans into investors. Allocate a small slice of your round to the crowd.
             </p>
-            <Button as={Link} href="/founders" kind="tertiary" size="lg" renderIcon={ArrowRight}>
+            <Button as={Link} href="/founders" kind="tertiary" size="lg" renderIcon={ArrowRight} aria-label="Raise with 9xf labs">
               Raise with 9xf labs
             </Button>
           </div>

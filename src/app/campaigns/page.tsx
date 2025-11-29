@@ -5,6 +5,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { CampaignCard } from '@/components/CampaignCard';
 import { mockCampaigns } from '@/lib/mock-data';
+import styles from './page.module.scss';
 
 export default function CampaignsPage() {
   const liveCampaigns = mockCampaigns.filter((c) => c.status === 'live');
@@ -13,14 +14,14 @@ export default function CampaignsPage() {
   return (
     <>
       <Header />
-      <main className="main-content">
+      <main className="main-content" id="main-content">
         {/* Hero */}
-        <section style={{ background: '#262626', padding: '3rem 0' }}>
+        <section className={styles.hero} aria-labelledby="campaigns-hero-heading">
           <div className="page-container">
-            <h1 style={{ fontSize: '2rem', fontWeight: 400, marginBottom: '0.75rem', color: '#f4f4f4' }}>
+            <h1 id="campaigns-hero-heading" className={styles.heroTitle}>
               Investment opportunities
             </h1>
-            <p style={{ color: '#c6c6c6', maxWidth: '600px' }}>
+            <p className={styles.heroCopy}>
               Browse startups raising on 9xf labs. Each company has been reviewed by our team.
               Invest from as little as $50.
             </p>
@@ -28,13 +29,15 @@ export default function CampaignsPage() {
         </section>
 
         {/* Live Campaigns */}
-        <section className="section" style={{ background: '#161616' }}>
+        <section className={`section ${styles.sectionLayer}`} aria-labelledby="live-campaigns-heading">
           <div className="page-container">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#f4f4f4', margin: 0 }}>
+            <div className={styles.sectionHeading}>
+              <h2 id="live-campaigns-heading" className={styles.sectionTitle}>
                 Raising now
               </h2>
-              <Tag type="green">{liveCampaigns.length} live</Tag>
+              <Tag type="green" aria-label={`${liveCampaigns.length} campaigns live`}>
+                {liveCampaigns.length} live
+              </Tag>
             </div>
             {liveCampaigns.length > 0 ? (
               <Grid>
@@ -45,20 +48,22 @@ export default function CampaignsPage() {
                 ))}
               </Grid>
             ) : (
-              <p style={{ color: '#c6c6c6' }}>No live campaigns at the moment. Check back soon!</p>
+              <p className={styles.emptyCopy}>No live campaigns at the moment. Check back soon!</p>
             )}
           </div>
         </section>
 
         {/* Upcoming Campaigns */}
         {upcomingCampaigns.length > 0 && (
-          <section className="section" style={{ background: '#1a1a1a' }}>
+          <section className={`section ${styles.sectionAlt}`} aria-labelledby="upcoming-campaigns-heading">
             <div className="page-container">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#f4f4f4', margin: 0 }}>
+              <div className={styles.sectionHeading}>
+                <h2 id="upcoming-campaigns-heading" className={styles.sectionTitle}>
                   Coming soon
                 </h2>
-                <Tag type="gray">{upcomingCampaigns.length} upcoming</Tag>
+                <Tag type="gray" aria-label={`${upcomingCampaigns.length} upcoming campaigns`}>
+                  {upcomingCampaigns.length} upcoming
+                </Tag>
               </div>
               <Grid>
                 {upcomingCampaigns.map((campaign) => (

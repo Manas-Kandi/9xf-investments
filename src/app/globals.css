@@ -12,6 +12,23 @@ body {
   min-height: 100vh;
 }
 
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 8px;
+  background: var(--cds-layer-01);
+  color: var(--cds-text-primary);
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--cds-focus);
+  border-radius: 4px;
+  z-index: 1000;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: 12px;
+}
+
 /* Force dark theme on all Carbon components */
 .cds--white,
 .cds--g10,

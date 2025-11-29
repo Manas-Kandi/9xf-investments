@@ -15,9 +15,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Theme theme="g100">
-          {children}
-        </Theme>
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
+        <Theme theme="g100">{children}</Theme>
       </body>
     </html>
   );

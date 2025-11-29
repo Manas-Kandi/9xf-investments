@@ -6,12 +6,15 @@ import { Grid, Column, Tile, TextInput, Button, InlineLoading, Checkbox, Progres
 import { ArrowRight, Checkmark, Warning } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
-import { useAppStore, type OnboardingStep } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
+import styles from './page.module.scss';
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { user, onboardingStep, setOnboardingStep, setUser, setFundingSource, isOnboarded } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [statusTone, setStatusTone] = useState<'info' | 'success' | 'error'>('info');
 
   // KYC form state
   const [fullName, setFullName] = useState('');
@@ -47,6 +50,8 @@ export default function OnboardingPage() {
   const handleKycSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setStatusTone('info');
+    setStatusMessage('Verifying your identity...');
 
     // Simulate KYC verification
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -65,11 +70,15 @@ export default function OnboardingPage() {
     }
 
     setOnboardingStep('funding');
+    setStatusTone('success');
+    setStatusMessage('Identity verified. Continue to link your bank.');
     setIsLoading(false);
   };
 
   const handleConnectBank = async () => {
     setIsLoading(true);
+    setStatusTone('info');
+    setStatusMessage('Connecting to your bank...');
 
     // Simulate Plaid connection
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -86,13 +95,21 @@ export default function OnboardingPage() {
     });
 
     setBankConnected(true);
+    setStatusTone('success');
+    setStatusMessage('Bank connected. You can proceed to accept the terms.');
     setIsLoading(false);
   };
 
   const handleTermsSubmit = async () => {
-    if (!riskAccepted || !termsAccepted) return;
+    if (!riskAccepted || !termsAccepted) {
+      setStatusTone('error');
+      setStatusMessage('Please confirm the risk disclosure and terms to continue.');
+      return;
+    }
 
     setIsLoading(true);
+    setStatusTone('info');
+    setStatusMessage('Completing setup...');
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (user) {
@@ -105,6 +122,8 @@ export default function OnboardingPage() {
 
     setOnboardingStep('complete');
     setIsLoading(false);
+    setStatusTone('success');
+    setStatusMessage('You are all set. Redirecting to campaigns.');
     router.push('/campaigns');
   };
 
@@ -113,24 +132,35 @@ export default function OnboardingPage() {
   return (
     <>
       <Header />
-      <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', background: '#f4f4f4' }}>
-        <div className="container" style={{ padding: '3rem 1rem' }}>
+      <main className={styles.pageMain} id="main-content">
+        <div className={`page-container ${styles.sectionContainer}`}>
           <Grid>
             <Column lg={{ span: 8, offset: 4 }} md={8} sm={4}>
               {/* Progress Indicator */}
-              <ProgressIndicator currentIndex={stepIndex} style={{ marginBottom: '2rem' }}>
+              <ProgressIndicator currentIndex={stepIndex} className={styles.progress}>
                 <ProgressStep label="Verify identity" />
                 <ProgressStep label="Link bank" />
                 <ProgressStep label="Accept terms" />
               </ProgressIndicator>
 
+              {statusMessage && (
+                <div className={styles.feedback} role="status" aria-live="polite">
+                  <div className={styles.statusRow}>
+                    <InlineLoading
+                      status={statusTone === 'error' ? 'error' : isLoading ? 'active' : 'finished'}
+                      description={statusMessage}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* KYC Step */}
               {onboardingStep === 'kyc' && (
-                <Tile style={{ padding: '2.5rem' }}>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <Tile className={styles.stepTile} aria-labelledby="kyc-heading">
+                  <h1 id="kyc-heading" className={styles.stepHeading}>
                     Verify your identity
                   </h1>
-                  <p style={{ color: '#525252', marginBottom: '2rem' }}>
+                  <p className={styles.stepCopy}>
                     We need to verify your identity once to keep the platform safe and compliant.
                   </p>
 
@@ -142,7 +172,7 @@ export default function OnboardingPage() {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       required
-                      style={{ marginBottom: '1rem' }}
+                      className={styles.fieldGroup}
                     />
                     <TextInput
                       id="dob"
@@ -151,7 +181,7 @@ export default function OnboardingPage() {
                       value={dob}
                       onChange={(e) => setDob(e.target.value)}
                       required
-                      style={{ marginBottom: '1rem' }}
+                      className={styles.fieldGroup}
                     />
                     <TextInput
                       id="address"
@@ -160,7 +190,7 @@ export default function OnboardingPage() {
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
                       required
-                      style={{ marginBottom: '1rem' }}
+                      className={styles.fieldGroup}
                     />
                     <TextInput
                       id="citizenship"
@@ -169,7 +199,7 @@ export default function OnboardingPage() {
                       value={citizenship}
                       onChange={(e) => setCitizenship(e.target.value)}
                       required
-                      style={{ marginBottom: '1rem' }}
+                      className={styles.fieldGroup}
                     />
                     <TextInput
                       id="ssn"
@@ -179,7 +209,7 @@ export default function OnboardingPage() {
                       value={ssn}
                       onChange={(e) => setSsn(e.target.value.replace(/\D/g, ''))}
                       required
-                      style={{ marginBottom: '2rem' }}
+                      className={styles.fieldGroup}
                     />
 
                     {isLoading ? (
@@ -190,7 +220,7 @@ export default function OnboardingPage() {
                         kind="primary"
                         size="lg"
                         renderIcon={ArrowRight}
-                        style={{ width: '100%' }}
+                        className={styles.fullWidthAction}
                       >
                         Continue
                       </Button>
@@ -201,11 +231,11 @@ export default function OnboardingPage() {
 
               {/* Funding Step */}
               {onboardingStep === 'funding' && (
-                <Tile style={{ padding: '2.5rem' }}>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <Tile className={styles.stepTile} aria-labelledby="bank-heading">
+                  <h1 id="bank-heading" className={styles.stepHeading}>
                     Link your bank account
                   </h1>
-                  <p style={{ color: '#525252', marginBottom: '2rem' }}>
+                  <p className={styles.stepCopy}>
                     Connect your bank account securely. Funds are only moved when you invest.
                   </p>
 
@@ -218,23 +248,23 @@ export default function OnboardingPage() {
                           kind="primary"
                           size="lg"
                           onClick={handleConnectBank}
-                          style={{ width: '100%' }}
+                          className={styles.fullWidthAction}
                         >
                           Connect bank account
                         </Button>
                       )}
-                      <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#525252', textAlign: 'center' }}>
+                      <p className={styles.helperText}>
                         We use Plaid to securely connect to your bank. We never store your login credentials.
                       </p>
                     </>
                   ) : (
                     <>
-                      <Tile style={{ background: '#defbe6', padding: '1.5rem', marginBottom: '1.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <Checkmark size={24} style={{ color: '#0e6027' }} />
+                      <Tile className={styles.bankConnected} aria-live="polite" role="status">
+                        <div className={styles.bankRow}>
+                          <Checkmark size={24} />
                           <div>
-                            <p style={{ fontWeight: 600, color: '#0e6027' }}>Bank connected</p>
-                            <p style={{ color: '#0e6027' }}>Chase Bank ••••4567</p>
+                            <p className={styles.bankTitle}>Bank connected</p>
+                            <p className={styles.bankSubtitle}>Chase Bank ••••4567</p>
                           </div>
                         </div>
                       </Tile>
@@ -243,7 +273,7 @@ export default function OnboardingPage() {
                         size="lg"
                         renderIcon={ArrowRight}
                         onClick={() => setOnboardingStep('terms')}
-                        style={{ width: '100%' }}
+                        className={styles.fullWidthAction}
                       >
                         Continue
                       </Button>
@@ -254,51 +284,51 @@ export default function OnboardingPage() {
 
               {/* Terms Step */}
               {onboardingStep === 'terms' && (
-                <Tile style={{ padding: '2.5rem' }}>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <Tile className={styles.stepTile} aria-labelledby="terms-heading">
+                  <h1 id="terms-heading" className={styles.stepHeading}>
                     Understand the risks
                   </h1>
-                  <p style={{ color: '#525252', marginBottom: '2rem' }}>
+                  <p className={styles.stepCopy}>
                     Please read and acknowledge the following before you can invest.
                   </p>
 
                   {/* Risk Warning */}
-                  <Tile style={{ background: '#fff8e1', padding: '1.5rem', marginBottom: '2rem', border: '1px solid #f1c21b' }}>
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <Warning size={24} style={{ color: '#8a6d3b', flexShrink: 0 }} />
-                      <div>
-                        <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', color: '#8a6d3b' }}>
-                          Important risk information
-                        </h3>
-                        <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#8a6d3b', lineHeight: 1.8 }}>
-                          <li><strong>High risk:</strong> You could lose all of your investment.</li>
-                          <li><strong>Illiquid:</strong> You may not be able to sell for many years.</li>
-                          <li><strong>Not a deposit:</strong> This is not a savings account or insured product.</li>
-                          <li><strong>No guarantees:</strong> Past performance does not predict future results.</li>
-                        </ul>
-                      </div>
+                  <Tile className={styles.riskTile} role="note" aria-labelledby="risk-info-heading">
+                    <div>
+                      <Warning size={24} aria-hidden="true" />
+                    </div>
+                    <div>
+                      <h3 id="risk-info-heading" className={styles.riskHeading}>
+                        Important risk information
+                      </h3>
+                      <ul className={styles.riskList}>
+                        <li><strong>High risk:</strong> You could lose all of your investment.</li>
+                        <li><strong>Illiquid:</strong> You may not be able to sell for many years.</li>
+                        <li><strong>Not a deposit:</strong> This is not a savings account or insured product.</li>
+                        <li><strong>No guarantees:</strong> Past performance does not predict future results.</li>
+                      </ul>
                     </div>
                   </Tile>
 
                   {/* Checkboxes */}
-                  <div style={{ marginBottom: '2rem' }}>
+                  <div className={styles.checkboxGroup}>
                     <Checkbox
                       id="riskAccepted"
                       labelText="I understand that this is a high-risk, long-term investment and I may lose all of my money."
                       checked={riskAccepted}
                       onChange={(_, { checked }) => setRiskAccepted(checked)}
-                      style={{ marginBottom: '1rem' }}
+                      className={styles.fieldGroup}
                     />
                     <Checkbox
                       id="termsAccepted"
                       labelText={
                         <>
                           I agree to the{' '}
-                          <Link href="/terms" target="_blank" style={{ color: '#0f62fe' }}>
+                          <Link href="/terms" target="_blank">
                             Terms of Use
                           </Link>{' '}
                           and{' '}
-                          <Link href="/risk-disclosure" target="_blank" style={{ color: '#0f62fe' }}>
+                          <Link href="/risk-disclosure" target="_blank">
                             Risk Disclosure
                           </Link>
                           , and consent to receive documents electronically.
@@ -318,7 +348,7 @@ export default function OnboardingPage() {
                       renderIcon={ArrowRight}
                       onClick={handleTermsSubmit}
                       disabled={!riskAccepted || !termsAccepted}
-                      style={{ width: '100%' }}
+                      className={styles.fullWidthAction}
                     >
                       Agree and continue
                     </Button>

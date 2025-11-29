@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Grid, Column, Tile, TextInput, Button, InlineLoading, Checkbox, ProgressIndicator, ProgressStep } from '@carbon/react';
-import { ArrowRight, Checkmark, Warning } from '@carbon/icons-react';
+import { ArrowRight, Checkmark } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { useAppStore } from '@/lib/store';
@@ -266,23 +266,9 @@ export default function OnboardingPage() {
                     Please read and acknowledge the following before you can invest.
                   </p>
 
-                  {/* Risk Warning */}
-                  <Tile style={{ background: '#fff8e1', padding: '1.5rem', marginBottom: '2rem', border: '1px solid #f1c21b' }}>
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <Warning size={24} style={{ color: '#8a6d3b', flexShrink: 0 }} />
-                      <div>
-                        <h3 style={{ fontWeight: 600, marginBottom: '0.75rem', color: '#8a6d3b' }}>
-                          Important risk information
-                        </h3>
-                        <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#8a6d3b', lineHeight: 1.8 }}>
-                          <li><strong>High risk:</strong> You could lose all of your investment.</li>
-                          <li><strong>Illiquid:</strong> You may not be able to sell for many years.</li>
-                          <li><strong>Not a deposit:</strong> This is not a savings account or insured product.</li>
-                          <li><strong>No guarantees:</strong> Past performance does not predict future results.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </Tile>
+                  <div style={{ marginBottom: '2rem' }}>
+                    <RiskDisclosureContent />
+                  </div>
 
                   {/* Checkboxes */}
                   <div style={{ marginBottom: '2rem' }}>
@@ -302,7 +288,7 @@ export default function OnboardingPage() {
                             Terms of Use
                           </Link>{' '}
                           and{' '}
-                          <Link href="/risk-disclosure" target="_blank" style={{ color: '#0f62fe' }}>
+                          <Link href="/risk-disclosure" style={{ color: '#0f62fe' }}>
                             Risk Disclosure
                           </Link>
                           , and consent to receive documents electronically.

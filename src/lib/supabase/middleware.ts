@@ -1,20 +1,16 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { env } from '@/env.mjs';
 
 export async function updateSession(request: NextRequest) {
   const supabaseResponse = NextResponse.next({
     request,
   });
 
-  // Skip Supabase session refresh if env vars are not set (dev mode without Supabase)
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return supabaseResponse;
-  }
-
   try {
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      env.NEXT_PUBLIC_SUPABASE_URL,
+      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
       {
         cookies: {
           getAll() {

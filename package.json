@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --pretty false",
+    "test": "npx --yes vitest@2.1.8 run --coverage --reporter=junit --outputFile=reports/vitest/results.xml",
+    "e2e": "npx --yes @playwright/test@1.50.1 test"
   },
   "dependencies": {
     "@carbon/react": "^1.96.0",

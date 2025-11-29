@@ -7,17 +7,20 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
+import { colors, shape, typography, components } from '../constants/theme';
+
+// Material Design 3 Button variants
+type ButtonVariant = 'filled' | 'outlined' | 'text' | 'elevated' | 'tonal';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: ButtonVariant;
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
   icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
   style?: ViewStyle;
   textStyle?: TextStyle;
 }
@@ -25,48 +28,67 @@ interface ButtonProps {
 export function Button({
   title,
   onPress,
-  variant = 'primary',
-  size = 'md',
+  variant = 'filled',
   disabled = false,
   loading = false,
   fullWidth = false,
   icon,
+  iconPosition = 'left',
   style,
   textStyle,
 }: ButtonProps) {
-  const buttonStyles = [
-    styles.base,
-    styles[variant],
-    styles[`size_${size}`],
-    fullWidth && styles.fullWidth,
-    disabled && styles.disabled,
-    style,
-  ];
+  const isDisabled = disabled || loading;
 
-  const textStyles = [
-    styles.text,
-    styles[`text_${variant}`],
-    styles[`textSize_${size}`],
-    disabled && styles.textDisabled,
-    textStyle,
-  ];
+  const getBackgroundColor = () => {
+    if (isDisabled) {
+      return variant === 'filled' || variant === 'elevated' || variant === 'tonal'
+        ? colors.textMuted
+        : colors.transparent;
+    }
+    switch (variant) {
+      case 'filled': return colors.primary;
+      case 'elevated': return colors.surfaceElevated;
+      case 'tonal': return colors.surfaceCard;
+      case 'outlined': return colors.transparent;
+      case 'text': return colors.transparent;
+      default: return colors.primary;
+    }
+  };
+
+  const getTextColor = () => {
+    if (isDisabled) return colors.textTertiary;
+    switch (variant) {
+      case 'filled': return colors.black;
+      case 'elevated': return colors.textPrimary;
+      case 'tonal': return colors.textPrimary;
+      case 'outlined': return colors.textPrimary;
+      case 'text': return colors.accent;
+      default: return colors.black;
+    }
+  };
 
   return (
     <TouchableOpacity
-      style={buttonStyles}
+      style={[
+        styles.base,
+        { backgroundColor: getBackgroundColor() },
+        variant === 'outlined' && styles.outlined,
+        fullWidth && styles.fullWidth,
+        style,
+      ]}
       onPress={onPress}
-      disabled={disabled || loading}
+      disabled={isDisabled}
       activeOpacity={0.7}
     >
       {loading ? (
-        <ActivityIndicator
-          color={variant === 'primary' ? colors.white : colors.primary}
-          size="small"
-        />
+        <ActivityIndicator color={getTextColor()} size="small" />
       ) : (
         <>
-          {icon}
-          <Text style={textStyles}>{title}</Text>
+          {icon && iconPosition === 'left' && icon}
+          <Text style={[styles.label, { color: getTextColor() }, textStyle]}>
+            {title}
+          </Text>
+          {icon && iconPosition === 'right' && icon}
         </>
       )}
     </TouchableOpacity>
@@ -75,90 +97,23 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
+    height: components.button.height,
+    paddingHorizontal: components.button.paddingHorizontal,
+    borderRadius: components.button.borderRadius,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
-    borderRadius: borderRadius.sm,
+    gap: 8,
   },
-  
-  // Variants
-  primary: {
-    backgroundColor: colors.primary,
-  },
-  secondary: {
-    backgroundColor: colors.surfaceSecondary,
+  outlined: {
     borderWidth: 1,
-    borderColor: colors.borderStrong,
+    borderColor: colors.border,
   },
-  tertiary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-  },
-  danger: {
-    backgroundColor: colors.error,
-  },
-  
-  // Sizes
-  size_sm: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    minHeight: 32,
-  },
-  size_md: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-    minHeight: 48,
-  },
-  size_lg: {
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    minHeight: 56,
-  },
-  
   fullWidth: {
     width: '100%',
   },
-  
-  disabled: {
-    opacity: 0.5,
-  },
-  
-  // Text styles
-  text: {
+  label: {
+    ...typography.labelLarge,
     fontWeight: '600',
-  },
-  text_primary: {
-    color: colors.white,
-  },
-  text_secondary: {
-    color: colors.textPrimary,
-  },
-  text_tertiary: {
-    color: colors.primary,
-  },
-  text_ghost: {
-    color: colors.link,
-  },
-  text_danger: {
-    color: colors.white,
-  },
-  
-  textSize_sm: {
-    fontSize: fontSize.sm,
-  },
-  textSize_md: {
-    fontSize: fontSize.md,
-  },
-  textSize_lg: {
-    fontSize: fontSize.lg,
-  },
-  
-  textDisabled: {
-    opacity: 0.7,
   },
 });

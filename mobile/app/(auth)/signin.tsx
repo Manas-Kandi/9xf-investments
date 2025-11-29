@@ -3,26 +3,29 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   TouchableOpacity,
+  TextInput,
+  StatusBar,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, fontSize } from '../../constants/theme';
-import { Button, Input } from '../../components';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors, spacing, typography, shape, components } from '../../constants/theme';
+import { Button } from '../../components';
 import { useAppStore } from '../../store';
 
 export default function SignInScreen() {
   const router = useRouter();
-  const { setUser, setOnboardingStep } = useAppStore();
+  const insets = useSafeAreaInsets();
+  const { setUser } = useAppStore();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -33,10 +36,8 @@ export default function SignInScreen() {
     setError('');
     setIsLoading(true);
 
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Mock sign in - in production, call your auth API
     setUser({
       id: '1',
       email,
@@ -52,72 +53,91 @@ export default function SignInScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          {/* Back button */}
+        {/* Header */}
+        <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.onSurface} />
           </TouchableOpacity>
+        </View>
 
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Welcome back</Text>
-            <Text style={styles.subtitle}>Sign in to your account</Text>
-          </View>
+        {/* Content */}
+        <View style={styles.content}>
+          <Text style={styles.title}>Sign in</Text>
 
           {/* Form */}
           <View style={styles.form}>
-            <Input
-              label="Email"
-              placeholder="you@example.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              leftIcon="mail-outline"
-            />
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Email</Text>
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="you@example.com"
+                placeholderTextColor={colors.textTertiary}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+              />
+            </View>
 
-            <Input
-              label="Password"
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password"
-              leftIcon="lock-closed-outline"
-              error={error}
-            />
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Password</Text>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={[styles.input, styles.passwordInput]}
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Enter password"
+                  placeholderTextColor={colors.textTertiary}
+                  secureTextEntry={!showPassword}
+                  autoComplete="password"
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <MaterialCommunityIcons
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    size={20}
+                    color={colors.onSurfaceVariant}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
 
-            <Button
-              title="Sign in"
-              onPress={handleSignIn}
-              loading={isLoading}
-              fullWidth
-              size="lg"
-            />
+            {error ? <Text style={styles.error}>{error}</Text> : null}
           </View>
+        </View>
 
-          {/* Footer */}
+        {/* Bottom */}
+        <View style={[styles.bottom, { paddingBottom: insets.bottom + spacing.xl }]}>
+          <Button
+            title="Sign in"
+            onPress={handleSignIn}
+            loading={isLoading}
+            fullWidth
+          />
+          
           <View style={styles.footer}>
             <Text style={styles.footerText}>Don't have an account? </Text>
             <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
               <Text style={styles.footerLink}>Sign up</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -129,42 +149,74 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
-  scrollContent: {
-    flexGrow: 1,
-    padding: spacing.lg,
+  header: {
+    paddingHorizontal: spacing.xl,
   },
   backButton: {
-    marginBottom: spacing.lg,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
   },
-  header: {
-    marginBottom: spacing.xl,
+  content: {
+    flex: 1,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.xl,
   },
   title: {
-    fontSize: fontSize.xxl,
-    fontWeight: '600',
+    ...typography.displaySmall,
     color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
+    marginBottom: spacing.xxl,
   },
   form: {
-    flex: 1,
-    gap: spacing.md,
+    gap: spacing.lg,
+  },
+  inputContainer: {
+    gap: spacing.sm,
+  },
+  inputLabel: {
+    ...typography.labelMedium,
+    color: colors.textSecondary,
+  },
+  input: {
+    height: components.input.height,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: components.input.borderRadius,
+    paddingHorizontal: components.input.paddingHorizontal,
+    ...typography.bodyLarge,
+    color: colors.textPrimary,
+  },
+  passwordContainer: {
+    position: 'relative',
+  },
+  passwordInput: {
+    paddingRight: 50,
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: spacing.lg,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+  },
+  error: {
+    ...typography.bodySmall,
+    color: colors.error,
+  },
+  bottom: {
+    paddingHorizontal: spacing.xl,
+    gap: spacing.lg,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: spacing.xl,
   },
   footerText: {
-    fontSize: fontSize.md,
+    ...typography.bodyMedium,
     color: colors.textSecondary,
   },
   footerLink: {
-    fontSize: fontSize.md,
-    color: colors.link,
-    fontWeight: '500',
+    ...typography.bodyMedium,
+    color: colors.primary,
+    fontWeight: '600',
   },
 });

@@ -1,56 +1,71 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
-import { useRouter } from 'expo-router';
-import { colors, spacing, fontSize } from '../constants/theme';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { useRouter, useRootNavigationState } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, spacing, typography, shape } from '../constants/theme';
 import { Button } from '../components';
 import { useAppStore } from '../store';
 
 export default function SplashScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { isAuthenticated, isOnboarded } = useAppStore();
+  const navigationState = useRootNavigationState();
+  const [isNavigationReady, setIsNavigationReady] = useState(false);
 
-  React.useEffect(() => {
-    // Auto-redirect if already authenticated
-    if (isAuthenticated && isOnboarded) {
+  useEffect(() => {
+    if (navigationState?.key) {
+      setIsNavigationReady(true);
+    }
+  }, [navigationState?.key]);
+
+  useEffect(() => {
+    if (isNavigationReady && isAuthenticated && isOnboarded) {
       router.replace('/(tabs)/home');
     }
-  }, [isAuthenticated, isOnboarded]);
+  }, [isNavigationReady, isAuthenticated, isOnboarded]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        {/* Logo and tagline */}
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      
+      {/* Content */}
+      <View style={[styles.content, { paddingTop: insets.top + spacing.xxxl }]}>
+        {/* Hero */}
         <View style={styles.hero}>
-          <Text style={styles.logo}>9xf labs</Text>
-          <Text style={styles.tagline}>
-            Co-invest with real VCs{'\n'}from $50.
+          {/* Logo mark */}
+          <View style={styles.logoContainer}>
+            <Text style={styles.logoText}>9xf</Text>
+          </View>
+          
+          <Text style={styles.headline}>
+            Invest alongside{'\n'}top VCs
+          </Text>
+          <Text style={styles.supporting}>
+            From $50. Same deal terms as the pros.
           </Text>
         </View>
+      </View>
 
-        {/* CTA buttons */}
-        <View style={styles.actions}>
-          <Button
-            title="Get started"
-            onPress={() => router.push('/(auth)/signup')}
-            variant="primary"
-            size="lg"
-            fullWidth
-          />
-          <Button
-            title="I already have an account"
-            onPress={() => router.push('/(auth)/signin')}
-            variant="secondary"
-            size="lg"
-            fullWidth
-          />
-        </View>
-
-        {/* Risk disclaimer */}
+      {/* Bottom actions */}
+      <View style={[styles.bottom, { paddingBottom: insets.bottom + spacing.lg }]}>
+        <Button
+          title="Get started"
+          onPress={() => router.push('/(auth)/signup')}
+          variant="filled"
+          fullWidth
+        />
+        <Button
+          title="Sign in"
+          onPress={() => router.push('/(auth)/signin')}
+          variant="text"
+          fullWidth
+        />
         <Text style={styles.disclaimer}>
-          Investing involves risk. You may lose money.
+          Capital at risk. Not FDIC insured.
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -61,32 +76,43 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
   },
   hero: {
-    alignItems: 'center',
-    marginBottom: spacing.xxl * 2,
+    flex: 1,
+    justifyContent: 'center',
   },
-  logo: {
-    fontSize: fontSize.display,
-    fontWeight: '600',
+  logoContainer: {
+    width: 72,
+    height: 72,
+    borderRadius: shape.lg,
+    backgroundColor: colors.cardMint,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xl,
+  },
+  logoText: {
+    ...typography.headlineMedium,
+    color: colors.onCardMint,
+    fontWeight: '700',
+  },
+  headline: {
+    ...typography.displaySmall,
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },
-  tagline: {
-    fontSize: fontSize.lg,
+  supporting: {
+    ...typography.bodyLarge,
     color: colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 28,
   },
-  actions: {
-    gap: spacing.md,
-    marginBottom: spacing.xl,
+  bottom: {
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
   },
   disclaimer: {
-    fontSize: fontSize.sm,
-    color: colors.textMuted,
+    ...typography.bodySmall,
+    color: colors.textTertiary,
     textAlign: 'center',
+    marginTop: spacing.md,
   },
 });

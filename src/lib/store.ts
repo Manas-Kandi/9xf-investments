@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { Session } from '@supabase/supabase-js';
 import type { User, FundingSource, Campaign, InvestmentIntent } from '@/types/database';
 
 // Onboarding step tracking
@@ -9,6 +10,7 @@ interface AppState {
   // Auth state
   user: User | null;
   isAuthenticated: boolean;
+  session: Session | null;
   
   // Onboarding
   onboardingStep: OnboardingStep;
@@ -27,6 +29,7 @@ interface AppState {
   addInvestment: (investment: InvestmentIntent) => void;
   updateInvestment: (id: string, updates: Partial<InvestmentIntent>) => void;
   logout: () => void;
+  setSession: (session: Session | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -35,6 +38,7 @@ export const useAppStore = create<AppState>()(
       // Initial state
       user: null,
       isAuthenticated: false,
+      session: null,
       onboardingStep: 'account',
       isOnboarded: false,
       fundingSource: null,
@@ -42,11 +46,11 @@ export const useAppStore = create<AppState>()(
 
       // Actions
       setUser: (user) =>
-        set({
+        set((state) => ({
           user,
-          isAuthenticated: !!user,
+          isAuthenticated: state.session ? true : !!user,
           isOnboarded: user?.kyc_status === 'verified' && user?.terms_accepted,
-        }),
+        })),
 
       setOnboardingStep: (step) =>
         set({
@@ -68,10 +72,13 @@ export const useAppStore = create<AppState>()(
           ),
         })),
 
+      setSession: (session) => set({ session, isAuthenticated: !!session }),
+
       logout: () =>
         set({
           user: null,
           isAuthenticated: false,
+          session: null,
           onboardingStep: 'account',
           isOnboarded: false,
           fundingSource: null,
@@ -82,6 +89,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        session: state.session,
         onboardingStep: state.onboardingStep,
         isOnboarded: state.isOnboarded,
         fundingSource: state.fundingSource,

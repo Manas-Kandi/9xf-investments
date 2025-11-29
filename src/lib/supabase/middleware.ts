@@ -1,39 +1,24 @@
-import { createServerClient } from '@supabase/ssr';
+import { createMiddlewareClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database';
 
-export async function updateSession(request: NextRequest) {
+export function createMiddlewareSupabaseClient(request: NextRequest): {
+  supabase: SupabaseClient<Database> | null;
+  response: NextResponse;
+} {
   const supabaseResponse = NextResponse.next({
     request,
   });
 
-  // Skip Supabase session refresh if env vars are not set (dev mode without Supabase)
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return supabaseResponse;
+    return { supabase: null, response: supabaseResponse };
   }
 
-  try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options)
-            );
-          },
-        },
-      }
-    );
+  const supabase = createMiddlewareClient<Database>({
+    req: request,
+    res: supabaseResponse,
+  });
 
-    // Refresh session if expired
-    await supabase.auth.getUser();
-  } catch {
-    // Supabase not configured, continue without session
-  }
-
-  return supabaseResponse;
+  return { supabase, response: supabaseResponse };
 }

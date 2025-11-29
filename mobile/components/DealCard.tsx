@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, fontSize, borderRadius, shadows } from '../constants/theme';
-import { useComponentTokens } from '../design-system';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors, spacing, fontSize, borderRadius } from '../constants/theme';
+import { color, type } from '../constants/design-system';
+import { PressableScale } from './animated';
 import type { Campaign } from '@shared/types';
 
 interface DealCardProps {
@@ -12,27 +13,15 @@ interface DealCardProps {
 }
 
 export function DealCard({ campaign, onPress, featured = false }: DealCardProps) {
-  const cardSpec = useComponentTokens('card');
   const progress = (campaign.amount_raised / campaign.target_amount) * 100;
   const isLive = campaign.status === 'live';
 
   return (
-    <TouchableOpacity
-      style={[
-        styles.container,
-        {
-          borderRadius: cardSpec.radius,
-          padding: cardSpec.padding,
-          backgroundColor: featured ? cardSpec.elevatedBackground : cardSpec.background,
-          borderColor: featured ? colors.primary : cardSpec.border,
-        },
-        featured && styles.featured,
-        shadows.md,
-      ]}
+    <PressableScale
+      style={[styles.container, featured && styles.featured]}
       onPress={onPress}
-      activeOpacity={0.8}
     >
-      {/* Header with logo and VC badge */}
+      {/* Header with logo and status */}
       <View style={styles.header}>
         <View style={styles.logoContainer}>
           {campaign.logo_url ? (
@@ -47,13 +36,13 @@ export function DealCard({ campaign, onPress, featured = false }: DealCardProps)
         {isLive && (
           <View style={styles.liveBadge}>
             <View style={styles.liveDot} />
-            <Text style={styles.liveText}>Raising now</Text>
+            <Text style={styles.liveText}>Live</Text>
           </View>
         )}
         
         {!isLive && campaign.status === 'draft' && (
           <View style={styles.comingSoonBadge}>
-            <Text style={styles.comingSoonText}>Coming soon</Text>
+            <Text style={styles.comingSoonText}>Soon</Text>
           </View>
         )}
       </View>
@@ -65,12 +54,12 @@ export function DealCard({ campaign, onPress, featured = false }: DealCardProps)
       {/* VC info */}
       {campaign.vc_info && (
         <View style={styles.vcInfo}>
-          <Ionicons name="shield-checkmark" size={14} color={colors.success} />
-          <Text style={styles.vcText}>Backed by {campaign.vc_info.name}</Text>
+          <MaterialCommunityIcons name="shield-check" size={14} color={color.success} />
+          <Text style={styles.vcText}>{campaign.vc_info.name}</Text>
         </View>
       )}
 
-      {/* Progress bar (only for live campaigns) */}
+      {/* Progress bar */}
       {isLive && (
         <View style={styles.progressSection}>
           <View style={styles.progressBar}>
@@ -78,10 +67,10 @@ export function DealCard({ campaign, onPress, featured = false }: DealCardProps)
           </View>
           <View style={styles.progressLabels}>
             <Text style={styles.raisedAmount}>
-              ${campaign.amount_raised.toLocaleString()} raised
+              ${(campaign.amount_raised / 1000).toFixed(0)}k raised
             </Text>
             <Text style={styles.goalAmount}>
-              {Math.round(progress)}% of ${(campaign.target_amount / 1000).toFixed(0)}k goal
+              {Math.round(progress)}%
             </Text>
           </View>
         </View>
@@ -90,11 +79,12 @@ export function DealCard({ campaign, onPress, featured = false }: DealCardProps)
       {/* Key metrics */}
       <View style={styles.metrics}>
         <View style={styles.metric}>
-          <Text style={styles.metricLabel}>Min investment</Text>
+          <Text style={styles.metricLabel}>Min</Text>
           <Text style={styles.metricValue}>${campaign.min_investment}</Text>
         </View>
+        <View style={styles.metricDivider} />
         <View style={styles.metric}>
-          <Text style={styles.metricLabel}>Crowd allocation</Text>
+          <Text style={styles.metricLabel}>Allocation</Text>
           <Text style={styles.metricValue}>{campaign.crowd_percentage}%</Text>
         </View>
       </View>
@@ -102,31 +92,35 @@ export function DealCard({ campaign, onPress, featured = false }: DealCardProps)
       {/* CTA */}
       <View style={styles.cta}>
         <Text style={styles.ctaText}>
-          {isLive ? `Invest from $${campaign.min_investment}` : 'Coming soon'}
+          {isLive ? 'Invest' : 'Notify me'}
         </Text>
-        <Ionicons name="arrow-forward" size={18} color={colors.textPrimary} />
+        <MaterialCommunityIcons name="arrow-right" size={16} color={color.bg} />
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: spacing.md,
+    backgroundColor: color.bgCard,
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 12,
   },
   featured: {
     borderWidth: 1,
+    borderColor: color.accent,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: spacing.md,
+    marginBottom: 12,
   },
   logoContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.md,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     overflow: 'hidden',
   },
   logo: {
@@ -136,126 +130,129 @@ const styles = StyleSheet.create({
   logoPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: colors.primary,
+    backgroundColor: color.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoText: {
-    color: colors.white,
-    fontSize: fontSize.xl,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: '700',
   },
   liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.success,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
-    gap: spacing.xs,
+    backgroundColor: color.success,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    gap: 4,
   },
   liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.white,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: '#fff',
   },
   liveText: {
-    color: colors.white,
-    fontSize: fontSize.xs,
+    color: '#fff',
+    fontSize: 11,
     fontWeight: '600',
   },
   comingSoonBadge: {
-    backgroundColor: colors.surfaceSecondary,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
+    backgroundColor: color.bgElevated,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
   },
   comingSoonText: {
-    color: colors.textSecondary,
-    fontSize: fontSize.xs,
+    color: color.textSecondary,
+    fontSize: 11,
     fontWeight: '500',
   },
   companyName: {
-    fontSize: fontSize.lg,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
+    ...type.titleMedium,
+    color: color.textPrimary,
+    marginBottom: 4,
   },
   tagline: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
-    marginBottom: spacing.md,
-    lineHeight: 20,
+    ...type.bodySmall,
+    color: color.textSecondary,
+    marginBottom: 12,
+    lineHeight: 18,
   },
   vcInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.md,
+    gap: 6,
+    marginBottom: 12,
   },
   vcText: {
-    fontSize: fontSize.sm,
-    color: colors.success,
-    fontWeight: '500',
+    ...type.labelSmall,
+    color: color.success,
   },
   progressSection: {
-    marginBottom: spacing.md,
+    marginBottom: 12,
   },
   progressBar: {
-    height: 6,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: 3,
+    height: 4,
+    backgroundColor: color.bgElevated,
+    borderRadius: 2,
     overflow: 'hidden',
-    marginBottom: spacing.sm,
+    marginBottom: 8,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 3,
+    backgroundColor: color.accent,
+    borderRadius: 2,
   },
   progressLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   raisedAmount: {
-    fontSize: fontSize.sm,
-    color: colors.primary,
-    fontWeight: '600',
+    ...type.labelSmall,
+    color: color.accent,
   },
   goalAmount: {
-    fontSize: fontSize.sm,
-    color: colors.textMuted,
+    ...type.labelSmall,
+    color: color.textSecondary,
   },
   metrics: {
     flexDirection: 'row',
-    gap: spacing.xl,
-    marginBottom: spacing.lg,
+    alignItems: 'center',
+    marginBottom: 16,
   },
   metric: {
     flex: 1,
   },
+  metricDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: color.borderSubtle,
+    marginHorizontal: 16,
+  },
   metricLabel: {
-    fontSize: fontSize.xs,
-    color: colors.textMuted,
-    marginBottom: spacing.xs,
+    ...type.labelSmall,
+    color: color.textSecondary,
+    marginBottom: 2,
   },
   metricValue: {
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
-    fontWeight: '600',
+    ...type.titleSmall,
+    color: color.textPrimary,
   },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.surfaceSecondary,
-    padding: spacing.md,
-    borderRadius: borderRadius.sm,
+    justifyContent: 'center',
+    backgroundColor: color.accent,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 6,
   },
   ctaText: {
-    fontSize: fontSize.md,
-    color: colors.textPrimary,
-    fontWeight: '500',
+    ...type.labelMedium,
+    color: color.bg,
+    fontWeight: '600',
   },
 });

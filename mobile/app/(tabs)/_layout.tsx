@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
+import { View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, components } from '../../constants/theme';
+import { colors, components, spacing } from '../../constants/theme';
 
 export default function TabsLayout() {
   return (
@@ -9,29 +10,33 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: colors.background,
-          borderTopWidth: 0,
-          height: components.tabBar.height,
-          paddingTop: 8,
-          paddingBottom: 8,
+          borderTopWidth: 1,
+          borderTopColor: colors.borderSubtle,
+          height: 84,
+          paddingTop: 12,
+          paddingBottom: 24,
+          paddingHorizontal: 8,
         },
         tabBarActiveTintColor: colors.textPrimary,
-        tabBarInactiveTintColor: colors.textTertiary,
+        tabBarInactiveTintColor: colors.textMuted,
         tabBarLabelStyle: {
-          fontSize: 1,
-          color: 'transparent',
-          margin: 0,
-          padding: 0,
+          fontSize: 11,
+          fontWeight: '500',
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginBottom: -2,
         },
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Discover',
+          title: 'Home',
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons 
               name={focused ? 'home' : 'home-outline'} 
-              size={24} 
+              size={22} 
               color={color} 
             />
           ),
@@ -40,11 +45,11 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
+          title: 'Statistics',
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons 
-              name={focused ? 'compass' : 'compass-outline'} 
-              size={24} 
+              name={focused ? 'chart-line' : 'chart-line-variant'} 
+              size={22} 
               color={color} 
             />
           ),
@@ -53,24 +58,27 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="portfolio"
         options={{
-          title: 'Portfolio',
+          title: 'Transaction',
           tabBarIcon: ({ color, focused }) => (
-            <MaterialCommunityIcons 
-              name={focused ? 'briefcase' : 'briefcase-outline'} 
-              size={24} 
-              color={color} 
-            />
+            <View style={[styles.centerButton, focused && styles.centerButtonActive]}>
+              <MaterialCommunityIcons 
+                name="plus" 
+                size={24} 
+                color={focused ? colors.onPrimary : colors.textPrimary} 
+              />
+            </View>
           ),
+          tabBarLabel: () => null,
         }}
       />
       <Tabs.Screen
         name="account"
         options={{
-          title: 'Profile',
+          title: 'Settings',
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons 
-              name={focused ? 'account-circle' : 'account-circle-outline'} 
-              size={24} 
+              name={focused ? 'cog' : 'cog-outline'} 
+              size={22} 
               color={color} 
             />
           ),
@@ -79,3 +87,18 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  centerButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.surfaceContainerHighest,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -20,
+  },
+  centerButtonActive: {
+    backgroundColor: colors.primary,
+  },
+});

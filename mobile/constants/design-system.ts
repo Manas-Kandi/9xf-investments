@@ -90,6 +90,7 @@ export const palette = {
 
 export const color = {
   bg: tokens.color.background,
+  bgPrimary: tokens.color.background,
   bgElevated: tokens.color.surfaceContainerHigh,
   bgCard: tokens.color.surfaceContainer,
   bgOverlay: tokens.color.scrim,
@@ -102,6 +103,7 @@ export const color = {
   accent: tokens.color.primary,
   accentText: tokens.color.onPrimary,
   link: tokens.color.info,
+  info: tokens.color.info,
   success: tokens.color.success,
   error: tokens.color.error,
   warning: tokens.color.warning,

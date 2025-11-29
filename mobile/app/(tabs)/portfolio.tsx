@@ -3,294 +3,326 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
-  TouchableOpacity,
+  TextInput,
   RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { colors, spacing, fontSize, borderRadius } from '../../constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors, spacing } from '../../constants/theme';
+import { color, type } from '../../constants/design-system';
+import { PressableScale, FadeIn, SlideUp } from '../../components/animated';
 import { Button } from '../../components';
 import { useAppStore } from '../../store';
 
 export default function PortfolioScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { investments } = useAppStore();
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    // Simulate data refresh
     setTimeout(() => setRefreshing(false), 1000);
   }, []);
 
-  const totalInvested = investments.reduce((sum, inv) => sum + inv.amount, 0);
-  const companiesCount = new Set(investments.map((i) => i.campaign_id)).size;
-
   const statusLabel: Record<string, string> = {
     initiated: 'Pending',
-    processing: 'Processing',
-    confirmed: 'Confirmed',
+    processing: 'In Progress',
+    confirmed: 'Completed',
     failed: 'Failed',
   };
 
   const statusColor: Record<string, string> = {
-    initiated: colors.warning,
-    processing: colors.info,
-    confirmed: colors.success,
-    failed: colors.error,
+    initiated: color.warning,
+    processing: color.info,
+    confirmed: color.success,
+    failed: color.error,
   };
+
+  const actionLabel: Record<string, string> = {
+    initiated: 'Buy',
+    processing: 'Shop',
+    confirmed: 'Buy',
+    failed: 'Buy',
+  };
+
+  // Group investments by date
+  const groupedInvestments = investments.reduce((groups, investment) => {
+    const date = new Date(investment.created_at).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+    if (!groups[date]) groups[date] = [];
+    groups[date].push(investment);
+    return groups;
+  }, {} as Record<string, typeof investments>);
 
   if (investments.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <FadeIn>
+          <Text style={styles.pageTitle}>Transaction{'\n'}History</Text>
+        </FadeIn>
         <View style={styles.emptyState}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="briefcase-outline" size={48} color={colors.textMuted} />
+            <MaterialCommunityIcons name="receipt-text-outline" size={48} color={color.textSecondary} />
           </View>
-          <Text style={styles.emptyTitle}>No investments yet</Text>
+          <Text style={styles.emptyTitle}>No transactions yet</Text>
           <Text style={styles.emptyText}>
-            When you invest, they'll appear here.
+            Your investment history will appear here.
           </Text>
-          <Button
-            title="Browse deals"
+          <PressableScale 
+            style={styles.browseButton}
             onPress={() => router.push('/(tabs)/home')}
-            variant="primary"
-            size="lg"
-          />
+          >
+            <Text style={styles.browseButtonText}>Browse deals</Text>
+          </PressableScale>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
+    <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-            progressBackgroundColor={colors.surface}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={color.accent} />
         }
+        showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Portfolio</Text>
-        </View>
+        <FadeIn>
+          <Text style={styles.pageTitle}>Transaction{'\n'}History</Text>
+        </FadeIn>
 
-        {/* Summary Cards */}
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Total invested</Text>
-            <Text style={styles.summaryValue}>${totalInvested.toLocaleString()}</Text>
+        {/* Search Bar */}
+        <SlideUp delay={50}>
+          <View style={styles.searchContainer}>
+            <MaterialCommunityIcons name="magnify" size={20} color={color.textSecondary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search transaction"
+              placeholderTextColor={color.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <PressableScale style={styles.filterButton}>
+              <MaterialCommunityIcons name="tune-variant" size={18} color={color.textSecondary} />
+            </PressableScale>
           </View>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Companies</Text>
-            <Text style={styles.summaryValue}>{companiesCount}</Text>
-          </View>
-        </View>
+        </SlideUp>
 
-        {/* Investments List */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your investments</Text>
-          {investments.map((investment) => (
-            <TouchableOpacity
-              key={investment.id}
-              style={styles.investmentCard}
-              onPress={() => router.push(`/deal/${investment.campaign?.slug}`)}
-            >
-              <View style={styles.investmentHeader}>
-                <View style={styles.companyLogo}>
-                  <Text style={styles.logoText}>
-                    {investment.campaign?.company_name?.charAt(0) || '?'}
-                  </Text>
+        {/* Transaction Groups */}
+        {Object.entries(groupedInvestments).map(([date, dateInvestments], groupIndex) => (
+          <SlideUp key={date} delay={100 + groupIndex * 50}>
+            <Text style={styles.dateHeader}>{date}</Text>
+            
+            {dateInvestments.map((investment, index) => (
+              <PressableScale
+                key={investment.id}
+                style={styles.transactionItem}
+                onPress={() => router.push(`/deal/${investment.campaign?.slug}`)}
+              >
+                <View style={styles.transactionLeft}>
+                  <View style={styles.transactionLogo}>
+                    <Text style={styles.transactionLogoText}>
+                      {investment.campaign?.company_name?.charAt(0) || '?'}
+                    </Text>
+                  </View>
+                  <View style={styles.transactionInfo}>
+                    <Text style={styles.transactionName}>
+                      {investment.campaign?.company_name || 'Unknown'}
+                    </Text>
+                    <View style={styles.transactionMeta}>
+                      <View style={[styles.statusBadge, { backgroundColor: statusColor[investment.status] + '20' }]}>
+                        <Text style={[styles.statusText, { color: statusColor[investment.status] }]}>
+                          {statusLabel[investment.status]}
+                        </Text>
+                      </View>
+                      <Text style={styles.actionText}>{actionLabel[investment.status]}</Text>
+                    </View>
+                  </View>
                 </View>
-                <View style={styles.companyInfo}>
-                  <Text style={styles.companyName}>
-                    {investment.campaign?.company_name || 'Unknown Company'}
-                  </Text>
-                  <Text style={styles.investmentDate}>
-                    Invested on {new Date(investment.created_at).toLocaleDateString()}
-                  </Text>
-                </View>
-                <View
-                  style={[
-                    styles.statusBadge,
-                    { backgroundColor: statusColor[investment.status] + '20' },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.statusText,
-                      { color: statusColor[investment.status] },
-                    ]}
-                  >
-                    {statusLabel[investment.status]}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.investmentFooter}>
-                <View>
-                  <Text style={styles.amountLabel}>Amount invested</Text>
-                  <Text style={styles.amountValue}>
+                <View style={styles.transactionRight}>
+                  <Text style={styles.transactionAmount}>
                     ${investment.amount.toLocaleString()}
                   </Text>
+                  <Text style={styles.transactionTime}>
+                    {new Date(investment.created_at).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}
+                  </Text>
                 </View>
-                <Ionicons
-                  name="chevron-forward"
-                  size={20}
-                  color={colors.textMuted}
-                />
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+              </PressableScale>
+            ))}
+          </SlideUp>
+        ))}
+
+        {/* Bottom padding */}
+        <View style={{ height: insets.bottom + 100 }} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: color.bg,
   },
   scrollContent: {
-    padding: spacing.lg,
+    paddingHorizontal: 20,
   },
-  header: {
-    marginBottom: spacing.lg,
+  pageTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: color.textPrimary,
+    lineHeight: 40,
+    marginBottom: 24,
+    letterSpacing: -0.5,
   },
-  title: {
-    fontSize: fontSize.xxl,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  summaryRow: {
+
+  // Search
+  searchContainer: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.xl,
+    alignItems: 'center',
+    backgroundColor: color.bgCard,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 24,
+    gap: 12,
   },
-  summaryCard: {
+  searchInput: {
     flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
+    ...type.bodyMedium,
+    color: color.textPrimary,
+    padding: 0,
   },
-  summaryLabel: {
-    fontSize: fontSize.sm,
-    color: colors.textMuted,
-    marginBottom: spacing.xs,
-  },
-  summaryValue: {
-    fontSize: fontSize.xl,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  section: {
-    marginBottom: spacing.xl,
-  },
-  sectionTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  investmentCard: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-  },
-  investmentHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  companyLogo: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.primary,
+  filterButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: color.bgElevated,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
   },
-  logoText: {
-    color: colors.white,
-    fontSize: fontSize.lg,
-    fontWeight: '700',
+
+  // Date Header
+  dateHeader: {
+    ...type.titleSmall,
+    color: color.textSecondary,
+    marginBottom: 12,
+    marginTop: 8,
   },
-  companyInfo: {
+
+  // Transaction Item
+  transactionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: color.borderSubtle,
+  },
+  transactionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
   },
-  companyName: {
-    fontSize: fontSize.md,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
+  transactionLogo: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: color.bgCard,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
-  investmentDate: {
-    fontSize: fontSize.sm,
-    color: colors.textMuted,
+  transactionLogoText: {
+    ...type.titleMedium,
+    color: color.textPrimary,
+  },
+  transactionInfo: {
+    flex: 1,
+  },
+  transactionName: {
+    ...type.titleSmall,
+    color: color.textPrimary,
+    marginBottom: 6,
+  },
+  transactionMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   statusBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
   },
   statusText: {
-    fontSize: fontSize.xs,
+    fontSize: 10,
     fontWeight: '600',
   },
-  investmentFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+  actionText: {
+    ...type.bodySmall,
+    color: color.textSecondary,
   },
-  amountLabel: {
-    fontSize: fontSize.xs,
-    color: colors.textMuted,
-    marginBottom: spacing.xs,
+  transactionRight: {
+    alignItems: 'flex-end',
   },
-  amountValue: {
-    fontSize: fontSize.lg,
-    fontWeight: '600',
-    color: colors.textPrimary,
+  transactionAmount: {
+    ...type.titleSmall,
+    color: color.textPrimary,
+    marginBottom: 4,
   },
+  transactionTime: {
+    ...type.bodySmall,
+    color: color.textSecondary,
+  },
+
+  // Empty State
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.xl,
+    paddingHorizontal: 40,
   },
   emptyIcon: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.surface,
+    backgroundColor: color.bgCard,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: 24,
   },
   emptyTitle: {
-    fontSize: fontSize.xl,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
+    ...type.titleLarge,
+    color: color.textPrimary,
+    marginBottom: 8,
   },
   emptyText: {
-    fontSize: fontSize.md,
-    color: colors.textSecondary,
+    ...type.bodyMedium,
+    color: color.textSecondary,
     textAlign: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: 32,
+  },
+  browseButton: {
+    backgroundColor: color.accent,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  browseButtonText: {
+    ...type.labelLarge,
+    color: color.accentText,
   },
 });

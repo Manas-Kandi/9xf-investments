@@ -7,6 +7,7 @@ import { ArrowRight } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { useAppStore } from '@/lib/store';
+import { trackEvent } from '@/lib/analytics';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -48,6 +49,7 @@ export default function SignUpPage() {
       updated_at: new Date().toISOString(),
     });
     setOnboardingStep('kyc');
+    trackEvent('signup_completed', { email });
     router.push('/onboarding');
 
     setIsLoading(false);

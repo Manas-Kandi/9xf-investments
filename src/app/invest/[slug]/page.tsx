@@ -6,8 +6,10 @@ import { Grid, Column, Tile, Button, InlineLoading, Checkbox, NumberInput } from
 import { ArrowRight, ArrowLeft, Checkmark, Warning } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAppStore } from '@/lib/store';
 import { getCampaignBySlug } from '@/lib/mock-data';
+import { trackEvent } from '@/lib/analytics';
 
 interface InvestPageProps {
   params: Promise<{ slug: string }>;
@@ -59,6 +61,10 @@ export default function InvestPage({ params }: InvestPageProps) {
 
   const handleContinue = () => {
     if (amount >= campaign.min_investment && amount <= campaign.max_investment_per_person) {
+      trackEvent('invest_attempt', {
+        amount,
+        campaign: campaign.slug,
+      });
       setStep('confirm');
     }
   };
@@ -83,6 +89,11 @@ export default function InvestPage({ params }: InvestPageProps) {
       campaign,
     });
 
+    trackEvent('invest_success', {
+      amount,
+      campaign: campaign.slug,
+    });
+
     setStep('success');
   };
 
@@ -91,30 +102,31 @@ export default function InvestPage({ params }: InvestPageProps) {
   return (
     <>
       <Header />
-      <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', background: '#f4f4f4' }}>
-        <div className="container" style={{ padding: '3rem 1rem' }}>
-          <Grid>
-            <Column lg={{ span: 8, offset: 4 }} md={8} sm={4}>
-              {/* Amount Selection */}
-              {step === 'amount' && (
-                <Tile style={{ padding: '2.5rem' }}>
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    renderIcon={ArrowLeft}
-                    as={Link}
-                    href={`/campaigns/${slug}`}
-                    style={{ marginBottom: '1.5rem', marginLeft: '-1rem' }}
-                  >
-                    Back to campaign
-                  </Button>
+      <ErrorBoundary title="Investment flow unavailable" description="We couldn't load the investment flow. Please refresh and try again.">
+        <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', background: '#f4f4f4' }}>
+          <div className="container" style={{ padding: '3rem 1rem' }}>
+            <Grid>
+              <Column lg={{ span: 8, offset: 4 }} md={8} sm={4}>
+                {/* Amount Selection */}
+                {step === 'amount' && (
+                  <Tile style={{ padding: '2.5rem' }}>
+                    <Button
+                      kind="ghost"
+                      size="sm"
+                      renderIcon={ArrowLeft}
+                      as={Link}
+                      href={`/campaigns/${slug}`}
+                      style={{ marginBottom: '1.5rem', marginLeft: '-1rem' }}
+                    >
+                      Back to campaign
+                    </Button>
 
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                    Invest in {campaign.company_name}
-                  </h1>
-                  <p style={{ color: '#525252', marginBottom: '2rem' }}>
-                    How much would you like to invest?
-                  </p>
+                    <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                      Invest in {campaign.company_name}
+                    </h1>
+                    <p style={{ color: '#525252', marginBottom: '2rem' }}>
+                      How much would you like to invest?
+                    </p>
 
                   {/* Preset Amounts */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -296,10 +308,11 @@ export default function InvestPage({ params }: InvestPageProps) {
                   </div>
                 </Tile>
               )}
-            </Column>
-          </Grid>
-        </div>
-      </main>
+              </Column>
+            </Grid>
+          </div>
+        </main>
+      </ErrorBoundary>
     </>
   );
 }

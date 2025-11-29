@@ -12,19 +12,28 @@
       "resizeMode": "contain",
       "backgroundColor": "#161616"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.9xflabs.app"
+      "bundleIdentifier": "com.9xflabs.app",
+      "associatedDomains": ["applinks:9xflabs.com"]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#161616"
       },
-      "package": "com.nxflabs.app"
+      "package": "com.nxflabs.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            { "scheme": "https", "host": "9xflabs.com", "pathPrefix": "/invest" },
+            { "scheme": "9xflabs", "host": "*" }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -38,6 +47,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://9xflabs.com"
+      },
+      "eas": {
+        "projectId": "c0c1e1bb-3d1e-4c3b-9c49-2a4b5d7f6f51"
+      }
     }
   }
 }

@@ -27,7 +27,21 @@ export default function SplashScreen() {
   // Animation values
   const fadeIn = useRef(new Animated.Value(0)).current;
   const slideUp = useRef(new Animated.Value(40)).current;
-  const lineWidth = useRef(new Animated.Value(0)).current;
+  
+  // Wave animations
+  const wave1Y = useRef(new Animated.Value(0)).current;
+  const wave2X = useRef(new Animated.Value(0)).current;
+  const wave3Scale = useRef(new Animated.Value(1)).current;
+  
+  // Floating particles
+  const particle1Y = useRef(new Animated.Value(0)).current;
+  const particle2Y = useRef(new Animated.Value(0)).current;
+  const particle3Y = useRef(new Animated.Value(0)).current;
+  const particle4Y = useRef(new Animated.Value(0)).current;
+  const particle5Y = useRef(new Animated.Value(0)).current;
+  const particle6Y = useRef(new Animated.Value(0)).current;
+  const particle7Y = useRef(new Animated.Value(0)).current;
+  const particle8Y = useRef(new Animated.Value(0)).current;
   
   // Comet animations
   const comet1X = useRef(new Animated.Value(-200)).current;
@@ -54,27 +68,97 @@ export default function SplashScreen() {
 
   // Start animations on mount
   useEffect(() => {
-    Animated.sequence([
-      // First fade in
-      Animated.parallel([
-        Animated.timing(fadeIn, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideUp, {
-          toValue: 0,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-      ]),
-      // Then animate the line
-      Animated.timing(lineWidth, {
+    Animated.parallel([
+      Animated.timing(fadeIn, {
         toValue: 1,
-        duration: 800,
-        useNativeDriver: false,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideUp, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
       }),
     ]).start();
+
+    // Wave animations
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(wave1Y, { toValue: 100, duration: 12000, useNativeDriver: true }),
+        Animated.timing(wave1Y, { toValue: -100, duration: 12000, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(wave2X, { toValue: 80, duration: 15000, useNativeDriver: true }),
+        Animated.timing(wave2X, { toValue: -80, duration: 15000, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(wave3Scale, { toValue: 1.1, duration: 8000, useNativeDriver: true }),
+        Animated.timing(wave3Scale, { toValue: 0.9, duration: 8000, useNativeDriver: true }),
+      ])
+    ).start();
+
+    // Floating particles
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(particle1Y, { toValue: -SCREEN_HEIGHT - 50, duration: 6000, useNativeDriver: true }),
+        Animated.timing(particle1Y, { toValue: 50, duration: 0, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(particle2Y, { toValue: -SCREEN_HEIGHT - 60, duration: 7000, useNativeDriver: true }),
+        Animated.timing(particle2Y, { toValue: 60, duration: 0, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(particle3Y, { toValue: -SCREEN_HEIGHT - 40, duration: 5500, useNativeDriver: true }),
+        Animated.timing(particle3Y, { toValue: 40, duration: 0, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(particle4Y, { toValue: -SCREEN_HEIGHT - 55, duration: 6500, useNativeDriver: true }),
+        Animated.timing(particle4Y, { toValue: 55, duration: 0, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(particle5Y, { toValue: -SCREEN_HEIGHT - 45, duration: 5800, useNativeDriver: true }),
+        Animated.timing(particle5Y, { toValue: 45, duration: 0, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(particle6Y, { toValue: -SCREEN_HEIGHT - 65, duration: 7200, useNativeDriver: true }),
+        Animated.timing(particle6Y, { toValue: 65, duration: 0, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(particle7Y, { toValue: -SCREEN_HEIGHT - 50, duration: 6400, useNativeDriver: true }),
+        Animated.timing(particle7Y, { toValue: 50, duration: 0, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(particle8Y, { toValue: -SCREEN_HEIGHT - 55, duration: 6900, useNativeDriver: true }),
+        Animated.timing(particle8Y, { toValue: 55, duration: 0, useNativeDriver: true }),
+      ])
+    ).start();
 
     // Comet animations
     Animated.loop(
@@ -128,26 +212,109 @@ export default function SplashScreen() {
     ).start();
   }, []);
 
-  const animatedLineWidth = lineWidth.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 60],
+  
+  // Wave interpolations
+  const wave1Translate = wave1Y.interpolate({
+    inputRange: [-100, 100],
+    outputRange: [-100, 100],
+  });
+
+  const wave2Translate = wave2X.interpolate({
+    inputRange: [-80, 80],
+    outputRange: [-80, 80],
+  });
+
+  const wave3ScaleValue = wave3Scale.interpolate({
+    inputRange: [0.9, 1.1],
+    outputRange: [0.9, 1.1],
+  });
+
+  // Particle positions
+  const particle1Pos = particle1Y.interpolate({
+    inputRange: [-SCREEN_HEIGHT - 50, 50],
+    outputRange: [-SCREEN_HEIGHT - 50, SCREEN_HEIGHT + 50],
+  });
+
+  const particle2Pos = particle2Y.interpolate({
+    inputRange: [-SCREEN_HEIGHT - 60, 60],
+    outputRange: [-SCREEN_HEIGHT - 60, SCREEN_HEIGHT + 60],
+  });
+
+  const particle3Pos = particle3Y.interpolate({
+    inputRange: [-SCREEN_HEIGHT - 40, 40],
+    outputRange: [-SCREEN_HEIGHT - 40, SCREEN_HEIGHT + 40],
+  });
+
+  const particle4Pos = particle4Y.interpolate({
+    inputRange: [-SCREEN_HEIGHT - 55, 55],
+    outputRange: [-SCREEN_HEIGHT - 55, SCREEN_HEIGHT + 55],
+  });
+
+  const particle5Pos = particle5Y.interpolate({
+    inputRange: [-SCREEN_HEIGHT - 45, 45],
+    outputRange: [-SCREEN_HEIGHT - 45, SCREEN_HEIGHT + 45],
+  });
+
+  const particle6Pos = particle6Y.interpolate({
+    inputRange: [-SCREEN_HEIGHT - 65, 65],
+    outputRange: [-SCREEN_HEIGHT - 65, SCREEN_HEIGHT + 65],
+  });
+
+  const particle7Pos = particle7Y.interpolate({
+    inputRange: [-SCREEN_HEIGHT - 50, 50],
+    outputRange: [-SCREEN_HEIGHT - 50, SCREEN_HEIGHT + 50],
+  });
+
+  const particle8Pos = particle8Y.interpolate({
+    inputRange: [-SCREEN_HEIGHT - 55, 55],
+    outputRange: [-SCREEN_HEIGHT - 55, SCREEN_HEIGHT + 55],
   });
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
-      {/* Galaxy Background */}
+      {/* Dynamic Galaxy Background */}
       <View style={styles.galaxyContainer}>
-        {/* Nebula gradient overlay */}
-        <LinearGradient
-          colors={['rgba(75, 0, 130, 0.2)', 'rgba(0, 0, 0, 0)', 'rgba(25, 25, 112, 0.1)']}
-          style={styles.nebula}
-          start={{ x: 0.3, y: 0.2 }}
-          end={{ x: 0.7, y: 0.8 }}
-        />
+        {/* Dark nebula waves */}
+        <Animated.View style={[styles.nebulaWave, styles.nebula1, { transform: [{ translateY: wave1Translate }] }]}>
+          <LinearGradient
+            colors={['rgba(30, 0, 60, 0.6)', 'rgba(10, 0, 30, 0.4)', 'rgba(0, 0, 0, 0)']}
+            style={styles.gradientFill}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        </Animated.View>
 
-        {/* Static stars */}
+        <Animated.View style={[styles.nebulaWave, styles.nebula2, { transform: [{ translateX: wave2Translate }] }]}>
+          <LinearGradient
+            colors={['rgba(60, 0, 120, 0.5)', 'rgba(20, 0, 50, 0.3)', 'rgba(0, 0, 0, 0)']}
+            style={styles.gradientFill}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+          />
+        </Animated.View>
+
+        <Animated.View style={[styles.nebulaWave, styles.nebula3, { transform: [{ scale: wave3ScaleValue }] }]}>
+          <LinearGradient
+            colors={['rgba(40, 0, 80, 0.4)', 'rgba(15, 0, 40, 0.2)', 'rgba(0, 0, 0, 0)']}
+            style={styles.gradientFill}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+          />
+        </Animated.View>
+
+        {/* Floating particles */}
+        <Animated.View style={[styles.floatingParticle, styles.particle1, { transform: [{ translateY: particle1Pos }] }]} />
+        <Animated.View style={[styles.floatingParticle, styles.particle2, { transform: [{ translateY: particle2Pos }] }]} />
+        <Animated.View style={[styles.floatingParticle, styles.particle3, { transform: [{ translateY: particle3Pos }] }]} />
+        <Animated.View style={[styles.floatingParticle, styles.particle4, { transform: [{ translateY: particle4Pos }] }]} />
+        <Animated.View style={[styles.floatingParticle, styles.particle5, { transform: [{ translateY: particle5Pos }] }]} />
+        <Animated.View style={[styles.floatingParticle, styles.particle6, { transform: [{ translateY: particle6Pos }] }]} />
+        <Animated.View style={[styles.floatingParticle, styles.particle7, { transform: [{ translateY: particle7Pos }] }]} />
+        <Animated.View style={[styles.floatingParticle, styles.particle8, { transform: [{ translateY: particle8Pos }] }]} />
+
+        {/* Dimmer stars */}
         <View style={[styles.star, styles.star1]} />
         <View style={[styles.star, styles.star2]} />
         <View style={[styles.star, styles.star3]} />
@@ -160,23 +327,17 @@ export default function SplashScreen() {
         <View style={[styles.star, styles.star10]} />
         <View style={[styles.star, styles.star11]} />
         <View style={[styles.star, styles.star12]} />
-        <View style={[styles.star, styles.star13]} />
-        <View style={[styles.star, styles.star14]} />
-        <View style={[styles.star, styles.star15]} />
-        <View style={[styles.star, styles.star16]} />
-        <View style={[styles.star, styles.star17]} />
-        <View style={[styles.star, styles.star18]} />
 
-        {/* Twinkling stars */}
+        {/* Subtle twinkling stars */}
         <Animated.View style={[styles.star, styles.twinkle1, { opacity: star1Opacity }]} />
         <Animated.View style={[styles.star, styles.twinkle2, { opacity: star2Opacity }]} />
         <Animated.View style={[styles.star, styles.twinkle3, { opacity: star3Opacity }]} />
         <Animated.View style={[styles.star, styles.twinkle4, { opacity: star4Opacity }]} />
 
-        {/* Moving comets */}
+        {/* Brighter comets for contrast */}
         <Animated.View style={[styles.comet, { transform: [{ translateX: comet1X }] }]}>
           <LinearGradient
-            colors={['rgba(255, 255, 255, 0.8)', 'rgba(255, 255, 255, 0.3)', 'transparent']}
+            colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0.5)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.cometGradient}
@@ -185,7 +346,7 @@ export default function SplashScreen() {
         
         <Animated.View style={[styles.comet, { transform: [{ translateX: comet2X }] }]}>
           <LinearGradient
-            colors={['rgba(255, 255, 255, 0.6)', 'rgba(255, 255, 255, 0.2)', 'transparent']}
+            colors={['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.4)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.cometGradient}
@@ -194,7 +355,7 @@ export default function SplashScreen() {
         
         <Animated.View style={[styles.comet, { transform: [{ translateX: comet3X }] }]}>
           <LinearGradient
-            colors={['rgba(255, 255, 255, 0.7)', 'rgba(255, 255, 255, 0.25)', 'transparent']}
+            colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.45)', 'transparent']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.cometGradient}
@@ -216,7 +377,6 @@ export default function SplashScreen() {
         {/* Logo */}
         <View style={styles.logoRow}>
           <Text style={styles.logoText}>9xf</Text>
-          <Animated.View style={[styles.logoLine, { width: animatedLineWidth }]} />
         </View>
 
         {/* Spacer */}
@@ -276,51 +436,80 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  // Nebula gradient
-  nebula: {
+  // Nebula waves
+  nebulaWave: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
   },
+  nebula1: {
+    width: SCREEN_WIDTH * 1.5,
+    height: SCREEN_HEIGHT * 1.5,
+    top: -SCREEN_HEIGHT * 0.25,
+    left: -SCREEN_WIDTH * 0.25,
+  },
+  nebula2: {
+    width: SCREEN_WIDTH * 1.3,
+    height: SCREEN_HEIGHT * 1.3,
+    top: -SCREEN_HEIGHT * 0.15,
+    left: -SCREEN_WIDTH * 0.15,
+  },
+  nebula3: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+    top: 0,
+    left: 0,
+  },
+  gradientFill: {
+    flex: 1,
+  },
 
-  // Stars
+  // Floating particles
+  floatingParticle: {
+    position: 'absolute',
+    backgroundColor: 'rgba(147, 51, 234, 0.6)',
+    borderRadius: 50,
+  },
+  particle1: { width: 3, height: 3, left: '15%' },
+  particle2: { width: 2, height: 2, left: '30%' },
+  particle3: { width: 4, height: 4, left: '45%' },
+  particle4: { width: 2, height: 2, left: '60%' },
+  particle5: { width: 3, height: 3, left: '75%' },
+  particle6: { width: 2, height: 2, left: '20%' },
+  particle7: { width: 3, height: 3, left: '50%' },
+  particle8: { width: 2, height: 2, left: '85%' },
+
+  // Stars (dimmer)
   star: {
     position: 'absolute',
     backgroundColor: '#FFFFFF',
     borderRadius: 50,
   },
-  // Static stars
-  star1: { width: 2, height: 2, top: '8%', left: '12%', opacity: 0.6 },
-  star2: { width: 3, height: 3, top: '15%', left: '25%', opacity: 0.8 },
-  star3: { width: 1, height: 1, top: '22%', left: '8%', opacity: 0.4 },
-  star4: { width: 2, height: 2, top: '28%', left: '45%', opacity: 0.7 },
-  star5: { width: 4, height: 4, top: '35%', left: '65%', opacity: 0.9 },
-  star6: { width: 2, height: 2, top: '42%', left: '78%', opacity: 0.5 },
-  star7: { width: 1, height: 1, top: '48%', left: '15%', opacity: 0.3 },
-  star8: { width: 3, height: 3, top: '55%', left: '35%', opacity: 0.8 },
-  star9: { width: 2, height: 2, top: '62%', left: '55%', opacity: 0.6 },
-  star10: { width: 1, height: 1, top: '68%', left: '85%', opacity: 0.4 },
-  star11: { width: 3, height: 3, top: '75%', left: '22%', opacity: 0.7 },
-  star12: { width: 2, height: 2, top: '82%', left: '42%', opacity: 0.5 },
-  star13: { width: 1, height: 1, top: '88%', left: '68%', opacity: 0.3 },
-  star14: { width: 2, height: 2, top: '92%', left: '15%', opacity: 0.6 },
-  star15: { width: 3, height: 3, top: '5%', left: '55%', opacity: 0.8 },
-  star16: { width: 1, height: 1, top: '18%', left: '88%', opacity: 0.4 },
-  star17: { width: 2, height: 2, top: '52%', left: '5%', opacity: 0.5 },
-  star18: { width: 1, height: 1, top: '95%', left: '75%', opacity: 0.3 },
+  star1: { width: 1, height: 1, top: '8%', left: '12%', opacity: 0.3 },
+  star2: { width: 2, height: 2, top: '15%', left: '25%', opacity: 0.4 },
+  star3: { width: 1, height: 1, top: '22%', left: '8%', opacity: 0.2 },
+  star4: { width: 1, height: 1, top: '28%', left: '45%', opacity: 0.3 },
+  star5: { width: 2, height: 2, top: '35%', left: '65%', opacity: 0.5 },
+  star6: { width: 1, height: 1, top: '42%', left: '78%', opacity: 0.2 },
+  star7: { width: 1, height: 1, top: '48%', left: '15%', opacity: 0.15 },
+  star8: { width: 2, height: 2, top: '55%', left: '35%', opacity: 0.4 },
+  star9: { width: 1, height: 1, top: '62%', left: '55%', opacity: 0.3 },
+  star10: { width: 1, height: 1, top: '68%', left: '85%', opacity: 0.2 },
+  star11: { width: 2, height: 2, top: '75%', left: '22%', opacity: 0.35 },
+  star12: { width: 1, height: 1, top: '82%', left: '42%', opacity: 0.25 },
   
-  // Twinkling stars
-  twinkle1: { width: 3, height: 3, top: '12%', left: '38%' },
-  twinkle2: { width: 2, height: 2, top: '38%', left: '72%' },
-  twinkle3: { width: 4, height: 4, top: '58%', left: '28%' },
-  twinkle4: { width: 2, height: 2, top: '78%', left: '58%' },
+  // Twinkling stars (subtle)
+  twinkle1: { width: 2, height: 2, top: '12%', left: '38%' },
+  twinkle2: { width: 1, height: 1, top: '38%', left: '72%' },
+  twinkle3: { width: 2, height: 2, top: '58%', left: '28%' },
+  twinkle4: { width: 1, height: 1, top: '78%', left: '58%' },
 
-  // Comets
+  // Comets (brighter)
   comet: {
     position: 'absolute',
-    height: 2,
+    height: 3,
   },
   comet1: { top: '20%', width: 120 },
   comet2: { top: '45%', width: 100 },
@@ -339,24 +528,20 @@ const styles = StyleSheet.create({
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    marginBottom: 8,
   },
   logoText: {
-    fontSize: 22,
+    fontSize: 32,
+    fontWeight: '200',
+    color: '#FFFFFF',
     fontFamily: Platform.select({
       ios: 'Georgia',
       android: 'serif',
     }),
-    fontWeight: '400',
     fontStyle: 'italic',
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
   },
-  logoLine: {
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-  },
-
+  
   spacer: {
     flex: 0.5,
   },

@@ -42,7 +42,7 @@ export default function AccountScreen() {
         {
           icon: 'person-outline' as const,
           label: 'Edit profile',
-          onPress: () => {},
+          onPress: () => router.push('/account/edit-profile'),
         },
         {
           icon: 'shield-checkmark-outline' as const,
@@ -59,7 +59,17 @@ export default function AccountScreen() {
           icon: 'card-outline' as const,
           label: 'Payment methods',
           value: fundingSources.length > 0 ? `${fundingSources.length} linked` : 'None',
-          onPress: () => {},
+          onPress: () => router.push('/account/payment-methods'),
+        },
+      ],
+    },
+    {
+      title: 'Learn',
+      items: [
+        {
+          icon: 'information-circle-outline' as const,
+          label: 'How it works',
+          onPress: () => router.push('/how-it-works'),
         },
       ],
     },
@@ -69,17 +79,17 @@ export default function AccountScreen() {
         {
           icon: 'document-text-outline' as const,
           label: 'Terms of use',
-          onPress: () => {},
+          onPress: () => router.push('/terms-of-use'),
         },
         {
           icon: 'alert-circle-outline' as const,
           label: 'Risk disclosure',
-          onPress: () => {},
+          onPress: () => router.push('/risk-disclosure'),
         },
         {
           icon: 'lock-closed-outline' as const,
           label: 'Privacy policy',
-          onPress: () => {},
+          onPress: () => router.push('/privacy-policy'),
         },
       ],
     },
@@ -106,12 +116,23 @@ export default function AccountScreen() {
         {
           icon: 'help-circle-outline' as const,
           label: 'Help & FAQ',
-          onPress: () => {},
+          onPress: () => router.push('/help'),
         },
         {
           icon: 'chatbubble-outline' as const,
           label: 'Contact support',
-          onPress: () => {},
+          onPress: () => router.push('/help/contact'),
+        },
+      ],
+    },
+    {
+      title: 'For Founders',
+      items: [
+        {
+          icon: 'rocket-outline' as const,
+          label: "I'm a founder looking to raise",
+          onPress: () => router.push('/founders/apply'),
+          highlight: true,
         },
       ],
     },

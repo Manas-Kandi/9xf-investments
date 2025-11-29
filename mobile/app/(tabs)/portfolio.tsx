@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +17,13 @@ import { useAppStore } from '../../store';
 export default function PortfolioScreen() {
   const router = useRouter();
   const { investments } = useAppStore();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate data refresh
+    setTimeout(() => setRefreshing(false), 1000);
+  }, []);
 
   const totalInvested = investments.reduce((sum, inv) => sum + inv.amount, 0);
   const companiesCount = new Set(investments.map((i) => i.campaign_id)).size;
@@ -58,7 +66,17 @@ export default function PortfolioScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            progressBackgroundColor={colors.surface}
+          />
+        }
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Portfolio</Text>

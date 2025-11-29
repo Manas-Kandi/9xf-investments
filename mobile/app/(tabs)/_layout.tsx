@@ -26,10 +26,23 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Invest',
+          title: 'Discover',
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons 
               name={focused ? 'home' : 'home-outline'} 
+              size={24} 
+              color={color} 
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: 'Explore',
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons 
+              name={focused ? 'compass' : 'compass-outline'} 
               size={24} 
               color={color} 
             />

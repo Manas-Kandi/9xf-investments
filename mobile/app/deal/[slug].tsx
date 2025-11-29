@@ -7,6 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Share,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +20,23 @@ export default function DealDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const campaign = getCampaignBySlug(slug || '');
+
+  const handleShare = async () => {
+    if (!campaign) return;
+    
+    try {
+      const result = await Share.share({
+        message: `Check out ${campaign.company_name} on 9xf: ${campaign.tagline}. Invest from just $${campaign.min_investment}!`,
+        title: `${campaign.company_name} - Investment Opportunity`,
+      });
+      
+      if (result.action === Share.sharedAction) {
+        // Shared successfully
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Unable to share this deal. Please try again.');
+    }
+  };
 
   if (!campaign) {
     return (
@@ -40,7 +59,7 @@ export default function DealDetailScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.shareButton}>
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
           <Ionicons name="share-outline" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
       </View>

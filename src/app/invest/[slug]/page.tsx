@@ -1,12 +1,23 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Grid, Column, Tile, Button, InlineLoading, Checkbox, NumberInput } from '@carbon/react';
+import {
+  Grid,
+  Column,
+  Tile,
+  Button,
+  InlineLoading,
+  Checkbox,
+  NumberInput,
+  Tag,
+} from '@carbon/react';
 import { ArrowRight, ArrowLeft, Checkmark, Warning } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { useAppStore } from '@/lib/store';
+import type { Campaign } from '@/types/database';
+import { createClient } from '@/lib/supabase/client';
 import { getCampaignBySlug } from '@/lib/mock-data';
 
 interface InvestPageProps {
@@ -14,6 +25,20 @@ interface InvestPageProps {
 }
 
 type InvestStep = 'amount' | 'confirm' | 'processing' | 'success' | 'error';
+type TransactionState = 'processing' | 'succeeded' | 'failed';
+
+interface TransactionReceipt {
+  receipt_url?: string;
+  payment_intent_id?: string;
+}
+
+interface ApiResponse {
+  id: string;
+  status: TransactionState;
+  receipt_url?: string;
+  payment_intent_id?: string;
+  error?: string;
+}
 
 export default function InvestPage({ params }: InvestPageProps) {
   const { slug } = use(params);
@@ -22,8 +47,12 @@ export default function InvestPage({ params }: InvestPageProps) {
   const [step, setStep] = useState<InvestStep>('amount');
   const [amount, setAmount] = useState<number>(0);
   const [confirmed, setConfirmed] = useState(false);
-
-  const campaign = getCampaignBySlug(slug);
+  const [campaign, setCampaign] = useState<Campaign | null>(null);
+  const [campaignError, setCampaignError] = useState<string | null>(null);
+  const [processingStatus, setProcessingStatus] = useState<TransactionState>('processing');
+  const [processingMessage, setProcessingMessage] = useState('Processing your investment...');
+  const [receipt, setReceipt] = useState<TransactionReceipt>({});
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     if (!user) {
@@ -35,13 +64,56 @@ export default function InvestPage({ params }: InvestPageProps) {
     }
   }, [user, isOnboarded, router, slug]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCampaign = async () => {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle();
+
+      if (!isMounted) return;
+
+      if (error) {
+        setCampaignError('Unable to load campaign from Supabase, showing fallback data.');
+        setCampaign(getCampaignBySlug(slug) || null);
+        return;
+      }
+
+      if (!data) {
+        setCampaignError('Campaign not found');
+        setCampaign(null);
+        return;
+      }
+
+      setCampaign(data as Campaign);
+      setCampaignError(null);
+    };
+
+    fetchCampaign();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [slug, supabase]);
+
   if (!campaign) {
     return (
       <>
         <Header />
-        <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <main
+          style={{
+            marginTop: '48px',
+            minHeight: 'calc(100vh - 48px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <Tile style={{ padding: '2rem', textAlign: 'center' }}>
-            <h1>Campaign not found</h1>
+            <h1>{campaignError || 'Campaign not found'}</h1>
             <Button as={Link} href="/campaigns" kind="primary" style={{ marginTop: '1rem' }}>
               Browse campaigns
             </Button>
@@ -63,27 +135,81 @@ export default function InvestPage({ params }: InvestPageProps) {
     }
   };
 
+  const pollTransaction = async (investmentId: string) => {
+    const pollInterval = 2000;
+    const maxAttempts = 10;
+    let attempts = 0;
+
+    const intervalId = setInterval(async () => {
+      attempts += 1;
+      const res = await fetch(`/api/investments/${investmentId}`);
+      const data: ApiResponse = await res.json();
+
+      if (!res.ok || data.error) {
+        clearInterval(intervalId);
+        setProcessingStatus('failed');
+        setProcessingMessage(data.error || 'Payment failed.');
+        setStep('error');
+        return;
+      }
+
+      if (data.status === 'succeeded' || data.status === 'failed' || attempts >= maxAttempts) {
+        clearInterval(intervalId);
+
+        if (data.status === 'succeeded') {
+          setProcessingStatus('succeeded');
+          setReceipt({ receipt_url: data.receipt_url, payment_intent_id: data.payment_intent_id });
+          addInvestment({
+            id: investmentId,
+            user_id: user?.id || '1',
+            campaign_id: campaign.id,
+            amount,
+            status: 'confirmed',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            partner_tx_id: data.payment_intent_id,
+            campaign,
+          });
+          setStep('success');
+        } else {
+          setProcessingStatus('failed');
+          setProcessingMessage('Payment failed. Please try again.');
+          setStep('error');
+        }
+      }
+    }, pollInterval);
+  };
+
   const handleConfirmInvestment = async () => {
-    if (!confirmed) return;
+    if (!confirmed || !fundingSource) return;
 
     setStep('processing');
+    setProcessingStatus('processing');
+    setProcessingMessage('Processing your payment in the sandbox...');
 
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Create investment record
-    addInvestment({
-      id: Date.now().toString(),
-      user_id: user?.id || '1',
-      campaign_id: campaign.id,
-      amount,
-      status: 'confirmed',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      campaign,
+    const res = await fetch('/api/investments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount,
+        campaignSlug: slug,
+        fundingSourceId: fundingSource.id,
+        paymentMethod: fundingSource.type,
+        userId: user?.id,
+      }),
     });
 
-    setStep('success');
+    const data: ApiResponse = await res.json();
+
+    if (!res.ok || data.error) {
+      setProcessingStatus('failed');
+      setProcessingMessage(data.error || 'Payment failed.');
+      setStep('error');
+      return;
+    }
+
+    setReceipt({ receipt_url: data.receipt_url, payment_intent_id: data.payment_intent_id });
+    await pollTransaction(data.id);
   };
 
   if (!user || !isOnboarded) return null;
@@ -232,29 +358,36 @@ export default function InvestPage({ params }: InvestPageProps) {
               {/* Processing */}
               {step === 'processing' && (
                 <Tile style={{ padding: '4rem 2.5rem', textAlign: 'center' }}>
-                  <InlineLoading
-                    description="Processing your investment..."
-                    style={{ justifyContent: 'center' }}
-                  />
-                  <p style={{ color: '#525252', marginTop: '1rem' }}>
-                    Please wait while we process your investment.
-                  </p>
+                  <InlineLoading description={processingMessage} style={{ justifyContent: 'center' }} />
+                  <p style={{ color: '#525252', marginTop: '1rem' }}>{processingMessage}</p>
+                  <Tag type={processingStatus === 'processing' ? 'blue' : processingStatus === 'succeeded' ? 'green' : 'red'}>
+                    {processingStatus === 'processing' && 'Processing payment'}
+                    {processingStatus === 'succeeded' && 'Payment succeeded'}
+                    {processingStatus === 'failed' && 'Payment failed'}
+                  </Tag>
+                  {receipt.receipt_url && (
+                    <p style={{ marginTop: '1rem' }}>
+                      Sandbox receipt: <Link href={receipt.receipt_url}>{receipt.receipt_url}</Link>
+                    </p>
+                  )}
                 </Tile>
               )}
 
               {/* Success */}
               {step === 'success' && (
                 <Tile style={{ padding: '3rem 2.5rem', textAlign: 'center' }}>
-                  <div style={{
-                    width: '80px',
-                    height: '80px',
-                    background: '#defbe6',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 1.5rem',
-                  }}>
+                  <div
+                    style={{
+                      width: '80px',
+                      height: '80px',
+                      background: '#defbe6',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 1.5rem',
+                    }}
+                  >
                     <Checkmark size={40} style={{ color: '#0e6027' }} />
                   </div>
 
@@ -274,24 +407,55 @@ export default function InvestPage({ params }: InvestPageProps) {
                     </ul>
                   </Tile>
 
+                  {receipt.receipt_url && (
+                    <Tile style={{ background: '#e8f0ff', padding: '1rem', marginBottom: '1.5rem' }}>
+                      <p style={{ margin: 0 }}>
+                        Sandbox receipt:{' '}
+                        <Link href={receipt.receipt_url} target="_blank">
+                          View receipt
+                        </Link>
+                      </p>
+                    </Tile>
+                  )}
+
                   <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
-                    <Button
-                      as={Link}
-                      href="/investments"
-                      kind="primary"
-                      size="lg"
-                      style={{ width: '100%' }}
-                    >
+                    <Button as={Link} href="/investments" kind="primary" size="lg" style={{ width: '100%' }}>
                       View my investments
                     </Button>
-                    <Button
-                      as={Link}
-                      href="/campaigns"
-                      kind="tertiary"
-                      size="lg"
-                      style={{ width: '100%' }}
-                    >
+                    <Button as={Link} href="/campaigns" kind="tertiary" size="lg" style={{ width: '100%' }}>
                       Browse more campaigns
+                    </Button>
+                  </div>
+                </Tile>
+              )}
+
+              {/* Error */}
+              {step === 'error' && (
+                <Tile style={{ padding: '3rem 2.5rem', textAlign: 'center' }}>
+                  <div
+                    style={{
+                      width: '80px',
+                      height: '80px',
+                      background: '#fff1f1',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0 auto 1.5rem',
+                    }}
+                  >
+                    <Warning size={40} style={{ color: '#da1e28' }} />
+                  </div>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    Payment failed
+                  </h1>
+                  <p style={{ color: '#525252', marginBottom: '2rem' }}>{processingMessage}</p>
+                  <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+                    <Button kind="primary" size="lg" style={{ width: '100%' }} onClick={() => setStep('confirm')}>
+                      Try again
+                    </Button>
+                    <Button as={Link} href="/campaigns" kind="tertiary" size="lg" style={{ width: '100%' }}>
+                      Browse campaigns
                     </Button>
                   </div>
                 </Tile>

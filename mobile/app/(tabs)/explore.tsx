@@ -14,8 +14,8 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { colors, spacing, fontSize, borderRadius } from '../../constants/theme';
-import { mockCampaigns, getLiveCampaigns, getUpcomingCampaigns } from '../../data/mockData';
-import type { Campaign } from '../../types';
+import { getLiveCampaigns, getUpcomingCampaigns, mockCampaigns } from '@shared/mock-data';
+import type { Campaign } from '@shared/types';
 
 type FilterType = 'all' | 'live' | 'coming_soon' | 'closed';
 type SortType = 'newest' | 'most_funded' | 'closing_soon' | 'min_investment';

@@ -18,41 +18,55 @@
 
 ### Prerequisites
 
-- Node.js 18+
-- npm or yarn
-- Supabase account (for production)
+- **Node.js**: 18+ (use `nvm use` if you manage multiple versions)
+- **npm**: included with Node.js
+- **Supabase**: project + access to the Supabase CLI for migrations
 
-### Installation
+### Environment setup
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Copy the example environment and update with your Supabase keys:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+3. Populate `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+### Running the app
 
 ```bash
-# Install dependencies
-npm install
-
-# Copy environment variables
-cp .env.local.example .env.local
-
-# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+Open [http://localhost:3000](http://localhost:3000) to see the app locally.
 
-### Environment Variables
+### Quality gates
 
-Create a `.env.local` file with:
+- Lint: `npm run lint`
+- Format with Prettier: `npm run format`
+- Component/unit tests: `npm test`
+- End-to-end tests (Playwright): `npm run test:e2e` (ensure Playwright browsers are installed with `npx playwright install`)
+- Database migrations: `npm run db:migrate` (requires Supabase CLI authenticated to your project)
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+### Git hooks
 
-### Database Setup
+This repo uses Husky + lint-staged to enforce linting/formatting on commit. Run `npm run prepare` once after installing dependencies to install the git hooks locally.
 
-Run the SQL schema in your Supabase SQL editor:
+### Database setup & seeding
+
+Execute the SQL schema against your Supabase instance:
 
 ```bash
-# Located at: supabase/schema.sql
+supabase db execute --file supabase/schema.sql
 ```
+
+You can also run the migrations with the npm script described above or paste the SQL into the Supabase SQL editor.
 
 ## Project Structure
 

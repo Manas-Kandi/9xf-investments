@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Grid,
   Column,
@@ -25,11 +25,13 @@ import {
   NumberInput,
   Select,
   SelectItem,
+  InlineNotification,
 } from '@carbon/react';
 import { Add, Edit, View } from '@carbon/icons-react';
 import { Header } from '@/components/Header';
 import { mockCampaigns } from '@/lib/mock-data';
 import type { Campaign, FounderApplication } from '@/types/database';
+import { createClient } from '@/lib/supabase/client';
 
 // Mock founder applications
 const mockApplications: FounderApplication[] = [
@@ -66,6 +68,14 @@ export default function AdminPage() {
   const [applications, setApplications] = useState<FounderApplication[]>(mockApplications);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
+  const [metrics, setMetrics] = useState({
+    volume: 0,
+    activeInvestors: 0,
+    conversion: 0,
+    totalInvestors: 0,
+  });
+  const [metricsError, setMetricsError] = useState<string | null>(null);
+  const [metricsLoading, setMetricsLoading] = useState(true);
 
   // Campaign form state
   const [formData, setFormData] = useState({
@@ -121,6 +131,37 @@ export default function AdminPage() {
     setIsModalOpen(false);
     setEditingCampaign(null);
   };
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    const fetchMetrics = async () => {
+      setMetricsLoading(true);
+      setMetricsError(null);
+
+      const [{ data: investments, error: investmentError }, userCountResponse] = await Promise.all([
+        supabase.from('investment_intents').select('amount, status, user_id'),
+        supabase.from('users').select('id', { count: 'exact', head: true }),
+      ]);
+
+      if (investmentError || userCountResponse.error) {
+        setMetricsError(investmentError?.message || userCountResponse.error?.message || 'Unable to load metrics');
+        setMetricsLoading(false);
+        return;
+      }
+
+      const confirmedInvestments = (investments || []).filter((inv) => inv.status === 'confirmed');
+      const volume = confirmedInvestments.reduce((sum, inv) => sum + inv.amount, 0);
+      const activeInvestors = new Set(confirmedInvestments.map((inv) => inv.user_id)).size;
+      const totalInvestors = userCountResponse.count || 0;
+      const conversion = totalInvestors > 0 ? (activeInvestors / totalInvestors) * 100 : 0;
+
+      setMetrics({ volume, activeInvestors, conversion, totalInvestors });
+      setMetricsLoading(false);
+    };
+
+    fetchMetrics();
+  }, []);
 
   const handleUpdateApplicationStatus = (id: string, status: FounderApplication['status']) => {
     setApplications(applications.map(app =>
@@ -324,26 +365,46 @@ export default function AdminPage() {
 
               {/* Metrics Tab */}
               <TabPanel>
+                {metricsError && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <InlineNotification
+                      kind="error"
+                      title="Unable to load platform metrics"
+                      subtitle={metricsError}
+                      onClose={() => setMetricsError(null)}
+                    />
+                  </div>
+                )}
+
                 <Grid>
                   <Column lg={4} md={4} sm={4}>
                     <Tile style={{ textAlign: 'center', padding: '2rem' }}>
-                      <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Total Campaigns</p>
-                      <p style={{ fontSize: '3rem', fontWeight: 600 }}>{campaigns.length}</p>
-                    </Tile>
-                  </Column>
-                  <Column lg={4} md={4} sm={4}>
-                    <Tile style={{ textAlign: 'center', padding: '2rem' }}>
-                      <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Live Campaigns</p>
+                      <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Platform volume</p>
                       <p style={{ fontSize: '3rem', fontWeight: 600 }}>
-                        {campaigns.filter(c => c.status === 'live').length}
+                        {metricsLoading ? '—' : `$${metrics.volume.toLocaleString()}`}
                       </p>
+                      <p style={{ color: '#525252' }}>Confirmed investments processed</p>
                     </Tile>
                   </Column>
                   <Column lg={4} md={4} sm={4}>
                     <Tile style={{ textAlign: 'center', padding: '2rem' }}>
-                      <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Total Raised</p>
+                      <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Active investors</p>
                       <p style={{ fontSize: '3rem', fontWeight: 600 }}>
-                        ${campaigns.reduce((sum, c) => sum + c.amount_raised, 0).toLocaleString()}
+                        {metricsLoading ? '—' : metrics.activeInvestors}
+                      </p>
+                      <p style={{ color: '#525252' }}>Investors with confirmed positions</p>
+                    </Tile>
+                  </Column>
+                  <Column lg={4} md={4} sm={4}>
+                    <Tile style={{ textAlign: 'center', padding: '2rem' }}>
+                      <p style={{ color: '#525252', marginBottom: '0.5rem' }}>Conversion</p>
+                      <p style={{ fontSize: '3rem', fontWeight: 600 }}>
+                        {metricsLoading ? '—' : `${metrics.conversion.toFixed(1)}%`}
+                      </p>
+                      <p style={{ color: '#525252' }}>
+                        {metricsLoading
+                          ? '—'
+                          : `${metrics.activeInvestors.toLocaleString()} of ${metrics.totalInvestors.toLocaleString()} investors engaged`}
                       </p>
                     </Tile>
                   </Column>

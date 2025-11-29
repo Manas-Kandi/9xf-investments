@@ -6,6 +6,7 @@ export type FundingSourceStatus = 'active' | 'inactive';
 export type CampaignStatus = 'draft' | 'live' | 'paused' | 'closed';
 export type InvestmentStatus = 'initiated' | 'processing' | 'confirmed' | 'failed';
 export type ApplicationStatus = 'new' | 'in_review' | 'approved' | 'rejected';
+export type PayoutType = 'distribution' | 'dividend' | 'redemption';
 
 export interface User {
   id: string;
@@ -75,6 +76,17 @@ export interface InvestmentIntent {
   campaign?: Campaign;
 }
 
+export interface Payout {
+  id: string;
+  user_id: string;
+  investment_id?: string;
+  campaign_id?: string;
+  amount: number;
+  type?: PayoutType;
+  created_at: string;
+  updated_at?: string;
+}
+
 export interface FounderApplication {
   id: string;
   company_name: string;
@@ -124,6 +136,11 @@ export interface Database {
         Row: InvestmentIntent;
         Insert: Omit<InvestmentIntent, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<InvestmentIntent, 'id' | 'created_at'>>;
+      };
+      payouts: {
+        Row: Payout;
+        Insert: Omit<Payout, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Payout, 'id' | 'created_at'>>;
       };
       founder_applications: {
         Row: FounderApplication;

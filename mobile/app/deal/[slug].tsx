@@ -14,7 +14,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, fontSize, borderRadius } from '../../constants/theme';
 import { Button } from '../../components';
-import { getCampaignBySlug } from '../../data/mockData';
+import { getCampaignBySlug } from '@shared/mock-data';
 
 export default function DealDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();

@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { space, size, radius, color, type, layout } from '../../constants/design-system';
 import { PressableScale, FadeIn, SlideUp, AnimatedProgress } from '../../components/animated';
-import { getLiveCampaigns } from '../../data/mockData';
+import { getLiveCampaigns } from '@shared/mock-data';
 
 export default function HomeScreen() {
   const router = useRouter();

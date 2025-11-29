@@ -5,6 +5,23 @@ import type { User, FundingSource, Campaign, InvestmentIntent } from '@/types/da
 // Onboarding step tracking
 export type OnboardingStep = 'account' | 'kyc' | 'funding' | 'terms' | 'complete';
 
+const computeOnboardingStep = (
+  user: User | null,
+  fundingSource: FundingSource | null
+): OnboardingStep => {
+  const hasVerifiedKyc = user?.kyc_status === 'verified';
+  const hasFundingSource = fundingSource?.status === 'active';
+  const hasAcceptedTerms = Boolean(user?.terms_accepted);
+
+  if (hasVerifiedKyc && hasFundingSource && hasAcceptedTerms) return 'complete';
+  if (hasVerifiedKyc && hasFundingSource) return 'terms';
+  if (hasVerifiedKyc) return 'funding';
+  return 'kyc';
+};
+
+const computeIsOnboarded = (user: User | null, fundingSource: FundingSource | null) =>
+  computeOnboardingStep(user, fundingSource) === 'complete';
+
 interface AppState {
   // Auth state
   user: User | null;
@@ -35,26 +52,32 @@ export const useAppStore = create<AppState>()(
       // Initial state
       user: null,
       isAuthenticated: false,
-      onboardingStep: 'account',
+      onboardingStep: 'kyc',
       isOnboarded: false,
       fundingSource: null,
       investments: [],
 
       // Actions
       setUser: (user) =>
-        set({
+        set((state) => ({
           user,
           isAuthenticated: !!user,
-          isOnboarded: user?.kyc_status === 'verified' && user?.terms_accepted,
-        }),
+          onboardingStep: computeOnboardingStep(user, state.fundingSource),
+          isOnboarded: computeIsOnboarded(user, state.fundingSource),
+        })),
 
       setOnboardingStep: (step) =>
-        set({
+        set((state) => ({
           onboardingStep: step,
-          isOnboarded: step === 'complete',
-        }),
+          isOnboarded: computeIsOnboarded(state.user, state.fundingSource),
+        })),
 
-      setFundingSource: (source) => set({ fundingSource: source }),
+      setFundingSource: (source) =>
+        set((state) => ({
+          fundingSource: source,
+          onboardingStep: computeOnboardingStep(state.user, source),
+          isOnboarded: computeIsOnboarded(state.user, source),
+        })),
 
       addInvestment: (investment) =>
         set((state) => ({
@@ -72,7 +95,7 @@ export const useAppStore = create<AppState>()(
         set({
           user: null,
           isAuthenticated: false,
-          onboardingStep: 'account',
+          onboardingStep: 'kyc',
           isOnboarded: false,
           fundingSource: null,
         }),

@@ -1,0 +1,216 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Ensure report directory
+        run: mkdir -p reports
+
+      - name: Install lint formatter
+        run: npm install --no-save eslint-formatter-junit@6.0.1
+
+      - name: Run ESLint
+        run: npm run lint -- --format junit --output-file reports/eslint.xml
+
+      - name: Publish lint annotations
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: ESLint
+          path: reports/eslint.xml
+          reporter: junit
+
+      - name: Upload lint artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: reports/eslint.xml
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Register TypeScript matcher
+        run: echo "::add-matcher::.github/tsc-problem-matcher.json"
+
+      - name: Type check
+        run: npm run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Ensure report directory
+        run: mkdir -p reports/vitest
+
+      - name: Run tests with coverage
+        run: npm test
+
+      - name: Publish unit test annotations
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Vitest
+          path: reports/vitest/results.xml
+          reporter: junit
+
+      - name: Enforce coverage threshold
+        if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          json-summary-path: coverage/coverage-summary.json
+          fail-if-coverage-less-than: 60
+          create-pr-comment: false
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-next-
+
+      - name: Install Playwright browsers
+        run: npx --yes @playwright/test@1.50.1 install --with-deps
+
+      - name: Build app
+        run: npm run build
+
+      - name: Prepare Playwright reports
+        run: mkdir -p reports/playwright
+
+      - name: Start app server
+        run: |
+          npm run start -- --hostname 0.0.0.0 --port 3000 &
+          npx --yes wait-on@7.0.1 http://127.0.0.1:3000
+
+      - name: Run Playwright e2e
+        run: npm run e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            reports/playwright
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test, e2e]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-next-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-next-
+
+      - name: Build
+        run: npm run build
+
+      - name: Capture preview metadata
+        run: |
+          if [ -n "${VERCEL_PREVIEW_URL}" ]; then
+            echo "Preview URL: ${VERCEL_PREVIEW_URL}" > preview-url.txt
+          elif [ -n "${NETLIFY_PREVIEW_URL}" ]; then
+            echo "Preview URL: ${NETLIFY_PREVIEW_URL}" > preview-url.txt
+          else
+            echo "No preview URL available. Set VERCEL_PREVIEW_URL or NETLIFY_PREVIEW_URL to publish preview link." > preview-url.txt
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-build
+          path: |
+            .next
+            preview-url.txt

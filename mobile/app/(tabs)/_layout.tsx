@@ -17,9 +17,10 @@ export default function TabsLayout() {
         tabBarActiveTintColor: colors.textPrimary,
         tabBarInactiveTintColor: colors.textTertiary,
         tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '500',
-          marginTop: 2,
+          fontSize: 1,
+          color: 'transparent',
+          margin: 0,
+          padding: 0,
         },
       }}
     >

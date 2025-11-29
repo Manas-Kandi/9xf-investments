@@ -16,7 +16,7 @@ export const colors = {
   textMuted: tokens.color.mutedStrong,
   textPlaceholder: tokens.color.muted,
   primary: tokens.color.primary,
-  primaryMuted: 'rgba(156, 202, 255, 0.16)',
+  primaryMuted: 'rgba(15, 98, 254, 0.16)',
   primaryContainer: tokens.color.primaryContainer,
   onPrimary: tokens.color.onPrimary,
   onPrimaryContainer: tokens.color.onPrimaryContainer,

@@ -61,3 +61,45 @@ body {
   min-height: calc(100vh - 48px);
   background: #161616;
 }
+
+/* Skeleton loading */
+.skeleton-line,
+.card-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #262626;
+  border-radius: 12px;
+}
+
+.card-skeleton {
+  height: 180px;
+}
+
+.skeleton-line::after,
+.card-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0) 100%);
+  animation: shimmer 1.4s infinite;
+}
+
+.skeleton-hover {
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.skeleton-hover:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(20%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

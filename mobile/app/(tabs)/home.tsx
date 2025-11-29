@@ -5,22 +5,14 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
-  TouchableOpacity,
   StatusBar,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing, typography, shape } from '../../constants/theme';
+import { space, size, radius, color, type, layout } from '../../constants/design-system';
+import { PressableScale, FadeIn, SlideUp, AnimatedProgress } from '../../components/animated';
 import { getLiveCampaigns } from '../../data/mockData';
-
-// Pastel card colors for each deal
-const cardColors = [
-  { bg: colors.cardMint, text: colors.onCardMint },
-  { bg: colors.cardCream, text: colors.onCardCream },
-  { bg: colors.cardCyan, text: colors.onCardCyan },
-  { bg: colors.cardLavender, text: colors.onCardLavender },
-];
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -35,49 +27,58 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={color.bg} />
       
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top + spacing.lg }
+          { paddingTop: insets.top + space.medium }
         ]}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.accent}
-            progressBackgroundColor={colors.surfaceCard}
+            tintColor={color.accent}
+            progressBackgroundColor={color.bgCard}
           />
         }
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headline}>Invest</Text>
-        </View>
+        <FadeIn>
+          <View style={styles.header}>
+            <Text style={styles.headline}>Invest</Text>
+            <PressableScale style={styles.avatarButton}>
+              <MaterialCommunityIcons name="account-circle" size={32} color={color.textSecondary} />
+            </PressableScale>
+          </View>
+        </FadeIn>
 
         {/* Hero stat card */}
-        <View style={styles.heroCard}>
-          <Text style={styles.heroValue}>
-            {campaigns.length}
-            <Text style={styles.heroUnit}> deals</Text>
-          </Text>
-          <View style={styles.heroMeta}>
-            <View style={styles.heroTag}>
-              <MaterialCommunityIcons name="arrow-up" size={14} color={colors.cardMint} />
-              <Text style={styles.heroTagText}>Live now</Text>
+        <SlideUp delay={100}>
+          <View style={styles.heroCard}>
+            <Text style={styles.heroValue}>
+              {campaigns.length}
+              <Text style={styles.heroUnit}> deals</Text>
+            </Text>
+            <View style={styles.heroMeta}>
+              <View style={styles.heroTag}>
+                <MaterialCommunityIcons name="arrow-up" size={14} color={color.accent} />
+                <Text style={styles.heroTagText}>Live now</Text>
+              </View>
             </View>
           </View>
-        </View>
+        </SlideUp>
 
         {/* Section header */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Cases</Text>
-          <TouchableOpacity style={styles.iconButton}>
-            <MaterialCommunityIcons name="tune-variant" size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
+        <SlideUp delay={200}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Cases</Text>
+            <PressableScale style={styles.iconButton}>
+              <MaterialCommunityIcons name="tune-variant" size={20} color={color.textSecondary} />
+            </PressableScale>
+          </View>
+        </SlideUp>
 
         {/* Pastel Deal Cards - Horizontal scroll */}
         <ScrollView
@@ -86,65 +87,68 @@ export default function HomeScreen() {
           contentContainerStyle={styles.cardsRow}
         >
           {campaigns.map((campaign, index) => {
-            const cardColor = cardColors[index % cardColors.length];
+            const cardStyle = color.cards[index % color.cards.length];
+            const progress = Math.min((campaign.amount_raised / campaign.target_amount) * 100, 100);
+            
             return (
-              <TouchableOpacity
-                key={campaign.id}
-                style={[styles.dealCard, { backgroundColor: cardColor.bg }]}
-                onPress={() => router.push(`/deal/${campaign.slug}`)}
-                activeOpacity={0.9}
-              >
-                {/* Company logo placeholder */}
-                <View style={[styles.cardLogo, { backgroundColor: cardColor.text + '20' }]}>
-                  <Text style={[styles.cardLogoText, { color: cardColor.text }]}>
-                    {campaign.company_name[0]}
-                  </Text>
-                </View>
-                
-                {/* Company name */}
-                <Text style={[styles.cardTitle, { color: cardColor.text }]}>
-                  {campaign.company_name}
-                </Text>
-                
-                {/* Amount */}
-                <Text style={[styles.cardAmount, { color: cardColor.text }]}>
-                  ${(campaign.amount_raised / 1000).toFixed(0)}k
-                </Text>
-                
-                {/* Mini chart placeholder */}
-                <View style={styles.cardChart}>
-                  <MaterialCommunityIcons 
-                    name="chart-line" 
-                    size={48} 
-                    color={cardColor.text + '30'} 
-                  />
-                </View>
-                
-                {/* Action button */}
-                <TouchableOpacity 
-                  style={[styles.cardButton, { borderColor: cardColor.text + '40' }]}
+              <SlideUp key={campaign.id} delay={300 + index * 50}>
+                <PressableScale
+                  style={[styles.dealCard, { backgroundColor: cardStyle.bg }]}
+                  onPress={() => router.push(`/deal/${campaign.slug}`)}
                 >
-                  <MaterialCommunityIcons 
-                    name="arrow-down" 
-                    size={16} 
-                    color={cardColor.text} 
+                  {/* Logo */}
+                  <View style={[styles.cardLogo, { backgroundColor: cardStyle.text + '15' }]}>
+                    <Text style={[styles.cardLogoText, { color: cardStyle.text }]}>
+                      {campaign.company_name[0]}
+                    </Text>
+                  </View>
+                  
+                  {/* Company name */}
+                  <Text style={[styles.cardCompany, { color: cardStyle.text }]}>
+                    {campaign.company_name}
+                  </Text>
+                  
+                  {/* Amount */}
+                  <Text style={[styles.cardAmount, { color: cardStyle.text }]}>
+                    ${(campaign.amount_raised / 1000).toFixed(0)}k
+                  </Text>
+                  
+                  {/* Progress */}
+                  <AnimatedProgress 
+                    progress={progress} 
+                    color={cardStyle.text}
+                    trackColor={cardStyle.text + '30'}
+                    height={3}
                   />
-                </TouchableOpacity>
-              </TouchableOpacity>
+                  
+                  {/* Action button */}
+                  <PressableScale 
+                    style={[styles.cardButton, { borderColor: cardStyle.text + '30' }]}
+                  >
+                    <MaterialCommunityIcons 
+                      name="arrow-down" 
+                      size={16} 
+                      color={cardStyle.text} 
+                    />
+                  </PressableScale>
+                </PressableScale>
+              </SlideUp>
             );
           })}
         </ScrollView>
 
         {/* About section */}
-        <View style={styles.aboutSection}>
-          <Text style={styles.aboutTitle}>About</Text>
-          <Text style={styles.aboutText}>
-            Co-invest alongside top VCs. All deals are vetted, with minimum investments from $50.
-          </Text>
-          <TouchableOpacity>
-            <Text style={styles.aboutLink}>Show more</Text>
-          </TouchableOpacity>
-        </View>
+        <SlideUp delay={500}>
+          <View style={styles.aboutSection}>
+            <Text style={styles.aboutTitle}>About</Text>
+            <Text style={styles.aboutText}>
+              Co-invest alongside top VCs. All deals are vetted, with minimum investments from $50.
+            </Text>
+            <PressableScale>
+              <Text style={styles.aboutLink}>Show more</Text>
+            </PressableScale>
+          </View>
+        </SlideUp>
 
         {/* Bottom padding */}
         <View style={{ height: insets.bottom + 120 }} />
@@ -156,52 +160,59 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: color.bg,
   },
   scrollContent: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: space.screenX,
   },
   
   // Header
   header: {
-    marginBottom: spacing.xl,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: space.large,
   },
   headline: {
-    ...typography.headlineLarge,
-    color: colors.textPrimary,
-    fontWeight: '600',
+    ...type.headlineLarge,
+    color: color.textPrimary,
+  },
+  avatarButton: {
+    width: size.avatar.medium,
+    height: size.avatar.medium,
+    borderRadius: radius.round,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // Hero stat card
   heroCard: {
-    backgroundColor: colors.surfaceCard,
-    borderRadius: shape.xl,
-    padding: spacing.xl,
-    marginBottom: spacing.xl,
+    backgroundColor: color.bgCard,
+    borderRadius: radius.xl,
+    padding: space.large,
+    marginBottom: space.large,
   },
   heroValue: {
-    fontSize: 48,
-    fontWeight: '300',
-    color: colors.textPrimary,
-    letterSpacing: -2,
+    ...type.displayLarge,
+    color: color.textPrimary,
   },
   heroUnit: {
-    fontSize: 24,
+    ...type.headlineSmall,
     fontWeight: '400',
-    color: colors.textSecondary,
+    color: color.textSecondary,
   },
   heroMeta: {
     flexDirection: 'row',
-    marginTop: spacing.md,
+    marginTop: space.small,
   },
   heroTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xxs,
+    gap: space.micro,
   },
   heroTagText: {
-    ...typography.bodySmall,
-    color: colors.cardMint,
+    ...type.bodySmall,
+    color: color.accent,
   },
 
   // Section
@@ -209,64 +220,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    marginBottom: space.medium,
   },
   sectionTitle: {
-    ...typography.titleLarge,
-    color: colors.textPrimary,
+    ...type.titleLarge,
+    color: color.textPrimary,
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: shape.full,
-    backgroundColor: colors.surfaceCard,
+    width: size.avatar.medium,
+    height: size.avatar.medium,
+    borderRadius: radius.round,
+    backgroundColor: color.bgCard,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   // Cards row
   cardsRow: {
-    paddingRight: spacing.lg,
-    gap: spacing.md,
+    paddingRight: space.screenX,
+    gap: space.small,
   },
 
   // Pastel deal card
   dealCard: {
-    width: 160,
-    height: 200,
-    borderRadius: shape.xl,
-    padding: spacing.md,
+    width: size.card.dealCard.width,
+    height: size.card.dealCard.height,
+    borderRadius: radius.xl,
+    padding: space.medium,
     justifyContent: 'space-between',
   },
   cardLogo: {
     width: 36,
     height: 36,
-    borderRadius: shape.sm,
+    borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardLogoText: {
-    ...typography.titleMedium,
-    fontWeight: '600',
+    ...type.titleMedium,
+    fontWeight: '700',
   },
-  cardTitle: {
-    ...typography.titleSmall,
+  cardCompany: {
+    ...type.titleSmall,
     fontWeight: '600',
   },
   cardAmount: {
-    ...typography.headlineMedium,
+    ...type.headlineMedium,
     fontWeight: '500',
-  },
-  cardChart: {
-    position: 'absolute',
-    bottom: 50,
-    right: 16,
-    opacity: 0.5,
   },
   cardButton: {
     width: 32,
     height: 32,
-    borderRadius: shape.full,
+    borderRadius: radius.round,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -275,22 +280,22 @@ const styles = StyleSheet.create({
 
   // About section
   aboutSection: {
-    marginTop: spacing.xl,
-    paddingTop: spacing.xl,
+    marginTop: space.section,
+    paddingTop: space.large,
   },
   aboutTitle: {
-    ...typography.titleLarge,
-    color: colors.textPrimary,
-    marginBottom: spacing.sm,
+    ...type.titleLarge,
+    color: color.textPrimary,
+    marginBottom: space.small,
   },
   aboutText: {
-    ...typography.bodyMedium,
-    color: colors.textSecondary,
+    ...type.bodyMedium,
+    color: color.textSecondary,
     lineHeight: 22,
-    marginBottom: spacing.sm,
+    marginBottom: space.small,
   },
   aboutLink: {
-    ...typography.labelLarge,
-    color: colors.link,
+    ...type.labelLarge,
+    color: color.link,
   },
 });

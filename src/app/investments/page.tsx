@@ -12,6 +12,7 @@ import { ArrowRight, Wallet } from '@carbon/icons-react';
 import { Footer } from '@/components/Footer';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAppStore } from '@/lib/store';
+import { useInvestments } from '@/lib/supabase/hooks';
 
 function InvestmentsSkeleton() {
   return (
@@ -55,6 +56,30 @@ function InvestmentsContent() {
   }, [user, router]);
 
   if (!user) return null;
+
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Tag type="cool-gray">Loading investments...</Tag>
+        </main>
+      </>
+    );
+  }
+
+  if (isError) {
+    return (
+      <>
+        <Header />
+        <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Tile style={{ padding: '2rem', textAlign: 'center' }}>
+            <p style={{ margin: 0 }}>We couldn&apos;t load your investments. Please retry.</p>
+          </Tile>
+        </main>
+      </>
+    );
+  }
 
   const totalInvested = investments.reduce((sum, inv) => sum + inv.amount, 0);
 

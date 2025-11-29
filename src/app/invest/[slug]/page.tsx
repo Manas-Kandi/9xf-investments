@@ -44,6 +44,7 @@ function InvestContent({ slug }: { slug: string }) {
   const [step, setStep] = useState<InvestStep>('amount');
   const [amount, setAmount] = useState<number>(0);
   const [confirmed, setConfirmed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -55,7 +56,18 @@ function InvestContent({ slug }: { slug: string }) {
     }
   }, [user, isOnboarded, router, slug]);
 
-  if (!campaign) {
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <InlineLoading description="Loading campaign..." />
+        </main>
+      </>
+    );
+  }
+
+  if (!campaign || isError) {
     return (
       <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Tile style={{ padding: '2rem', textAlign: 'center' }}>

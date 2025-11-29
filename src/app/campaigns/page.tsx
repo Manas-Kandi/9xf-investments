@@ -1,15 +1,44 @@
 'use client';
 
-import { Grid, Column, Tag } from '@carbon/react';
-import { Header } from '@/components/Header';
+import { Suspense, use } from 'react';
+import Column from '@carbon/react/es/components/Grid/Column.js';
+import { Grid } from '@carbon/react/es/components/Grid/Grid.js';
+import Tag from '@carbon/react/es/components/Tag/Tag.js';
 import { Footer } from '@/components/Footer';
 import { CampaignCard } from '@/components/CampaignCard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { mockCampaigns } from '@/lib/mock-data';
 
-export default function CampaignsPage() {
-  const liveCampaigns = mockCampaigns.filter((c) => c.status === 'live');
-  const upcomingCampaigns = mockCampaigns.filter((c) => c.status === 'draft');
+function CampaignsSkeleton() {
+  return (
+    <main className="main-content">
+      <section style={{ background: '#262626', padding: '3rem 0' }}>
+        <div className="page-container">
+          <div className="skeleton-line" style={{ width: '320px', height: '28px', marginBottom: '0.75rem' }} />
+          <div className="skeleton-line" style={{ width: '520px', height: '20px' }} />
+        </div>
+      </section>
+      <section className="section" style={{ background: '#161616' }}>
+        <div className="page-container">
+          <div className="skeleton-line" style={{ width: '200px', height: '24px', marginBottom: '2rem' }} />
+          <Grid condensed>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Column key={index} lg={8} md={4} sm={4}>
+                <div className="card-skeleton" />
+              </Column>
+            ))}
+          </Grid>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function CampaignsContent() {
+  const campaigns = use(getCampaigns());
+
+  const liveCampaigns = campaigns.filter((c) => c.status === 'live');
+  const upcomingCampaigns = campaigns.filter((c) => c.status === 'draft');
 
   return (
     <>

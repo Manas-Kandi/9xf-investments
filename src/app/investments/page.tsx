@@ -1,18 +1,52 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Grid, Column, Tile, Button, Tag } from '@carbon/react';
-import { ArrowRight, Wallet } from '@carbon/icons-react';
+import { Suspense, use, useEffect } from 'react';
 import Link from 'next/link';
-import { Header } from '@/components/Header';
+import { useRouter } from 'next/navigation';
+import Button from '@carbon/react/es/components/Button/Button.js';
+import Column from '@carbon/react/es/components/Grid/Column.js';
+import { Grid } from '@carbon/react/es/components/Grid/Grid.js';
+import Tag from '@carbon/react/es/components/Tag/Tag.js';
+import { Tile } from '@carbon/react/es/components/Tile/Tile.js';
+import { ArrowRight, Wallet } from '@carbon/icons-react';
 import { Footer } from '@/components/Footer';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAppStore } from '@/lib/store';
 
-export default function InvestmentsPage() {
+function InvestmentsSkeleton() {
+  return (
+    <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)' }}>
+      <section style={{ background: '#161616', color: 'white', padding: '3rem 0' }}>
+        <div className="container">
+          <div className="skeleton-line" style={{ width: '260px', height: '28px', marginBottom: '0.5rem' }} />
+          <div className="skeleton-line" style={{ width: '200px', height: '18px' }} />
+        </div>
+      </section>
+
+      <section style={{ background: '#f4f4f4', padding: '2rem 0' }}>
+        <div className="container">
+          <Grid>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Column key={index} lg={4} md={4} sm={4}>
+                <div className="card-skeleton" style={{ height: '140px' }} />
+              </Column>
+            ))}
+          </Grid>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container">
+          <div className="card-skeleton" style={{ height: '220px' }} />
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function InvestmentsContent() {
+  const { user, isOnboarded, investments } = use(getInvestmentsSnapshot());
   const router = useRouter();
-  const { user, isOnboarded, investments } = useAppStore();
 
   useEffect(() => {
     if (!user) {

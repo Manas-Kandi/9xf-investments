@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "next test",
+    "test:e2e": "next test --type e2e",
+    "db:migrate": "supabase migration up",
+    "prepare": "husky"
   },
   "dependencies": {
     "@carbon/react": "^1.96.0",
@@ -31,7 +36,21 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.5",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "prettier": "^3.5.3",
+    "supabase": "^2.13.1",
     "tailwindcss": "^4.1.17",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix"
+    ],
+    "*.{ts,tsx,js,jsx,json,md,css,scss}": [
+      "prettier --write"
+    ]
   }
 }

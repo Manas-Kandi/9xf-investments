@@ -14,9 +14,9 @@ import Tag from '@carbon/react/es/components/Tag/Tag.js';
 import { Tile } from '@carbon/react/es/components/Tile/Tile.js';
 import { ArrowRight, Warning } from '@carbon/icons-react';
 import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
-import { getCampaignBySlug } from '@/lib/queries/campaigns';
-import type { Campaign } from '@/types/database';
+import { getCampaignBySlug } from '@/lib/mock-data';
+import { useCmsContent } from '@/lib/hooks/useCmsContent';
+import { buildCampaignFallbackContent, editorialGuidelines } from '@/lib/cms/fallback-content';
 
 interface CampaignPageProps {
   params: { slug: string };
@@ -60,6 +60,11 @@ function CampaignSkeleton() {
 function CampaignContent({ campaign }: { campaign: Campaign }) {
   const progress = Math.round((campaign.amount_raised / campaign.target_amount) * 100);
   const isLive = campaign.status === 'live';
+  const story = useCmsContent('campaignStory', {
+    slug,
+    initialData: buildCampaignFallbackContent(campaign),
+    initialContext: editorialGuidelines,
+  });
 
   return (
     <main style={{ marginTop: '48px' }}>
@@ -235,61 +240,66 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
                 </div>
               </Tile>
 
-              <Tile style={{ padding: '2rem' }}>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>
-                  Frequently asked questions
-                </h2>
-                <Accordion>
-                  <AccordionItem title="What exactly am I buying?">
-                    <p style={{ lineHeight: 1.6 }}>
-                      You are investing in a pooled investment vehicle (like an SPV) that holds shares in {campaign.company_name}
-                      . This means you own a piece of the vehicle, which in turn owns equity in the company.
-                    </p>
-                  </AccordionItem>
-                  <AccordionItem title="How do I earn returns?">
-                    <p style={{ lineHeight: 1.6 }}>
-                      If {campaign.company_name} is acquired or goes public, the proceeds are distributed to investors
-                      proportionally. There are no dividends or regular payouts—this is a long-term investment.
-                    </p>
-                  </AccordionItem>
-                  <AccordionItem title="What if the company fails?">
-                    <p style={{ lineHeight: 1.6 }}>
-                      If the company fails, you could lose your entire investment. Startup investing is high-risk.
-                      Only invest money you can afford to lose.
-                    </p>
-                  </AccordionItem>
-                  <AccordionItem title="When can I get my money back?">
-                    <p style={{ lineHeight: 1.6 }}>
-                      This is an illiquid investment. You typically cannot sell your shares until there is an exit event
-                      (acquisition or IPO), which could take 5-10+ years or may never happen.
-                    </p>
-                  </AccordionItem>
-                </Accordion>
-              </Tile>
-            </Column>
+        {/* Main Content */}
+        <section className="section">
+          <div className="container">
+            <Grid>
+              <Column lg={10} md={5} sm={4}>
+                {/* Story */}
+                <Tile style={{ marginBottom: '2rem', padding: '2rem' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>
+                    About {campaign.company_name}
+                  </h2>
+                  {story.source === 'fallback' && (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <Tag type="warm-gray">CMS fallback</Tag>
+                      {story.context.fallbackMessage && (
+                        <p style={{ color: '#525252', marginTop: '0.5rem' }}>{story.context.fallbackMessage}</p>
+                      )}
+                      <ul style={{ color: '#525252', lineHeight: 1.6, paddingLeft: '1.25rem', marginTop: '0.5rem' }}>
+                        {story.context.guidelines.map((rule) => (
+                          <li key={rule}>{rule}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <p style={{ lineHeight: 1.8, marginBottom: '1.5rem' }}>
+                    {story.data.description}
+                  </p>
 
-            <Column lg={6} md={3} sm={4}>
-              <Tile style={{ marginBottom: '2rem', padding: '1.5rem' }}>
-                <h3 style={{ fontWeight: 600, marginBottom: '1rem' }}>Offer details</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#525252' }}>Target raise</span>
-                    <span style={{ fontWeight: 600 }}>${campaign.target_amount.toLocaleString()}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#525252' }}>Crowd allocation</span>
-                    <span style={{ fontWeight: 600 }}>{campaign.crowd_percentage}%</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#525252' }}>Min investment</span>
-                    <span style={{ fontWeight: 600 }}>${campaign.min_investment}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#525252' }}>Max per person</span>
-                    <span style={{ fontWeight: 600 }}>${campaign.max_investment_per_person.toLocaleString()}</span>
-                  </div>
-                </div>
-              </Tile>
+                  {story.data.problem && (
+                    <>
+                      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                        The problem
+                      </h3>
+                      <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: '#525252' }}>
+                        {story.data.problem}
+                      </p>
+                    </>
+                  )}
+
+                  {story.data.solution && (
+                    <>
+                      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                        Our solution
+                      </h3>
+                      <p style={{ lineHeight: 1.8, marginBottom: '1.5rem', color: '#525252' }}>
+                        {story.data.solution}
+                      </p>
+                    </>
+                  )}
+
+                  {story.data.traction && (
+                    <>
+                      <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+                        Traction
+                      </h3>
+                      <p style={{ lineHeight: 1.8, color: '#525252' }}>
+                        {story.data.traction}
+                      </p>
+                    </>
+                  )}
+                </Tile>
 
               <Tile style={{ padding: '1.5rem', background: '#fff8e1', border: '1px solid #f1c21b' }}>
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
@@ -308,33 +318,32 @@ function CampaignContent({ campaign }: { campaign: Campaign }) {
                       href="/risk-disclosure"
                       style={{ color: '#8a6d3b', fontWeight: 600, display: 'inline-block', marginTop: '1rem' }}
                     >
-                      Read full risk disclosure →
-                    </Link>
+                      {campaign.founder_name.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{campaign.founder_name}</h3>
+                      <p style={{ color: '#525252', lineHeight: 1.6 }}>{story.data.founderBio || campaign.founder_bio}</p>
+                    </div>
                   </div>
                 </div>
               </Tile>
 
-              {isLive && (
-                <div style={{ marginTop: '2rem' }}>
-                  <Button
-                    as={Link}
-                    href={`/invest/${campaign.slug}`}
-                    kind="primary"
-                    size="lg"
-                    renderIcon={ArrowRight}
-                    style={{ width: '100%' }}
-                  >
-                    Invest from ${campaign.min_investment}
-                  </Button>
-                </div>
-              )}
-            </Column>
-          </Grid>
-        </div>
-      </section>
-    </main>
-  );
-}
+                {/* FAQ */}
+                <Tile style={{ padding: '2rem' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '1.5rem' }}>
+                    Frequently asked questions
+                  </h2>
+                  <Accordion>
+                    {story.data.faqs?.map((faq) => (
+                      <AccordionItem key={faq.question} title={faq.question}>
+                        <p style={{ lineHeight: 1.6 }}>
+                          {faq.answer}
+                        </p>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </Tile>
+              </Column>
 
 function CampaignPageContent({ slug }: { slug: string }) {
   const campaign = use(getCampaignBySlug(slug));

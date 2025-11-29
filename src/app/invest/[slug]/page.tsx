@@ -12,8 +12,10 @@ import { NumberInput } from '@carbon/react/es/components/NumberInput/NumberInput
 import { Tile } from '@carbon/react/es/components/Tile/Tile.js';
 import { ArrowLeft, ArrowRight, Checkmark, Warning } from '@carbon/icons-react';
 import { Header } from '@/components/Header';
-import { getCampaignBySlug } from '@/lib/queries/campaigns';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useAppStore } from '@/lib/store';
+import { getCampaignBySlug } from '@/lib/mock-data';
+import { trackEvent } from '@/lib/analytics';
 
 interface InvestPageProps {
   params: { slug: string };
@@ -74,6 +76,10 @@ function InvestContent({ slug }: { slug: string }) {
 
   const handleContinue = () => {
     if (amount >= campaign.min_investment && amount <= campaign.max_investment_per_person) {
+      trackEvent('invest_attempt', {
+        amount,
+        campaign: campaign.slug,
+      });
       setStep('confirm');
     }
   };
@@ -96,121 +102,65 @@ function InvestContent({ slug }: { slug: string }) {
       campaign,
     });
 
+    trackEvent('invest_success', {
+      amount,
+      campaign: campaign.slug,
+    });
+
     setStep('success');
   };
 
   if (!user || !isOnboarded) return null;
 
   return (
-    <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', background: '#f4f4f4' }}>
-      <div className="container" style={{ padding: '3rem 1rem' }}>
-        <Grid>
-          <Column lg={{ span: 8, offset: 4 }} md={8} sm={4}>
-            {step === 'amount' && (
-              <Tile style={{ padding: '2.5rem' }}>
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  renderIcon={ArrowLeft}
-                  as={Link}
-                  href={`/campaigns/${slug}`}
-                  style={{ marginBottom: '1.5rem', marginLeft: '-1rem' }}
-                >
-                  Back to campaign
-                </Button>
-
-                <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                  Invest in {campaign.company_name}
-                </h1>
-                <p style={{ color: '#525252', marginBottom: '2rem' }}>
-                  How much would you like to invest?
-                </p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
-                  {presetAmounts.map((preset) => (
-                    <button
-                      key={preset}
-                      onClick={() => handleAmountSelect(preset)}
-                      className="skeleton-hover"
-                      style={{
-                        padding: '1.5rem',
-                        fontSize: '1.5rem',
-                        fontWeight: 600,
-                        border: amount === preset ? '2px solid #0f62fe' : '2px solid #e0e0e0',
-                        background: amount === preset ? '#e0e0ff' : 'white',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                      }}
+    <>
+      <Header />
+      <ErrorBoundary title="Investment flow unavailable" description="We couldn't load the investment flow. Please refresh and try again.">
+        <main style={{ marginTop: '48px', minHeight: 'calc(100vh - 48px)', background: '#f4f4f4' }}>
+          <div className="container" style={{ padding: '3rem 1rem' }}>
+            <Grid>
+              <Column lg={{ span: 8, offset: 4 }} md={8} sm={4}>
+                {/* Amount Selection */}
+                {step === 'amount' && (
+                  <Tile style={{ padding: '2.5rem' }}>
+                    <Button
+                      kind="ghost"
+                      size="sm"
+                      renderIcon={ArrowLeft}
+                      as={Link}
+                      href={`/campaigns/${slug}`}
+                      style={{ marginBottom: '1.5rem', marginLeft: '-1rem' }}
                     >
-                      ${preset}
-                    </button>
-                  ))}
-                </div>
+                      Back to campaign
+                    </Button>
 
-                <NumberInput
-                  id="customAmount"
-                  label="Or enter a custom amount"
-                  min={campaign.min_investment}
-                  max={campaign.max_investment_per_person}
-                  value={amount}
-                  onChange={(_, { value }) => setAmount(Number(value) || 0)}
-                  helperText={`Min: $${campaign.min_investment} · Max: $${campaign.max_investment_per_person.toLocaleString()}`}
-                  style={{ marginBottom: '2rem' }}
-                />
-
-                <Button
-                  kind="primary"
-                  size="lg"
-                  renderIcon={ArrowRight}
-                  onClick={handleContinue}
-                  disabled={amount < campaign.min_investment || amount > campaign.max_investment_per_person}
-                  style={{ width: '100%' }}
-                >
-                  Continue with ${amount}
-                </Button>
-              </Tile>
-            )}
-
-            {step === 'confirm' && (
-              <Tile style={{ padding: '2.5rem' }}>
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  renderIcon={ArrowLeft}
-                  onClick={() => setStep('amount')}
-                  style={{ marginBottom: '1.5rem', marginLeft: '-1rem' }}
-                >
-                  Change amount
-                </Button>
-
-                <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '2rem' }}>
-                  Confirm your investment
-                </h1>
-
-                <Tile style={{ background: '#f4f4f4', padding: '1.5rem', marginBottom: '1.5rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e0e0e0' }}>
-                    <span style={{ color: '#525252' }}>Company</span>
-                    <span style={{ fontWeight: 600 }}>{campaign.company_name}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #e0e0e0' }}>
-                    <span style={{ color: '#525252' }}>Investment amount</span>
-                    <span style={{ fontWeight: 600, fontSize: '1.25rem' }}>${amount.toLocaleString()}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#525252' }}>Funding source</span>
-                    <span style={{ fontWeight: 600 }}>
-                      {fundingSource?.institution_name} ••••{fundingSource?.last4}
-                    </span>
-                  </div>
-                </Tile>
-
-                <Tile style={{ background: '#fff8e1', padding: '1rem', marginBottom: '1.5rem', border: '1px solid #f1c21b' }}>
-                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                    <Warning size={20} style={{ color: '#8a6d3b', flexShrink: 0, marginTop: '2px' }} />
-                    <p style={{ color: '#8a6d3b', fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>
-                      This is a high-risk, long-term investment. You may lose all of this money, and you may not be able to sell for many years.
+                    <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                      Invest in {campaign.company_name}
+                    </h1>
+                    <p style={{ color: '#525252', marginBottom: '2rem' }}>
+                      How much would you like to invest?
                     </p>
+
+                  {/* Preset Amounts */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                    {presetAmounts.map((preset) => (
+                      <button
+                        key={preset}
+                        onClick={() => handleAmountSelect(preset)}
+                        style={{
+                          padding: '1.5rem',
+                          fontSize: '1.5rem',
+                          fontWeight: 600,
+                          border: amount === preset ? '2px solid #0f62fe' : '2px solid #e0e0e0',
+                          background: amount === preset ? '#e0e0ff' : 'white',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        ${preset}
+                      </button>
+                    ))}
                   </div>
                 </Tile>
 
@@ -308,12 +258,49 @@ function InvestContent({ slug }: { slug: string }) {
 export default function InvestPage({ params }: InvestPageProps) {
   const { slug } = params;
 
-  return (
-    <>
-      <Header />
-      <Suspense fallback={<InvestSkeleton />}>
-        <InvestContent slug={slug} />
-      </Suspense>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    Investment confirmed!
+                  </h1>
+                  <p style={{ color: '#525252', marginBottom: '2rem' }}>
+                    You&apos;ve invested ${amount.toLocaleString()} in {campaign.company_name}.
+                  </p>
+
+                  <Tile style={{ background: '#f4f4f4', padding: '1.5rem', marginBottom: '2rem', textAlign: 'left' }}>
+                    <h3 style={{ fontWeight: 600, marginBottom: '1rem' }}>What happens next?</h3>
+                    <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#525252', lineHeight: 1.8 }}>
+                      <li>You&apos;ll receive a confirmation email shortly.</li>
+                      <li>Funds will be debited from your bank account within 3-5 business days.</li>
+                      <li>You can view your investment in your portfolio at any time.</li>
+                    </ul>
+                  </Tile>
+
+                  <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+                    <Button
+                      as={Link}
+                      href="/investments"
+                      kind="primary"
+                      size="lg"
+                      style={{ width: '100%' }}
+                    >
+                      View my investments
+                    </Button>
+                    <Button
+                      as={Link}
+                      href="/campaigns"
+                      kind="tertiary"
+                      size="lg"
+                      style={{ width: '100%' }}
+                    >
+                      Browse more campaigns
+                    </Button>
+                  </div>
+                </Tile>
+              )}
+              </Column>
+            </Grid>
+          </div>
+        </main>
+      </ErrorBoundary>
     </>
   );
 }

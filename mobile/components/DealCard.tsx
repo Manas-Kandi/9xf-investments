@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, fontSize, borderRadius, shadows } from '../constants/theme';
 import { useComponentTokens } from '../design-system';
-import type { Campaign } from '../types';
+import type { Campaign } from '@shared/types';
 
 interface DealCardProps {
   campaign: Campaign;

@@ -6,8 +6,8 @@ import { Grid, Column, Tile, TextInput, Button, InlineLoading, Checkbox, Progres
 import { ArrowRight, Checkmark } from '@carbon/icons-react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
-import { RiskDisclosureContent } from '@/components/legal/RiskDisclosureContent';
 import { useAppStore } from '@/lib/store';
+import { trackEvent } from '@/lib/analytics';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -105,6 +105,9 @@ export default function OnboardingPage() {
     }
 
     setOnboardingStep('complete');
+    trackEvent('onboarding_completed', {
+      userId: user?.id,
+    });
     setIsLoading(false);
     router.push('/campaigns');
   };

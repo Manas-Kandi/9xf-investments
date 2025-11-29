@@ -13,7 +13,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, spacing, fontSize, borderRadius } from '../../constants/theme';
 import { Button } from '../../components';
 import { useAppStore } from '../../store';
-import type { FundingSource } from '../../types';
+import type { FundingSource } from '@shared/types';
 
 export default function PaymentMethodsScreen() {
   const router = useRouter();

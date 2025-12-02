@@ -60,7 +60,7 @@ export default function ContactScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Contact Support</Text>
         <View style={styles.backButton} />
@@ -77,7 +77,7 @@ export default function ContactScreen() {
           {/* Intro */}
           <View style={styles.intro}>
             <View style={styles.introIcon}>
-              <Ionicons name="chatbubbles" size={32} color={colors.primary} />
+              <Ionicons name="chatbubbles" size={32} color={colors.accent} />
             </View>
             <Text style={styles.introTitle}>How can we help?</Text>
             <Text style={styles.introText}>
@@ -142,7 +142,7 @@ export default function ContactScreen() {
           <View style={styles.alternativeSection}>
             <Text style={styles.alternativeTitle}>Prefer email?</Text>
             <TouchableOpacity style={styles.emailButton} onPress={handleEmail}>
-              <Ionicons name="mail-outline" size={20} color={colors.primary} />
+              <Ionicons name="mail-outline" size={20} color={colors.accent} />
               <Text style={styles.emailText}>support@9xf.com</Text>
             </TouchableOpacity>
           </View>
@@ -180,7 +180,7 @@ export default function ContactScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   keyboardView: {
     flex: 1,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colors.accent + '15',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   introTitle: {
     fontSize: fontSize.xl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   introText: {
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: fontSize.sm,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   topicGrid: {
@@ -253,8 +253,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   topicButtonActive: {
-    backgroundColor: colors.primary + '15',
-    borderColor: colors.primary,
+    backgroundColor: colors.accent + '15',
+    borderColor: colors.accent,
   },
   topicText: {
     fontSize: fontSize.sm,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   topicTextActive: {
-    color: colors.primary,
+    color: colors.accent,
   },
   input: {
     backgroundColor: colors.surface,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   textArea: {
     height: 150,
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   emailText: {
     fontSize: fontSize.md,
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: '500',
   },
   infoCard: {
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: fontSize.sm,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xs,
   },
   infoText: {
@@ -322,6 +322,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingBottom: spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
   },
 });

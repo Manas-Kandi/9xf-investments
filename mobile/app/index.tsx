@@ -424,7 +424,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
 
   // Galaxy Background
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   // Floating particles
   floatingParticle: {
     position: 'absolute',
-    backgroundColor: colors.primary + '66',
+    backgroundColor: colors.accent + '66',
     borderRadius: 50,
   },
   particle1: { width: 3, height: 3, left: '15%' },
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     height: 54,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     borderRadius: 27,
     alignItems: 'center',
     justifyContent: 'center',

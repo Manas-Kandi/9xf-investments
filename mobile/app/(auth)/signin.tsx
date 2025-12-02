@@ -54,7 +54,7 @@ export default function SignInScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
       
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -67,7 +67,7 @@ export default function SignInScreen() {
             onPress={() => router.back()}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.onSurface} />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
         </View>
 
@@ -110,7 +110,7 @@ export default function SignInScreen() {
                   <MaterialCommunityIcons
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={20}
-                    color={colors.onSurfaceVariant}
+                    color={colors.textVariant}
                   />
                 </TouchableOpacity>
               </View>
@@ -144,7 +144,7 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   keyboardView: {
     flex: 1,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.displaySmall,
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xxl,
   },
   form: {
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: components.input.borderRadius,
     paddingHorizontal: components.input.paddingHorizontal,
     ...typography.bodyLarge,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   passwordContainer: {
     position: 'relative',
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     ...typography.bodyMedium,
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: '600',
   },
 });

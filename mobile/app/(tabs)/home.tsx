@@ -1,486 +1,339 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  RefreshControl,
+  Pressable,
   StatusBar,
   Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
 
-import { colors, spacing, borderRadius, typography } from '../../constants/theme';
-import { PressableScale, FadeIn, SlideUp } from '../../components/animated';
-import { 
-  Surface, 
-  FilledCard, 
-  OutlinedCard,
-  FilledButton, 
-  OutlinedButton,
-  FilterChip,
-  Avatar,
-  StatusBadge,
-  ProgressBar,
-  IconButton,
-} from '../../components/ui';
+import { colors, spacing, radius, typography } from '../../constants/theme';
 import { useAppStore } from '../../store';
 import { getLiveCampaigns } from '@shared/mock-data';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const formatCurrency = (value: number) =>
-  `$${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
-
-function SparkLine({
-  data,
-  color = colors.primary,
-  width = 92,
-  height = 34,
-}: {
-  data: number[];
-  color?: string;
-  width?: number;
-  height?: number;
-}) {
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-
-  const points = data.map((v, i) => ({
-    x: (i / (data.length - 1)) * width,
-    y: height - ((v - min) / range) * height * 0.82 - height * 0.09,
-  }));
-
-  let path = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 1; i < points.length; i++) {
-    const cp1x = points[i - 1].x + (points[i].x - points[i - 1].x) / 3;
-    const cp2x = points[i - 1].x + ((points[i].x - points[i - 1].x) * 2) / 3;
-    path += ` C ${cp1x} ${points[i - 1].y}, ${cp2x} ${points[i].y}, ${points[i].x} ${points[i].y}`;
-  }
-
-  return (
-    <Svg width={width} height={height}>
-      <Path d={path} stroke={color} strokeWidth={2} fill="none" strokeLinecap="round" />
-    </Svg>
-  );
-}
-
-type FilterKey = 'featured' | 'live' | 'vc' | 'closing';
+  new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value);
 
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { investments, user } = useAppStore();
-  const [refreshing, setRefreshing] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<FilterKey>('featured');
   const campaigns = getLiveCampaigns();
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
-  }, []);
-
   const portfolioValue = investments.reduce((sum, inv) => sum + inv.amount, 0);
-  const completedInvestments = investments.filter((inv) => inv.status === 'confirmed');
-  const hasInvestments = investments.length > 0;
-
-  const filteredCampaigns = useMemo(() => {
-    switch (activeFilter) {
-      case 'live':
-        return campaigns.filter((c) => c.status === 'live');
-      case 'vc':
-        return campaigns.filter((c) => !!c.vc_info);
-      case 'closing':
-        return [...campaigns].sort((a, b) => {
-          if (!a.close_date) return 1;
-          if (!b.close_date) return -1;
-          return new Date(a.close_date).getTime() - new Date(b.close_date).getTime();
-        });
-      default:
-        return [...campaigns].sort((a, b) => b.amount_raised - a.amount_raised);
-    }
-  }, [activeFilter, campaigns]);
-
-  const momentumData = [10000, 11250, 11800, 12500, 13250, 12900, 14150, 15320, 16250, 17500];
-
-  const filters: { key: FilterKey; label: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }[] = [
-    { key: 'featured', label: 'Featured', icon: 'star-four-points' },
-    { key: 'live', label: 'Live now', icon: 'lightning-bolt' },
-    { key: 'vc', label: 'VC-backed', icon: 'shield-check' },
-    { key: 'closing', label: 'Closing soon', icon: 'clock-outline' },
-  ];
-
-  const metrics = [
-    {
-      label: hasInvestments ? 'Invested' : 'Target',
-      value: hasInvestments ? formatCurrency(portfolioValue) : '$25k',
-    },
-    {
-      label: 'Deals',
-      value: hasInvestments ? `${completedInvestments.length}` : `${campaigns.length}`,
-    },
-    {
-      label: 'Available',
-      value: hasInvestments ? '$7.5k' : '$5k',
-    },
-  ];
+  const firstName = user?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
 
       <ScrollView
         contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + 120 },
+          styles.content,
+          { paddingTop: insets.top + spacing.xl, paddingBottom: insets.bottom + 100 },
         ]}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
-        }
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <FadeIn>
-          <View style={styles.header}>
-            <Avatar name={user?.full_name || user?.email || 'U'} size="md" />
-            <View style={styles.headerContent}>
-              <Text style={styles.greeting}>
-                Hi, {user?.full_name || user?.email?.split('@')[0] || 'investor'}
-              </Text>
-              <Text style={styles.subhead}>Build your portfolio</Text>
-            </View>
-            <View style={styles.headerActions}>
-              <IconButton icon="bell-outline" onPress={() => {}} />
-              <IconButton icon="cog-outline" onPress={() => router.push('/account')} />
-            </View>
-          </View>
-        </FadeIn>
+        {/* Greeting */}
+        <Text style={styles.greeting}>Hi {firstName}</Text>
 
-        {/* Hero Card */}
-        <SlideUp delay={40}>
-          <Surface elevation={2} rounded="xl" style={styles.heroCard}>
-            <View style={styles.heroHeader}>
-              <View>
-                <Text style={styles.heroLabel}>
-                  {hasInvestments ? 'Portfolio value' : 'Getting started'}
-                </Text>
-                <Text style={styles.heroValue}>
-                  {hasInvestments ? formatCurrency(portfolioValue) : '$0'}
-                </Text>
-              </View>
-              <StatusBadge status="success" label="Active" />
-            </View>
+        {/* Portfolio Value */}
+        <View style={styles.valueSection}>
+          <Text style={styles.valueLabel}>Portfolio</Text>
+          <Text style={styles.valueAmount}>{formatCurrency(portfolioValue)}</Text>
+          {portfolioValue > 0 && (
+            <Text style={styles.valueChange}>+4.2% this month</Text>
+          )}
+        </View>
 
-            <View style={styles.heroStats}>
-              {metrics.map((metric) => (
-                <View key={metric.label} style={styles.heroStat}>
-                  <Text style={styles.heroStatLabel}>{metric.label}</Text>
-                  <Text style={styles.heroStatValue}>{metric.value}</Text>
-                </View>
-              ))}
-            </View>
-
-            <View style={styles.heroActions}>
-              <FilledButton onPress={() => router.push('/account/payment-methods')}>
-                Add funds
-              </FilledButton>
-              <OutlinedButton onPress={() => router.push('/(tabs)/explore')}>
-                Explore
-              </OutlinedButton>
-            </View>
-          </Surface>
-        </SlideUp>
-
-        {/* Filter Chips */}
-        <SlideUp delay={80}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filtersContainer}
+        {/* Quick Actions */}
+        <View style={styles.actions}>
+          <Pressable
+            style={styles.primaryButton}
+            onPress={() => router.push('/(tabs)/explore')}
           >
-            {filters.map((filter) => (
-              <FilterChip
-                key={filter.key}
-                label={filter.label}
-                icon={filter.icon}
-                selected={activeFilter === filter.key}
-                onPress={() => setActiveFilter(filter.key)}
-              />
-            ))}
-          </ScrollView>
-        </SlideUp>
+            <Text style={styles.primaryButtonText}>Explore deals</Text>
+          </Pressable>
+          <Pressable
+            style={styles.secondaryButton}
+            onPress={() => router.push('/account/payment-methods')}
+          >
+            <Text style={styles.secondaryButtonText}>Add funds</Text>
+          </Pressable>
+        </View>
 
-        {/* Live Rounds Section */}
-        <SlideUp delay={120}>
+        {/* Divider */}
+        <View style={styles.divider} />
+
+        {/* Live Deals */}
+        <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Live rounds</Text>
-            <PressableScale onPress={() => router.push('/(tabs)/explore')}>
+            <Text style={styles.sectionTitle}>Live</Text>
+            <Pressable onPress={() => router.push('/(tabs)/explore')}>
               <Text style={styles.sectionLink}>See all</Text>
-            </PressableScale>
+            </Pressable>
           </View>
 
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.cardsRow}
+            contentContainerStyle={styles.dealsRow}
           >
-            {filteredCampaigns.slice(0, 6).map((campaign) => {
-              const progress = Math.min((campaign.amount_raised / campaign.target_amount) * 100, 100);
+            {campaigns.slice(0, 5).map((deal) => {
+              const progress = Math.round((deal.amount_raised / deal.target_amount) * 100);
               return (
-                <OutlinedCard
-                  key={campaign.id}
+                <Pressable
+                  key={deal.id}
                   style={styles.dealCard}
-                  onPress={() => router.push(`/deal/${campaign.slug}`)}
+                  onPress={() => router.push(`/deal/${deal.slug}`)}
                 >
-                  <View style={styles.dealHeader}>
-                    <Avatar name={campaign.company_name} size="md" />
-                    <View style={styles.dealInfo}>
-                      <Text style={styles.company}>{campaign.company_name}</Text>
-                      <Text style={styles.tagline} numberOfLines={1}>
-                        {campaign.tagline}
-                      </Text>
-                    </View>
+                  {/* Company Initial */}
+                  <View style={styles.dealLogo}>
+                    <Text style={styles.dealLogoText}>
+                      {deal.company_name.charAt(0)}
+                    </Text>
                   </View>
 
-                  <ProgressBar progress={progress} height={4} style={styles.dealProgress} />
-                  <Text style={styles.progressLabel}>{progress.toFixed(0)}% funded</Text>
+                  {/* Info */}
+                  <Text style={styles.dealName} numberOfLines={1}>
+                    {deal.company_name}
+                  </Text>
+                  <Text style={styles.dealTagline} numberOfLines={2}>
+                    {deal.tagline}
+                  </Text>
 
-                  <View style={styles.dealStats}>
-                    <View style={styles.dealStat}>
-                      <Text style={styles.statLabel}>Min</Text>
-                      <Text style={styles.statValue}>${campaign.min_investment}</Text>
+                  {/* Progress */}
+                  <View style={styles.progressContainer}>
+                    <View style={styles.progressTrack}>
+                      <View style={[styles.progressFill, { width: `${Math.min(progress, 100)}%` }]} />
                     </View>
-                    <View style={styles.dealStat}>
-                      <Text style={styles.statLabel}>Target</Text>
-                      <Text style={styles.statValue}>${(campaign.target_amount / 1000).toFixed(0)}k</Text>
-                    </View>
+                    <Text style={styles.progressText}>{progress}%</Text>
                   </View>
 
-                  {campaign.vc_info && (
-                    <StatusBadge status="info" label="VC-backed" style={styles.vcBadge} />
-                  )}
-                </OutlinedCard>
+                  {/* Min Investment */}
+                  <Text style={styles.dealMin}>
+                    ${deal.min_investment} min
+                  </Text>
+                </Pressable>
               );
             })}
           </ScrollView>
-        </SlideUp>
+        </View>
 
-        {/* Market Pulse */}
-        <SlideUp delay={160}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Market pulse</Text>
-            <PressableScale onPress={() => router.push('/(tabs)/portfolio')}>
-              <Text style={styles.sectionLink}>Activity</Text>
-            </PressableScale>
+        {/* Stats Row */}
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{campaigns.length}</Text>
+            <Text style={styles.statLabel}>Live deals</Text>
           </View>
-
-          <FilledCard style={styles.pulseCard}>
-            <View style={styles.pulseHeader}>
-              <StatusBadge status="success" label="Live" />
-              <Text style={styles.pulseTitle}>Momentum index</Text>
-            </View>
-            <View style={styles.pulseContent}>
-              <View style={styles.pulseStats}>
-                <View>
-                  <Text style={styles.pulseStatLabel}>10d change</Text>
-                  <Text style={[styles.pulseStatValue, { color: colors.primary }]}>+12.8%</Text>
-                </View>
-                <View>
-                  <Text style={styles.pulseStatLabel}>Volatility</Text>
-                  <Text style={styles.pulseStatValue}>Low</Text>
-                </View>
-              </View>
-              <SparkLine data={momentumData} color={colors.primary} width={100} height={40} />
-            </View>
-          </FilledCard>
-        </SlideUp>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{investments.length}</Text>
+            <Text style={styles.statLabel}>Investments</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>$100</Text>
+            <Text style={styles.statLabel}>Min invest</Text>
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
 }
 
-const CARD_WIDTH = Math.min(260, SCREEN_WIDTH * 0.7);
+const CARD_WIDTH = SCREEN_WIDTH * 0.6;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
-  scrollContent: {
+  content: {
     paddingHorizontal: spacing.lg,
-    gap: spacing.lg,
   },
-  
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  headerContent: {
-    flex: 1,
-  },
+
+  // Greeting
   greeting: {
-    ...typography.titleMedium,
-    color: colors.textPrimary,
-  },
-  subhead: {
-    ...typography.bodySmall,
+    ...typography.h2,
     color: colors.textSecondary,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: spacing.xs,
+    marginBottom: spacing.sm,
   },
 
-  // Hero Card
-  heroCard: {
-    padding: spacing.lg,
+  // Portfolio Value
+  valueSection: {
+    marginBottom: spacing.xl,
   },
-  heroHeader: {
+  valueLabel: {
+    ...typography.label,
+    color: colors.textMuted,
+    textTransform: 'uppercase',
+    marginBottom: spacing.xs,
+  },
+  valueAmount: {
+    ...typography.hero,
+    color: colors.text,
+  },
+  valueChange: {
+    ...typography.body,
+    color: colors.accent,
+    marginTop: spacing.xs,
+  },
+
+  // Actions
+  actions: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
+    gap: spacing.md,
+    marginBottom: spacing.xl,
   },
-  heroLabel: {
-    ...typography.labelSmall,
-    color: colors.textSecondary,
-  },
-  heroValue: {
-    ...typography.headlineLarge,
-    color: colors.textPrimary,
-    marginTop: spacing.xxs,
-  },
-  heroStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.lg,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
-  },
-  heroStat: {
+  primaryButton: {
+    flex: 1,
+    backgroundColor: colors.accent,
+    paddingVertical: spacing.md,
+    borderRadius: radius.full,
     alignItems: 'center',
   },
-  heroStatLabel: {
-    ...typography.labelSmall,
-    color: colors.textSecondary,
+  primaryButtonText: {
+    ...typography.label,
+    color: colors.black,
+    fontWeight: '600',
   },
-  heroStatValue: {
-    ...typography.titleMedium,
-    color: colors.textPrimary,
-    marginTop: spacing.xxs,
+  secondaryButton: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    paddingVertical: spacing.md,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
   },
-  heroActions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
+  secondaryButtonText: {
+    ...typography.label,
+    color: colors.text,
   },
 
-  // Filters
-  filtersContainer: {
-    gap: spacing.sm,
+  // Divider
+  divider: {
+    height: 1,
+    backgroundColor: colors.border,
+    marginBottom: spacing.xl,
   },
 
   // Section
+  section: {
+    marginBottom: spacing.xl,
+  },
   sectionHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
   },
   sectionTitle: {
-    ...typography.titleMedium,
-    color: colors.textPrimary,
+    ...typography.h3,
+    color: colors.text,
   },
   sectionLink: {
-    ...typography.labelMedium,
-    color: colors.primary,
+    ...typography.label,
+    color: colors.accent,
   },
 
-  // Deal Cards
-  cardsRow: {
+  // Deals
+  dealsRow: {
     gap: spacing.md,
-    paddingRight: spacing.lg,
   },
   dealCard: {
     width: CARD_WIDTH,
+    backgroundColor: colors.bgCard,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
   },
-  dealHeader: {
-    flexDirection: 'row',
+  dealLogo: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.md,
+    backgroundColor: colors.bgSubtle,
     alignItems: 'center',
-    gap: spacing.sm,
+    justifyContent: 'center',
     marginBottom: spacing.md,
   },
-  dealInfo: {
-    flex: 1,
+  dealLogoText: {
+    ...typography.h2,
+    color: colors.text,
   },
-  company: {
-    ...typography.titleSmall,
-    color: colors.textPrimary,
-  },
-  tagline: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  dealProgress: {
+  dealName: {
+    ...typography.h3,
+    color: colors.text,
     marginBottom: spacing.xs,
   },
-  progressLabel: {
-    ...typography.labelSmall,
+  dealTagline: {
+    ...typography.bodySmall,
     color: colors.textSecondary,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
+    minHeight: 40,
   },
-  dealStats: {
-    flexDirection: 'row',
-    gap: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  dealStat: {},
-  statLabel: {
-    ...typography.labelSmall,
-    color: colors.textSecondary,
-  },
-  statValue: {
-    ...typography.titleSmall,
-    color: colors.textPrimary,
-    marginTop: 2,
-  },
-  vcBadge: {
-    alignSelf: 'flex-start',
-  },
-
-  // Pulse Card
-  pulseCard: {},
-  pulseHeader: {
+  progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
-  pulseTitle: {
-    ...typography.titleMedium,
-    color: colors.textPrimary,
+  progressTrack: {
+    flex: 1,
+    height: 4,
+    backgroundColor: colors.bgSubtle,
+    borderRadius: 2,
+    overflow: 'hidden',
   },
-  pulseContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
+  progressFill: {
+    height: '100%',
+    backgroundColor: colors.accent,
+    borderRadius: 2,
   },
-  pulseStats: {
-    gap: spacing.sm,
-  },
-  pulseStatLabel: {
+  progressText: {
     ...typography.labelSmall,
     color: colors.textSecondary,
+    width: 36,
+    textAlign: 'right',
   },
-  pulseStatValue: {
-    ...typography.titleSmall,
-    color: colors.textPrimary,
-    marginTop: 2,
+  dealMin: {
+    ...typography.label,
+    color: colors.textMuted,
+  },
+
+  // Stats
+  statsRow: {
+    flexDirection: 'row',
+    backgroundColor: colors.bgCard,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    ...typography.h2,
+    color: colors.text,
+  },
+  statLabel: {
+    ...typography.labelSmall,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: colors.border,
+    marginHorizontal: spacing.md,
   },
 });

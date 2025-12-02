@@ -129,7 +129,7 @@ export default function KYCDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   keyboardView: {
     flex: 1,
@@ -151,13 +151,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceSecondary,
   },
   progressDotActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     width: 24,
   },
   title: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   subtitle: {
@@ -173,6 +173,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
   },
 });

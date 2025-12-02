@@ -6,7 +6,7 @@ export default function AccountLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: colors.background },
+        contentStyle: { backgroundColor: colors.bg },
       }}
     />
   );

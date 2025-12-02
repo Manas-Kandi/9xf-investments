@@ -126,7 +126,7 @@ export default function HelpScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Help & FAQ</Text>
         <View style={styles.backButton} />
@@ -157,7 +157,7 @@ export default function HelpScreen() {
             onPress={() => router.push('/help/contact')}
           >
             <View style={styles.quickActionIcon}>
-              <Ionicons name="chatbubble-outline" size={24} color={colors.primary} />
+              <Ionicons name="chatbubble-outline" size={24} color={colors.accent} />
             </View>
             <Text style={styles.quickActionText}>Contact Support</Text>
           </TouchableOpacity>
@@ -167,7 +167,7 @@ export default function HelpScreen() {
             onPress={() => router.push('/how-it-works')}
           >
             <View style={styles.quickActionIcon}>
-              <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
+              <Ionicons name="information-circle-outline" size={24} color={colors.accent} />
             </View>
             <Text style={styles.quickActionText}>How It Works</Text>
           </TouchableOpacity>
@@ -177,7 +177,7 @@ export default function HelpScreen() {
             onPress={() => router.push('/risk-disclosure')}
           >
             <View style={styles.quickActionIcon}>
-              <Ionicons name="warning-outline" size={24} color={colors.primary} />
+              <Ionicons name="warning-outline" size={24} color={colors.accent} />
             </View>
             <Text style={styles.quickActionText}>Risk Disclosure</Text>
           </TouchableOpacity>
@@ -202,7 +202,7 @@ export default function HelpScreen() {
                 }
               >
                 <View style={styles.categoryTitleRow}>
-                  <Ionicons name={category.icon} size={22} color={colors.textPrimary} />
+                  <Ionicons name={category.icon} size={22} color={colors.text} />
                   <Text style={styles.categoryTitle}>{category.title}</Text>
                 </View>
                 <Ionicons
@@ -227,7 +227,7 @@ export default function HelpScreen() {
                           <Ionicons
                             name={expandedFaq === faqKey ? 'remove' : 'add'}
                             size={20}
-                            color={colors.primary}
+                            color={colors.accent}
                           />
                         </View>
                         {expandedFaq === faqKey && (
@@ -265,7 +265,7 @@ export default function HelpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   quickActions: {
     flexDirection: 'row',
@@ -321,14 +321,14 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colors.accent + '15',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
   },
   quickActionText: {
     fontSize: fontSize.xs,
-    color: colors.textPrimary,
+    color: colors.text,
     fontWeight: '500',
     textAlign: 'center',
   },
@@ -352,16 +352,16 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   faqList: {
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
   },
   faqItem: {
     padding: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderSubtle,
+    borderBottomColor: colors.border,
   },
   faqQuestion: {
     flexDirection: 'row',
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: fontSize.sm,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginRight: spacing.md,
   },
   faqAnswer: {
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   helpBanner: {
-    backgroundColor: colors.primary + '10',
+    backgroundColor: colors.accent + '10',
     borderRadius: borderRadius.lg,
     padding: spacing.xl,
     alignItems: 'center',
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   helpBannerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   helpBannerText: {
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   helpBannerButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.full,

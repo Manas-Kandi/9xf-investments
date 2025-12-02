@@ -115,7 +115,7 @@ export default function ExploreScreen() {
         activeOpacity={0.8}
       >
         <LinearGradient
-          colors={[colors.surfaceContainer, colors.surfaceContainerHigh]}
+          colors={[colors.bgCard, colors.bgCardHigh]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.cardBackground}
@@ -133,13 +133,13 @@ export default function ExploreScreen() {
             <View
               style={[
                 styles.statusBadge,
-                { backgroundColor: isLive ? colors.primary + '22' : isClosed ? colors.error + '22' : colors.textMuted + '22' },
+                { backgroundColor: isLive ? colors.accent + '22' : isClosed ? colors.error + '22' : colors.textMuted + '22' },
               ]}
             >
               <Text
                 style={[
                   styles.statusText,
-                  { color: isLive ? colors.primary : isClosed ? colors.error : colors.textMuted },
+                  { color: isLive ? colors.accent : isClosed ? colors.error : colors.textMuted },
                 ]}
               >
                 {isLive ? 'Live' : campaign.status === 'draft' ? 'Coming' : 'Closed'}
@@ -193,9 +193,9 @@ export default function ExploreScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
       <LinearGradient
-        colors={[colors.surfaceContainerHigh, colors.background]}
+        colors={[colors.bgCardHigh, colors.bg]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -210,7 +210,7 @@ export default function ExploreScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.primary}
+            tintColor={colors.accent}
             progressBackgroundColor={colors.surface}
           />
         }
@@ -317,7 +317,7 @@ export default function ExploreScreen() {
                   {option.label}
                 </Text>
                 {sortBy === option.key && (
-                  <Ionicons name="checkmark" size={18} color={colors.primary} />
+                  <Ionicons name="checkmark" size={18} color={colors.accent} />
                 )}
               </TouchableOpacity>
             ))}
@@ -343,7 +343,7 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     ...typography.headlineMedium,
-    color: colors.textPrimary,
+    color: colors.text,
     letterSpacing: -0.25,
   },
   subtitle: {
@@ -368,12 +368,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
   },
   sortText: {
     ...typography.labelMedium,
@@ -385,11 +385,11 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     gap: spacing.xs,
   },
   statLabel: {
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     ...typography.titleLarge,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   statHint: {
     ...typography.bodySmall,
@@ -407,11 +407,11 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     borderRadius: borderRadius.full,
     paddingHorizontal: spacing.md,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
   },
   searchIcon: {
     marginRight: spacing.sm,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     ...typography.bodyLarge,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   filtersContainer: {
     gap: spacing.sm,
@@ -431,14 +431,14 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     borderRadius: borderRadius.full,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
   },
   filterChipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   filterText: {
     ...typography.labelMedium,
@@ -448,10 +448,10 @@ const styles = StyleSheet.create({
     color: colors.onPrimary,
   },
   sortMenu: {
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     overflow: 'hidden',
   },
   sortMenuItem: {
@@ -461,17 +461,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderSubtle,
+    borderBottomColor: colors.border,
   },
   sortMenuItemActive: {
-    backgroundColor: colors.primary + '14',
+    backgroundColor: colors.accent + '14',
   },
   sortMenuText: {
     ...typography.bodyMedium,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   sortMenuTextActive: {
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: '600',
   },
   campaignList: {
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
   },
   cardBackground: {
     padding: spacing.lg,
@@ -497,20 +497,20 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.bgCardHigh,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoText: {
     ...typography.titleMedium,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   cardHeaderInfo: {
     flex: 1,
   },
   companyName: {
     ...typography.titleMedium,
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 2,
   },
   tagline: {
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.bgCardHigh,
     borderRadius: borderRadius.full,
     alignSelf: 'flex-start',
   },
@@ -555,7 +555,7 @@ const styles = StyleSheet.create({
   },
   raised: {
     ...typography.bodySmall,
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: '600',
   },
   goal: {
@@ -564,13 +564,13 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 8,
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.bgCardHigh,
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     borderRadius: 4,
   },
   cardFooter: {
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
   },
   footerValue: {
     ...typography.titleSmall,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   footerCTA: {
     flexDirection: 'row',
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     ...typography.labelMedium,
-    color: colors.primary,
+    color: colors.accent,
   },
   emptyState: {
     alignItems: 'center',
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typography.titleLarge,
-    color: colors.textPrimary,
+    color: colors.text,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },

@@ -71,7 +71,7 @@ export function Button({
     if (isDisabled) return colors.textTertiary;
     switch (resolvedVariant) {
       case 'filled': return buttonSpec.variants.filled.content;
-      case 'elevated': return colors.textPrimary;
+      case 'elevated': return colors.text;
       case 'tonal': return buttonSpec.variants.tonal.content;
       case 'outlined': return buttonSpec.variants.outlined.content;
       case 'ghost': return buttonSpec.variants.ghost.content;

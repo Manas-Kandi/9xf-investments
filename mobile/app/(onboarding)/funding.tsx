@@ -52,7 +52,7 @@ export default function FundingScreen() {
         <View style={styles.options}>
           <TouchableOpacity style={styles.optionCard} onPress={handleConnectBank}>
             <View style={styles.optionIcon}>
-              <Ionicons name="business-outline" size={28} color={colors.primary} />
+              <Ionicons name="business-outline" size={28} color={colors.accent} />
             </View>
             <View style={styles.optionContent}>
               <Text style={styles.optionTitle}>Connect bank account</Text>
@@ -65,7 +65,7 @@ export default function FundingScreen() {
 
           <TouchableOpacity style={styles.optionCard}>
             <View style={styles.optionIcon}>
-              <Ionicons name="card-outline" size={28} color={colors.primary} />
+              <Ionicons name="card-outline" size={28} color={colors.accent} />
             </View>
             <View style={styles.optionContent}>
               <Text style={styles.optionTitle}>Add debit card</Text>
@@ -101,7 +101,7 @@ export default function FundingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   content: {
     flex: 1,
@@ -120,13 +120,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceSecondary,
   },
   progressDotActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     width: 24,
   },
   title: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   subtitle: {
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colors.accent + '15',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   optionTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xs,
   },
   optionDescription: {

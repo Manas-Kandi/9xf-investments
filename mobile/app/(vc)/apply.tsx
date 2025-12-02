@@ -66,7 +66,7 @@ export default function VCApplyScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="close" size={24} color={colors.textPrimary} />
+            <Ionicons name="close" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Apply as a VC</Text>
           <View style={{ width: 40 }} />
@@ -76,7 +76,7 @@ export default function VCApplyScreen() {
           {/* Intro */}
           <View style={styles.intro}>
             <View style={styles.introIcon}>
-              <Ionicons name="business" size={32} color={colors.primary} />
+              <Ionicons name="business" size={32} color={colors.accent} />
             </View>
             <Text style={styles.introTitle}>For VCs and fund managers</Text>
             <Text style={styles.introText}>
@@ -178,7 +178,7 @@ export default function VCApplyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   keyboardView: {
     flex: 1,
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderSubtle,
+    borderBottomColor: colors.border,
   },
   backButton: {
     padding: spacing.sm,
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   scrollContent: {
     padding: spacing.lg,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colors.accent + '15',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   introTitle: {
     fontSize: fontSize.xl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   introText: {
@@ -254,8 +254,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   typeOptionActive: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '15',
+    borderColor: colors.accent,
+    backgroundColor: colors.accent + '15',
   },
   typeOptionText: {
     fontSize: fontSize.sm,
@@ -263,13 +263,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   typeOptionTextActive: {
-    color: colors.primary,
+    color: colors.accent,
   },
   footer: {
     padding: spacing.lg,
     paddingBottom: spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
   },
   footerNote: {
     fontSize: fontSize.sm,

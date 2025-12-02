@@ -1,152 +1,156 @@
 import { Platform } from 'react-native';
 
 /**
- * Material Design 3 Dark Theme Color System
+ * Minimal Dark Design System
  * 
- * Based on official M3 guidelines:
- * - Tonal surface hierarchy for elevation
- * - Primary/Secondary/Tertiary color roles with on-colors
- * - Accessible contrast ratios (4.5:1 minimum for text)
- * - Surface container hierarchy: lowest → low → container → high → highest
+ * Philosophy:
+ * - Pure blacks, not tinted
+ * - Single accent color
+ * - Maximum contrast
+ * - Generous space
+ * - Confident typography
  */
-const m3Dark = {
-  // Primary - Main brand color (green accent for investments)
-  primary: '#A8DAB5',
-  onPrimary: '#0D3820',
-  primaryContainer: '#245234',
-  onPrimaryContainer: '#C4F7D0',
+
+const palette = {
+  // Pure blacks
+  black: '#000000',
+  dark: '#0A0A0A',
+  elevated: '#111111',
+  card: '#161616',
   
-  // Secondary - Supporting elements
-  secondary: '#B8CCB9',
-  onSecondary: '#243527',
-  secondaryContainer: '#3A4B3C',
-  onSecondaryContainer: '#D4E8D5',
+  // Grays - minimal steps
+  gray: '#666666',
+  muted: '#999999',
+  subtle: '#1A1A1A',
   
-  // Tertiary - Accent for distinctive elements
-  tertiary: '#A1CED8',
-  onTertiary: '#00363E',
-  tertiaryContainer: '#1F4D55',
-  onTertiaryContainer: '#BDEAF4',
+  // Single accent - vibrant green
+  accent: '#00FF88',
+  accentMuted: 'rgba(0, 255, 136, 0.15)',
   
-  // Error states
-  error: '#FFB4AB',
-  onError: '#690005',
-  errorContainer: '#93000A',
-  onErrorContainer: '#FFDAD6',
+  // Text
+  white: '#FFFFFF',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#999999',
+  textTertiary: '#666666',
   
-  // Surface hierarchy (tonal elevation)
-  background: '#0F1512',
-  onBackground: '#DFE4DF',
-  surface: '#0F1512',
-  onSurface: '#DFE4DF',
-  surfaceVariant: '#404942',
-  onSurfaceVariant: '#BFC9BF',
+  // Borders - barely visible
+  border: 'rgba(255, 255, 255, 0.08)',
+  borderStrong: 'rgba(255, 255, 255, 0.15)',
   
-  // Surface containers (M3 tonal elevation hierarchy)
-  surfaceContainerLowest: '#0A0F0C',
-  surfaceContainerLow: '#171D19',
-  surfaceContainer: '#1B211D',
-  surfaceContainerHigh: '#252B27',
-  surfaceContainerHighest: '#303632',
+  // States
+  error: '#FF4444',
+  success: '#00FF88',
+  warning: '#FFAA00',
+  info: '#4DA6FF',
   
-  // Outline colors
-  outline: '#8A938A',
-  outlineVariant: '#404942',
-  
-  // Utility colors
-  shadow: '#000000',
-  scrim: 'rgba(0,0,0,0.6)',
-  inverseSurface: '#DFE4DF',
-  inverseOnSurface: '#2C322D',
-  inversePrimary: '#3A6A4A',
-  
-  // Semantic colors
-  success: '#A8DAB5',
-  warning: '#F9DE8C',
-  info: '#A1CED8',
-  muted: '#8A938A',
-  mutedStrong: '#5C645C',
+  // Legacy aliases for backwards compatibility
+  background: '#000000',
+  surface: '#161616',
+  surfaceContainer: '#161616',
+  surfaceContainerHigh: '#111111',
+  primary: '#00FF88',
+  onPrimary: '#000000',
+  onSurface: '#FFFFFF',
+  onSurfaceVariant: '#999999',
+  onSecondaryContainer: '#999999',
+  secondaryContainer: '#1A1A1A',
+  tertiary: '#4DA6FF',
+  tertiaryContainer: '#1A2A3A',
+  onTertiaryContainer: '#AADDFF',
+  mutedStrong: '#444444',
+  outline: 'rgba(255, 255, 255, 0.08)',
+  outlineVariant: 'rgba(255, 255, 255, 0.15)',
+  scrim: 'rgba(0, 0, 0, 0.6)',
 };
 
 const fontFamily = Platform.select({
-  ios: 'SF Pro Display',
+  ios: 'System',
   android: 'Roboto',
   default: 'System',
 });
 
+// Generous spacing - let things breathe
 export const spacing = {
-  xxs: 4,
-  xs: 8,
-  sm: 12,
+  xxs: 2,
+  xs: 4,
+  sm: 8,
   md: 16,
   lg: 24,
   xl: 32,
   xxl: 48,
-  screenGutter: 20,
+  xxxl: 64,
 };
 
+// Soft, modern radii
 export const radius = {
-  xs: 6,
-  sm: 10,
-  md: 14,
-  lg: 18,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
   xl: 24,
-  pill: 9999,
+  full: 9999,
+  pill: 9999, // Legacy alias
 };
 
+// Bold, confident typography
 export const typography = {
-  displayLarge: { fontFamily, fontSize: 48, lineHeight: 56, fontWeight: '700' as const, letterSpacing: -1 },
-  displayMedium: { fontFamily, fontSize: 40, lineHeight: 48, fontWeight: '700' as const, letterSpacing: -0.5 },
-  displaySmall: { fontFamily, fontSize: 32, lineHeight: 40, fontWeight: '600' as const, letterSpacing: -0.25 },
-  headlineLarge: { fontFamily, fontSize: 28, lineHeight: 36, fontWeight: '600' as const, letterSpacing: -0.25 },
-  headlineMedium: { fontFamily, fontSize: 24, lineHeight: 32, fontWeight: '600' as const, letterSpacing: 0 },
+  // Display - for hero numbers
+  hero: { fontFamily, fontSize: 56, lineHeight: 64, fontWeight: '700' as const, letterSpacing: -2 },
+  display: { fontFamily, fontSize: 40, lineHeight: 48, fontWeight: '700' as const, letterSpacing: -1.5 },
+  
+  // Headings
+  h1: { fontFamily, fontSize: 32, lineHeight: 40, fontWeight: '600' as const, letterSpacing: -0.5 },
+  h2: { fontFamily, fontSize: 24, lineHeight: 32, fontWeight: '600' as const, letterSpacing: -0.3 },
+  h3: { fontFamily, fontSize: 20, lineHeight: 28, fontWeight: '600' as const, letterSpacing: 0 },
+  
+  // Body
+  body: { fontFamily, fontSize: 16, lineHeight: 24, fontWeight: '400' as const, letterSpacing: 0 },
+  bodySmall: { fontFamily, fontSize: 14, lineHeight: 20, fontWeight: '400' as const, letterSpacing: 0 },
+  
+  // Labels
+  label: { fontFamily, fontSize: 13, lineHeight: 16, fontWeight: '500' as const, letterSpacing: 0.5 },
+  labelSmall: { fontFamily, fontSize: 11, lineHeight: 14, fontWeight: '500' as const, letterSpacing: 0.5 },
+  
+  // Mono for numbers
+  mono: { fontFamily: Platform.select({ ios: 'SF Mono', android: 'monospace', default: 'monospace' }), fontSize: 14, lineHeight: 20, fontWeight: '500' as const },
+  
+  // Legacy aliases for backwards compatibility
+  displayLarge: { fontFamily, fontSize: 56, lineHeight: 64, fontWeight: '700' as const, letterSpacing: -2 },
+  displayMedium: { fontFamily, fontSize: 40, lineHeight: 48, fontWeight: '700' as const, letterSpacing: -1.5 },
+  displaySmall: { fontFamily, fontSize: 32, lineHeight: 40, fontWeight: '600' as const, letterSpacing: -0.5 },
+  headlineLarge: { fontFamily, fontSize: 32, lineHeight: 40, fontWeight: '600' as const, letterSpacing: -0.5 },
+  headlineMedium: { fontFamily, fontSize: 24, lineHeight: 32, fontWeight: '600' as const, letterSpacing: -0.3 },
   headlineSmall: { fontFamily, fontSize: 20, lineHeight: 28, fontWeight: '600' as const, letterSpacing: 0 },
-  titleLarge: { fontFamily, fontSize: 18, lineHeight: 26, fontWeight: '600' as const, letterSpacing: 0 },
+  titleLarge: { fontFamily, fontSize: 20, lineHeight: 28, fontWeight: '600' as const, letterSpacing: 0 },
   titleMedium: { fontFamily, fontSize: 16, lineHeight: 24, fontWeight: '600' as const, letterSpacing: 0 },
   titleSmall: { fontFamily, fontSize: 14, lineHeight: 20, fontWeight: '600' as const, letterSpacing: 0 },
   bodyLarge: { fontFamily, fontSize: 16, lineHeight: 24, fontWeight: '400' as const, letterSpacing: 0 },
-  bodyMedium: { fontFamily, fontSize: 14, lineHeight: 22, fontWeight: '400' as const, letterSpacing: 0 },
-  bodySmall: { fontFamily, fontSize: 12, lineHeight: 18, fontWeight: '400' as const, letterSpacing: 0 },
-  labelLarge: { fontFamily, fontSize: 14, lineHeight: 20, fontWeight: '500' as const, letterSpacing: 0 },
-  labelMedium: { fontFamily, fontSize: 12, lineHeight: 16, fontWeight: '500' as const, letterSpacing: 0 },
-  labelSmall: { fontFamily, fontSize: 11, lineHeight: 14, fontWeight: '500' as const, letterSpacing: 0 },
+  bodyMedium: { fontFamily, fontSize: 14, lineHeight: 20, fontWeight: '400' as const, letterSpacing: 0 },
+  labelLarge: { fontFamily, fontSize: 14, lineHeight: 20, fontWeight: '500' as const, letterSpacing: 0.5 },
+  labelMedium: { fontFamily, fontSize: 13, lineHeight: 16, fontWeight: '500' as const, letterSpacing: 0.5 },
 };
 
+// Quick animations
 export const motion = {
-  duration: {
-    instant: 80,
-    fast: 160,
-    normal: 240,
-    slow: 400,
-    slower: 600,
-  },
+  fast: 150,
+  normal: 250,
+  slow: 400,
+  spring: { damping: 20, stiffness: 300 },
+  duration: { fast: 150, normal: 250, slow: 400 },
   pressScale: 0.97,
 };
 
+// Elevation (minimal - we use flat design)
 export const elevation = {
-  level0: Platform.select({ ios: {}, android: { elevation: 0 } }),
-  level1: Platform.select({
-    ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 3 },
-    android: { elevation: 1 },
-  }),
-  level2: Platform.select({
-    ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 6 },
-    android: { elevation: 3 },
-  }),
-  level3: Platform.select({
-    ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 10 },
-    android: { elevation: 6 },
-  }),
-  level4: Platform.select({
-    ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.2, shadowRadius: 12 },
-    android: { elevation: 8 },
-  }),
-  level5: Platform.select({
-    ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.22, shadowRadius: 16 },
-    android: { elevation: 12 },
-  }),
+  level0: {},
+  level1: {},
+  level2: {},
+  level3: {},
+  level4: {},
+  level5: {},
 };
 
+// Opacity
 export const opacity = {
   disabled: 0.4,
   hover: 0.08,
@@ -155,7 +159,7 @@ export const opacity = {
 };
 
 export const tokens = {
-  color: m3Dark,
+  color: palette,
   spacing,
   radius,
   typography,

@@ -72,7 +72,7 @@ export default function RiskDisclosureScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Risk Disclosure</Text>
         <View style={styles.backButton} />
@@ -160,7 +160,7 @@ export default function RiskDisclosureScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   warningTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
     textAlign: 'center',
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   riskContent: {
     fontSize: fontSize.sm,
@@ -251,18 +251,18 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   summaryCard: {
-    backgroundColor: colors.primary + '10',
+    backgroundColor: colors.accent + '10',
     borderRadius: borderRadius.lg,
     padding: spacing.xl,
     marginTop: spacing.lg,
     marginBottom: spacing.xl,
     borderWidth: 1,
-    borderColor: colors.primary + '20',
+    borderColor: colors.accent + '20',
   },
   summaryTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.md,
   },
   summaryText: {
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
   summaryItem: {
     fontSize: fontSize.sm,
-    color: colors.textPrimary,
+    color: colors.text,
     lineHeight: 20,
   },
   summaryFooter: {
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   },
   legalSection: {
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
     paddingTop: spacing.xl,
   },
   legalText: {

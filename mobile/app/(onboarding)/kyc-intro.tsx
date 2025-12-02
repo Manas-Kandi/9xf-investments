@@ -27,7 +27,7 @@ export default function KYCIntroScreen() {
 
         {/* Icon */}
         <View style={styles.iconContainer}>
-          <Ionicons name="person-circle-outline" size={80} color={colors.primary} />
+          <Ionicons name="person-circle-outline" size={80} color={colors.accent} />
         </View>
 
         {/* Content */}
@@ -63,7 +63,7 @@ export default function KYCIntroScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   content: {
     flex: 1,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceSecondary,
   },
   progressDotActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     width: 24,
   },
   iconContainer: {
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     textAlign: 'center',
     marginBottom: spacing.md,
   },
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   footer: {
     padding: spacing.lg,

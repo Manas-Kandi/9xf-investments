@@ -80,9 +80,9 @@ export default function PortfolioScreen() {
   if (investments.length === 0) {
     return (
       <View style={[styles.container, { paddingTop: insets.top + spacing.lg }]}>
-        <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+        <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
         <LinearGradient
-          colors={[colors.surfaceContainerHigh, colors.background]}
+          colors={[colors.bgCardHigh, colors.bg]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -109,9 +109,9 @@ export default function PortfolioScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
       <LinearGradient
-        colors={[colors.surfaceContainerHigh, colors.background]}
+        colors={[colors.bgCardHigh, colors.bg]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -119,7 +119,7 @@ export default function PortfolioScreen() {
       <ScrollView
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.lg }]}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
         }
         showsVerticalScrollIndicator={false}
       >
@@ -219,7 +219,7 @@ export default function PortfolioScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     ...typography.headlineMedium,
-    color: colors.textPrimary,
+    color: colors.text,
     letterSpacing: -0.25,
   },
   statsRow: {
@@ -236,11 +236,11 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     gap: spacing.xs,
   },
   statLabel: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     ...typography.titleLarge,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   statHint: {
     ...typography.bodySmall,
@@ -258,25 +258,25 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     borderRadius: borderRadius.full,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     gap: spacing.sm,
   },
   searchInput: {
     flex: 1,
     ...typography.bodyLarge,
-    color: colors.textPrimary,
+    color: colors.text,
     padding: 0,
   },
   filterButton: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.bgCardHigh,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -290,11 +290,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     marginBottom: spacing.sm,
   },
   transactionLeft: {
@@ -307,20 +307,20 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.surfaceContainerHigh,
+    backgroundColor: colors.bgCardHigh,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoText: {
     ...typography.titleMedium,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   transactionInfo: {
     flex: 1,
   },
   transactionName: {
     ...typography.titleSmall,
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 4,
   },
   transactionMeta: {
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   },
   transactionAmount: {
     ...typography.titleSmall,
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 2,
   },
   transactionTime: {
@@ -369,13 +369,13 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: colors.bgCard,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emptyTitle: {
     ...typography.titleLarge,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   emptyText: {
     ...typography.bodyMedium,
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   browseButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.full,

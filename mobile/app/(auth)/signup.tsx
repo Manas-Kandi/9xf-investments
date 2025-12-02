@@ -77,7 +77,7 @@ export default function SignUpScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
 
           {/* Header */}
@@ -143,14 +143,14 @@ export default function SignUpScreen() {
               onPress={() => {}}
               variant="secondary"
               fullWidth
-              icon={<Ionicons name="logo-google" size={20} color={colors.textPrimary} />}
+              icon={<Ionicons name="logo-google" size={20} color={colors.text} />}
             />
             <Button
               title="Continue with Apple"
               onPress={() => {}}
               variant="secondary"
               fullWidth
-              icon={<Ionicons name="logo-apple" size={20} color={colors.textPrimary} />}
+              icon={<Ionicons name="logo-apple" size={20} color={colors.text} />}
             />
           </View>
 
@@ -170,7 +170,7 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   keyboardView: {
     flex: 1,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   subtitle: {
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: colors.borderSubtle,
+    backgroundColor: colors.border,
   },
   dividerText: {
     marginHorizontal: spacing.md,

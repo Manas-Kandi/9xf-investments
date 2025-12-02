@@ -75,7 +75,7 @@ export default function FoundersApplyScreen() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="close" size={24} color={colors.textPrimary} />
+            <Ionicons name="close" size={24} color={colors.text} />
           </TouchableOpacity>
           <View style={styles.backButton} />
           <View style={styles.backButton} />
@@ -106,7 +106,7 @@ export default function FoundersApplyScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Raise with 9xf</Text>
         <View style={styles.backButton} />
@@ -134,7 +134,7 @@ export default function FoundersApplyScreen() {
             {BENEFITS.map((benefit, index) => (
               <View key={index} style={styles.benefitCard}>
                 <View style={styles.benefitIcon}>
-                  <Ionicons name={benefit.icon} size={24} color={colors.primary} />
+                  <Ionicons name={benefit.icon} size={24} color={colors.accent} />
                 </View>
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>{benefit.title}</Text>
@@ -265,7 +265,7 @@ export default function FoundersApplyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   keyboardView: {
     flex: 1,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   heroSubtitle: {
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colors.accent + '15',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   benefitTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 2,
   },
   benefitDescription: {
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   formTitle: {
     fontSize: fontSize.xl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xs,
   },
   formSubtitle: {
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: fontSize.sm,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   required: {
@@ -379,8 +379,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   stageButtonActive: {
-    backgroundColor: colors.primary + '15',
-    borderColor: colors.primary,
+    backgroundColor: colors.accent + '15',
+    borderColor: colors.accent,
   },
   stageText: {
     fontSize: fontSize.sm,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   stageTextActive: {
-    color: colors.primary,
+    color: colors.accent,
   },
   textArea: {
     backgroundColor: colors.surfaceSecondary,
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
     height: 120,
   },
   bottomBar: {
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingBottom: spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
   },
   successContainer: {
     flex: 1,
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.md,
     textAlign: 'center',
   },

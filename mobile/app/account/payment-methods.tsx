@@ -80,7 +80,7 @@ export default function PaymentMethodsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payment Methods</Text>
         <View style={styles.backButton} />
@@ -107,7 +107,7 @@ export default function PaymentMethodsScreen() {
                     <MaterialCommunityIcons
                       name={getIcon(source.type)}
                       size={24}
-                      color={colors.textPrimary}
+                      color={colors.text}
                     />
                   </View>
                   <View style={styles.methodDetails}>
@@ -165,7 +165,7 @@ export default function PaymentMethodsScreen() {
             disabled={isAddingMethod}
           >
             <View style={styles.addMethodIcon}>
-              <MaterialCommunityIcons name="bank-plus" size={28} color={colors.primary} />
+              <MaterialCommunityIcons name="bank-plus" size={28} color={colors.accent} />
             </View>
             <View style={styles.addMethodInfo}>
               <Text style={styles.addMethodTitle}>Link bank account</Text>
@@ -223,7 +223,7 @@ export default function PaymentMethodsScreen() {
       {isAddingMethod && (
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingCard}>
-            <Ionicons name="sync" size={32} color={colors.primary} />
+            <Ionicons name="sync" size={32} color={colors.accent} />
             <Text style={styles.loadingText}>Connecting to your bank...</Text>
           </View>
         </View>
@@ -235,7 +235,7 @@ export default function PaymentMethodsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   methodName: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 2,
   },
   methodNumber: {
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   defaultBadge: {
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colors.accent + '15',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
@@ -326,14 +326,14 @@ const styles = StyleSheet.create({
   defaultText: {
     fontSize: fontSize.xs,
     fontWeight: '600',
-    color: colors.primary,
+    color: colors.accent,
   },
   methodActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
     paddingTop: spacing.md,
   },
   actionButton: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     fontSize: fontSize.sm,
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: '500',
   },
   removeButton: {
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   emptyText: {
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colors.accent + '15',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   addMethodTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 2,
   },
   addMethodSubtitle: {
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.lg,
   },
   infoItem: {
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
     fontWeight: '500',
   },
 });

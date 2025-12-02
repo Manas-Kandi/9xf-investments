@@ -59,7 +59,7 @@ export default function EditProfileScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Profile</Text>
         <View style={styles.backButton} />
@@ -81,7 +81,7 @@ export default function EditProfileScreen() {
               </Text>
             </View>
             <TouchableOpacity style={styles.changePhotoButton}>
-              <Ionicons name="camera-outline" size={18} color={colors.primary} />
+              <Ionicons name="camera-outline" size={18} color={colors.accent} />
               <Text style={styles.changePhotoText}>Change photo</Text>
             </TouchableOpacity>
           </View>
@@ -185,7 +185,7 @@ export default function EditProfileScreen() {
             <Text style={styles.deleteButtonText}>Delete account</Text>
           </TouchableOpacity>
 
-          <View style={{ height: spacing.xxxl }} />
+          <View style={{ height: spacing.xxl }} />
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -206,7 +206,7 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   keyboardView: {
     flex: 1,
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   },
   changePhotoText: {
     fontSize: fontSize.sm,
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: '500',
   },
   form: {
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: fontSize.sm,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   hint: {
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   kycTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: 2,
   },
   kycStatus: {
@@ -305,14 +305,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    backgroundColor: colors.primary + '15',
+    backgroundColor: colors.accent + '15',
     borderRadius: borderRadius.md,
     alignSelf: 'flex-start',
   },
   verifyButtonText: {
     fontSize: fontSize.sm,
     fontWeight: '600',
-    color: colors.primary,
+    color: colors.accent,
   },
   deleteButton: {
     flexDirection: 'row',
@@ -331,6 +331,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     paddingBottom: spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
   },
 });

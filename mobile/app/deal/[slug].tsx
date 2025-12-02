@@ -57,10 +57,10 @@ export default function DealDetailScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-          <Ionicons name="share-outline" size={24} color={colors.textPrimary} />
+          <Ionicons name="share-outline" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -252,7 +252,7 @@ export default function DealDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   logoPlaceholder: {
     width: '100%',
     height: '100%',
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   companyName: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xs,
     textAlign: 'center',
   },
@@ -346,13 +346,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.md,
   },
   subSectionTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
   },
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   termValue: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   memoText: {
     fontSize: fontSize.md,
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   reasonText: {
     flex: 1,
     fontSize: fontSize.sm,
-    color: colors.textPrimary,
+    color: colors.text,
     lineHeight: 20,
   },
   bodyText: {
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     borderRadius: 4,
   },
   progressLabels: {
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
   progressAmount: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.primary,
+    color: colors.accent,
   },
   progressGoal: {
     fontSize: fontSize.sm,
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   riskText: {
     flex: 1,
     fontSize: fontSize.sm,
-    color: colors.textPrimary,
+    color: colors.text,
     lineHeight: 20,
   },
   riskLink: {
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   faqQuestion: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   faqAnswer: {
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     paddingBottom: spacing.xl,

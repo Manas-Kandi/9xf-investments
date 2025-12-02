@@ -75,7 +75,7 @@ export default function HowItWorksScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>How it works</Text>
         <View style={styles.backButton} />
@@ -223,7 +223,7 @@ export default function HowItWorksScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.md,
   },
   stepCard: {
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: fontSize.xs,
     fontWeight: '600',
-    color: colors.primary,
+    color: colors.accent,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: spacing.xs,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   stepTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xs,
   },
   stepDescription: {
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   bulletList: {
     gap: spacing.sm,
@@ -335,14 +335,14 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     marginTop: 7,
     marginRight: spacing.sm,
   },
   bulletText: {
     flex: 1,
     fontSize: fontSize.sm,
-    color: colors.textPrimary,
+    color: colors.text,
     lineHeight: 20,
   },
   riskCard: {
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   riskTitle: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   riskText: {
     fontSize: fontSize.sm,
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginRight: spacing.md,
   },
   faqAnswer: {
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
   ctaTitle: {
     fontSize: fontSize.xl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },

@@ -17,12 +17,12 @@ export default function RootLayout() {
 
   return (
     <DesignSystemProvider>
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, backgroundColor: colors.bg }}>
         <StatusBar style="light" />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
+            contentStyle: { backgroundColor: colors.bg },
             animation: 'slide_from_right',
           }}
         >

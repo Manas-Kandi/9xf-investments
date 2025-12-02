@@ -128,7 +128,7 @@ export default function TermsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   scrollContent: {
     padding: spacing.lg,
@@ -147,13 +147,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceSecondary,
   },
   progressDotActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     width: 24,
   },
   title: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xl,
   },
   riskCard: {
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   riskText: {
     flex: 1,
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
     lineHeight: 24,
   },
   links: {
@@ -206,19 +206,19 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   checkboxLabel: {
     flex: 1,
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
     lineHeight: 24,
   },
   footer: {
     padding: spacing.lg,
     paddingBottom: spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
   },
 });

@@ -75,7 +75,7 @@ export default function InvestScreen() {
     <>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
-          <Ionicons name="close" size={24} color={colors.textPrimary} />
+          <Ionicons name="close" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -148,7 +148,7 @@ export default function InvestScreen() {
     <>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setStep('amount')} style={styles.closeButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -197,7 +197,7 @@ export default function InvestScreen() {
 
   const renderProcessingStep = () => (
     <View style={styles.centerContent}>
-      <ActivityIndicator size="large" color={colors.primary} />
+      <ActivityIndicator size="large" color={colors.accent} />
       <Text style={styles.processingText}>
         Processing your investment...
       </Text>
@@ -278,7 +278,7 @@ export default function InvestScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   header: {
     flexDirection: 'row',
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSize.xl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xl,
     textAlign: 'center',
   },
@@ -317,8 +317,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   presetButtonActive: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '15',
+    borderColor: colors.accent,
+    backgroundColor: colors.accent + '15',
   },
   presetText: {
     fontSize: fontSize.lg,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   presetTextActive: {
-    color: colors.primary,
+    color: colors.accent,
   },
   amountDisplay: {
     flexDirection: 'row',
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   amountValue: {
     fontSize: 56,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   amountHint: {
     fontSize: fontSize.sm,
@@ -369,13 +369,13 @@ const styles = StyleSheet.create({
   fundingText: {
     flex: 1,
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   bottomBar: {
     padding: spacing.lg,
     paddingBottom: spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
+    borderTopColor: colors.border,
   },
   confirmCard: {
     backgroundColor: colors.surface,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
   confirmAmount: {
     fontSize: 48,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.sm,
   },
   confirmCompany: {
@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
   riskText: {
     flex: 1,
     fontSize: fontSize.sm,
-    color: colors.textPrimary,
+    color: colors.text,
     lineHeight: 20,
   },
   checkbox: {
@@ -431,13 +431,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   checkboxLabel: {
     flex: 1,
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
     lineHeight: 24,
   },
   centerContent: {
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   processingText: {
     fontSize: fontSize.lg,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginTop: spacing.xl,
     marginBottom: spacing.sm,
   },
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.md,
   },
   successText: {
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: fontSize.xl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.md,
     textAlign: 'center',
   },

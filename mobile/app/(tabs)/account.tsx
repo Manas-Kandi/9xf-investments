@@ -191,7 +191,7 @@ export default function AccountScreen() {
                     <Ionicons
                       name={item.icon}
                       size={22}
-                      color={item.highlight ? colors.primary : colors.textSecondary}
+                      color={item.highlight ? colors.accent : colors.textSecondary}
                     />
                     <Text
                       style={[
@@ -243,7 +243,7 @@ export default function AccountScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.bg,
   },
   scrollContent: {
     padding: spacing.lg,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSize.xxl,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
   },
   userCard: {
     flexDirection: 'row',
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   userEmail: {
     fontSize: fontSize.md,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.text,
     marginBottom: spacing.xs,
   },
   userStatus: {
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   },
   menuItemBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderSubtle,
+    borderBottomColor: colors.border,
   },
   menuItemLeft: {
     flexDirection: 'row',
@@ -324,10 +324,10 @@ const styles = StyleSheet.create({
   },
   menuItemLabel: {
     fontSize: fontSize.md,
-    color: colors.textPrimary,
+    color: colors.text,
   },
   menuItemLabelHighlight: {
-    color: colors.primary,
+    color: colors.accent,
     fontWeight: '500',
   },
   menuItemRight: {

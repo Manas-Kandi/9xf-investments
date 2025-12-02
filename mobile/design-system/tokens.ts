@@ -1,43 +1,71 @@
 import { Platform } from 'react-native';
 
-// Modern dark palette - cleaner, more contrast
-const carbonDark = {
-  primary: '#22C55E', // Green accent like the inspiration
-  onPrimary: '#ffffff',
-  primaryContainer: '#166534',
-  onPrimaryContainer: '#f0fdf4',
-  secondary: '#6B7280',
-  onSecondary: '#ffffff',
-  secondaryContainer: '#1F2937',
-  onSecondaryContainer: '#F9FAFB',
-  tertiary: '#A78BFA', // Purple accent for variety
-  onTertiary: '#1F2937',
-  tertiaryContainer: '#2E1065',
-  onTertiaryContainer: '#F5F3FF',
-  background: '#0A0A0A', // Deeper black
-  onBackground: '#FAFAFA',
-  surface: '#0A0A0A',
-  onSurface: '#FAFAFA',
-  surfaceVariant: '#171717',
-  onSurfaceVariant: '#A3A3A3',
-  surfaceContainerLowest: '#050505',
-  surfaceContainerLow: '#0F0F0F',
-  surfaceContainer: '#171717',
-  surfaceContainerHigh: '#1F1F1F',
-  surfaceContainerHighest: '#262626',
-  outline: '#404040',
-  outlineVariant: '#262626',
+/**
+ * Material Design 3 Dark Theme Color System
+ * 
+ * Based on official M3 guidelines:
+ * - Tonal surface hierarchy for elevation
+ * - Primary/Secondary/Tertiary color roles with on-colors
+ * - Accessible contrast ratios (4.5:1 minimum for text)
+ * - Surface container hierarchy: lowest → low → container → high → highest
+ */
+const m3Dark = {
+  // Primary - Main brand color (green accent for investments)
+  primary: '#A8DAB5',
+  onPrimary: '#0D3820',
+  primaryContainer: '#245234',
+  onPrimaryContainer: '#C4F7D0',
+  
+  // Secondary - Supporting elements
+  secondary: '#B8CCB9',
+  onSecondary: '#243527',
+  secondaryContainer: '#3A4B3C',
+  onSecondaryContainer: '#D4E8D5',
+  
+  // Tertiary - Accent for distinctive elements
+  tertiary: '#A1CED8',
+  onTertiary: '#00363E',
+  tertiaryContainer: '#1F4D55',
+  onTertiaryContainer: '#BDEAF4',
+  
+  // Error states
+  error: '#FFB4AB',
+  onError: '#690005',
+  errorContainer: '#93000A',
+  onErrorContainer: '#FFDAD6',
+  
+  // Surface hierarchy (tonal elevation)
+  background: '#0F1512',
+  onBackground: '#DFE4DF',
+  surface: '#0F1512',
+  onSurface: '#DFE4DF',
+  surfaceVariant: '#404942',
+  onSurfaceVariant: '#BFC9BF',
+  
+  // Surface containers (M3 tonal elevation hierarchy)
+  surfaceContainerLowest: '#0A0F0C',
+  surfaceContainerLow: '#171D19',
+  surfaceContainer: '#1B211D',
+  surfaceContainerHigh: '#252B27',
+  surfaceContainerHighest: '#303632',
+  
+  // Outline colors
+  outline: '#8A938A',
+  outlineVariant: '#404942',
+  
+  // Utility colors
   shadow: '#000000',
   scrim: 'rgba(0,0,0,0.6)',
-  error: '#EF4444',
-  onError: '#ffffff',
-  errorContainer: '#7F1D1D',
-  onErrorContainer: '#FEE2E2',
-  success: '#22C55E',
-  warning: '#F59E0B',
-  info: '#3B82F6',
-  muted: '#737373',
-  mutedStrong: '#525252',
+  inverseSurface: '#DFE4DF',
+  inverseOnSurface: '#2C322D',
+  inversePrimary: '#3A6A4A',
+  
+  // Semantic colors
+  success: '#A8DAB5',
+  warning: '#F9DE8C',
+  info: '#A1CED8',
+  muted: '#8A938A',
+  mutedStrong: '#5C645C',
 };
 
 const fontFamily = Platform.select({
@@ -127,7 +155,7 @@ export const opacity = {
 };
 
 export const tokens = {
-  color: carbonDark,
+  color: m3Dark,
   spacing,
   radius,
   typography,

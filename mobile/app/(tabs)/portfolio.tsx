@@ -1,4 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,15 +9,30 @@ import {
   ScrollView,
   TextInput,
   RefreshControl,
+  StatusBar,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors, spacing } from '../../constants/theme';
-import { color, type } from '../../constants/design-system';
+
+import { colors, spacing, borderRadius, typography } from '../../constants/theme';
 import { PressableScale, FadeIn, SlideUp } from '../../components/animated';
-import { Button } from '../../components';
 import { useAppStore } from '../../store';
+
+const formatCurrency = (value: number) =>
+  `$${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
+
+const STATUS_LABEL: Record<string, string> = {
+  initiated: 'Pending',
+  processing: 'In progress',
+  confirmed: 'Completed',
+  failed: 'Failed',
+};
+
+const STATUS_COLOR: Record<string, string> = {
+  initiated: colors.warning,
+  processing: colors.info,
+  confirmed: colors.success,
+  failed: colors.error,
+};
 
 export default function PortfolioScreen() {
   const router = useRouter();
@@ -25,56 +43,60 @@ export default function PortfolioScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    setTimeout(() => setRefreshing(false), 800);
   }, []);
 
-  const statusLabel: Record<string, string> = {
-    initiated: 'Pending',
-    processing: 'In Progress',
-    confirmed: 'Completed',
-    failed: 'Failed',
-  };
+  const visibleInvestments = useMemo(
+    () =>
+      investments.filter((investment) => {
+        if (!searchQuery.trim()) return true;
+        const query = searchQuery.toLowerCase();
+        const name = investment.campaign?.company_name?.toLowerCase() ?? '';
+        const status = STATUS_LABEL[investment.status]?.toLowerCase() ?? '';
+        return name.includes(query) || status.includes(query);
+      }),
+    [investments, searchQuery]
+  );
 
-  const statusColor: Record<string, string> = {
-    initiated: color.warning,
-    processing: color.info,
-    confirmed: color.success,
-    failed: color.error,
-  };
+  const groupedInvestments = useMemo(() => {
+    return visibleInvestments.reduce((groups, investment) => {
+      const date = new Date(investment.created_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+      if (!groups[date]) groups[date] = [];
+      groups[date].push(investment);
+      return groups;
+    }, {} as Record<string, typeof visibleInvestments>);
+  }, [visibleInvestments]);
 
-  const actionLabel: Record<string, string> = {
-    initiated: 'Buy',
-    processing: 'Shop',
-    confirmed: 'Buy',
-    failed: 'Buy',
-  };
-
-  // Group investments by date
-  const groupedInvestments = investments.reduce((groups, investment) => {
-    const date = new Date(investment.created_at).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-    if (!groups[date]) groups[date] = [];
-    groups[date].push(investment);
-    return groups;
-  }, {} as Record<string, typeof investments>);
+  const totals = useMemo(() => {
+    const totalVolume = investments.reduce((sum, inv) => sum + inv.amount, 0);
+    const completed = investments.filter((inv) => inv.status === 'confirmed').length;
+    const pending = investments.filter((inv) => inv.status === 'initiated' || inv.status === 'processing').length;
+    return { totalVolume, completed, pending };
+  }, [investments]);
 
   if (investments.length === 0) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { paddingTop: insets.top + spacing.lg }]}>
+        <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+        <LinearGradient
+          colors={[colors.surfaceContainerHigh, colors.background]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        />
         <FadeIn>
-          <Text style={styles.pageTitle}>Transaction{'\n'}History</Text>
+          <Text style={styles.pageTitle}>Activity</Text>
         </FadeIn>
         <View style={styles.emptyState}>
           <View style={styles.emptyIcon}>
-            <MaterialCommunityIcons name="receipt-text-outline" size={48} color={color.textSecondary} />
+            <MaterialCommunityIcons name="receipt-text-outline" size={48} color={colors.textSecondary} />
           </View>
           <Text style={styles.emptyTitle}>No transactions yet</Text>
-          <Text style={styles.emptyText}>
-            Your investment history will appear here.
-          </Text>
-          <PressableScale 
+          <Text style={styles.emptyText}>Your investment history will appear here.</Text>
+          <PressableScale
             style={styles.browseButton}
             onPress={() => router.push('/(tabs)/home')}
           >
@@ -87,85 +109,108 @@ export default function PortfolioScreen() {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <LinearGradient
+        colors={[colors.surfaceContainerHigh, colors.background]}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 16 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.lg }]}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={color.accent} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <FadeIn>
-          <Text style={styles.pageTitle}>Transaction{'\n'}History</Text>
+          <Text style={styles.pageTitle}>Activity</Text>
         </FadeIn>
 
-        {/* Search Bar */}
-        <SlideUp delay={50}>
+        <SlideUp delay={30}>
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <Text style={styles.statLabel}>Total volume</Text>
+              <Text style={styles.statValue}>{formatCurrency(totals.totalVolume)}</Text>
+              <Text style={styles.statHint}>All time</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statLabel}>Completed</Text>
+              <Text style={styles.statValue}>{totals.completed}</Text>
+              <Text style={styles.statHint}>Settled deals</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statLabel}>Pending</Text>
+              <Text style={styles.statValue}>{totals.pending}</Text>
+              <Text style={styles.statHint}>In flight</Text>
+            </View>
+          </View>
+        </SlideUp>
+
+        <SlideUp delay={60}>
           <View style={styles.searchContainer}>
-            <MaterialCommunityIcons name="magnify" size={20} color={color.textSecondary} />
+            <MaterialCommunityIcons name="magnify" size={20} color={colors.textSecondary} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search transaction"
-              placeholderTextColor={color.textSecondary}
+              placeholder="Search activity"
+              placeholderTextColor={colors.textSecondary}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
             <PressableScale style={styles.filterButton}>
-              <MaterialCommunityIcons name="tune-variant" size={18} color={color.textSecondary} />
+              <MaterialCommunityIcons name="tune-variant" size={18} color={colors.textSecondary} />
             </PressableScale>
           </View>
         </SlideUp>
 
-        {/* Transaction Groups */}
-        {Object.entries(groupedInvestments).map(([date, dateInvestments], groupIndex) => (
-          <SlideUp key={date} delay={100 + groupIndex * 50}>
-            <Text style={styles.dateHeader}>{date}</Text>
-            
-            {dateInvestments.map((investment, index) => (
-              <PressableScale
-                key={investment.id}
-                style={styles.transactionItem}
-                onPress={() => router.push(`/deal/${investment.campaign?.slug}`)}
-              >
-                <View style={styles.transactionLeft}>
-                  <View style={styles.transactionLogo}>
-                    <Text style={styles.transactionLogoText}>
-                      {investment.campaign?.company_name?.charAt(0) || '?'}
-                    </Text>
-                  </View>
-                  <View style={styles.transactionInfo}>
-                    <Text style={styles.transactionName}>
-                      {investment.campaign?.company_name || 'Unknown'}
-                    </Text>
+        {Object.keys(groupedInvestments).length === 0 ? (
+          <View style={styles.emptyStateInline}>
+            <Text style={styles.emptyTitle}>No matches</Text>
+            <Text style={styles.emptyText}>Try a different search.</Text>
+          </View>
+        ) : (
+          Object.entries(groupedInvestments).map(([date, dateInvestments], groupIndex) => (
+            <SlideUp key={date} delay={100 + groupIndex * 40}>
+              <Text style={styles.dateHeader}>{date}</Text>
+              {dateInvestments.map((investment) => (
+                <PressableScale
+                  key={investment.id}
+                  style={styles.transactionCard}
+                  onPress={() => router.push(`/deal/${investment.campaign?.slug}`)}
+                >
+                  <View style={styles.transactionLeft}>
+                    <View style={styles.logo}>
+                      <Text style={styles.logoText}>{investment.campaign?.company_name?.charAt(0) || '?'}</Text>
+                    </View>
+                    <View style={styles.transactionInfo}>
+                      <Text style={styles.transactionName}>
+                        {investment.campaign?.company_name || 'Unknown'}
+                      </Text>
                     <View style={styles.transactionMeta}>
-                      <View style={[styles.statusBadge, { backgroundColor: statusColor[investment.status] + '20' }]}>
-                        <Text style={[styles.statusText, { color: statusColor[investment.status] }]}>
-                          {statusLabel[investment.status]}
-                        </Text>
+                        <View style={[styles.statusBadge, { backgroundColor: STATUS_COLOR[investment.status] + '22' }]}>
+                          <Text style={[styles.statusText, { color: STATUS_COLOR[investment.status] }]}>
+                            {STATUS_LABEL[investment.status]}
+                          </Text>
+                        </View>
+                        <Text style={styles.actionText}>{investment.status === 'confirmed' ? 'Buy' : 'Processing'}</Text>
                       </View>
-                      <Text style={styles.actionText}>{actionLabel[investment.status]}</Text>
                     </View>
                   </View>
-                </View>
-                <View style={styles.transactionRight}>
-                  <Text style={styles.transactionAmount}>
-                    ${investment.amount.toLocaleString()}
-                  </Text>
-                  <Text style={styles.transactionTime}>
-                    {new Date(investment.created_at).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true,
-                    })}
-                  </Text>
-                </View>
-              </PressableScale>
-            ))}
-          </SlideUp>
-        ))}
-
-        {/* Bottom padding */}
-        <View style={{ height: insets.bottom + 100 }} />
+                  <View style={styles.transactionRight}>
+                    <Text style={styles.transactionAmount}>{formatCurrency(investment.amount)}</Text>
+                    <Text style={styles.transactionTime}>
+                      {new Date(investment.created_at).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                      })}
+                    </Text>
+                  </View>
+                </PressableScale>
+              ))}
+            </SlideUp>
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -174,155 +219,177 @@ export default function PortfolioScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: color.bg,
+    backgroundColor: colors.background,
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.lg,
   },
   pageTitle: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: color.textPrimary,
-    lineHeight: 40,
-    marginBottom: 24,
-    letterSpacing: -0.5,
+    ...typography.headlineMedium,
+    color: colors.textPrimary,
+    letterSpacing: -0.25,
   },
-
-  // Search
+  statsRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    gap: spacing.xs,
+  },
+  statLabel: {
+    ...typography.labelSmall,
+    color: colors.textSecondary,
+  },
+  statValue: {
+    ...typography.titleLarge,
+    color: colors.textPrimary,
+  },
+  statHint: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: color.bgCard,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 24,
-    gap: 12,
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    gap: spacing.sm,
   },
   searchInput: {
     flex: 1,
-    ...type.bodyMedium,
-    color: color.textPrimary,
+    ...typography.bodyLarge,
+    color: colors.textPrimary,
     padding: 0,
   },
   filterButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: color.bgElevated,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  // Date Header
   dateHeader: {
-    ...type.titleSmall,
-    color: color.textSecondary,
-    marginBottom: 12,
-    marginTop: 8,
+    ...typography.labelMedium,
+    color: colors.textSecondary,
+    marginBottom: spacing.sm,
+    marginTop: spacing.xs,
   },
-
-  // Transaction Item
-  transactionItem: {
+  transactionCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: color.borderSubtle,
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    marginBottom: spacing.sm,
   },
   transactionLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    gap: spacing.sm,
   },
-  transactionLogo: {
+  logo: {
     width: 44,
     height: 44,
-    borderRadius: 12,
-    backgroundColor: color.bgCard,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
   },
-  transactionLogoText: {
-    ...type.titleMedium,
-    color: color.textPrimary,
+  logoText: {
+    ...typography.titleMedium,
+    color: colors.textPrimary,
   },
   transactionInfo: {
     flex: 1,
   },
   transactionName: {
-    ...type.titleSmall,
-    color: color.textPrimary,
-    marginBottom: 6,
+    ...typography.titleSmall,
+    color: colors.textPrimary,
+    marginBottom: 4,
   },
   transactionMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.full,
   },
   statusText: {
-    fontSize: 10,
+    ...typography.labelSmall,
     fontWeight: '600',
   },
   actionText: {
-    ...type.bodySmall,
-    color: color.textSecondary,
+    ...typography.bodySmall,
+    color: colors.textSecondary,
   },
   transactionRight: {
     alignItems: 'flex-end',
   },
   transactionAmount: {
-    ...type.titleSmall,
-    color: color.textPrimary,
-    marginBottom: 4,
+    ...typography.titleSmall,
+    color: colors.textPrimary,
+    marginBottom: 2,
   },
   transactionTime: {
-    ...type.bodySmall,
-    color: color.textSecondary,
+    ...typography.bodySmall,
+    color: colors.textSecondary,
   },
-
-  // Empty State
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 40,
+    gap: spacing.md,
+  },
+  emptyStateInline: {
+    paddingVertical: spacing.xl,
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   emptyIcon: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: color.bgCard,
+    backgroundColor: colors.surfaceContainer,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
   },
   emptyTitle: {
-    ...type.titleLarge,
-    color: color.textPrimary,
-    marginBottom: 8,
+    ...typography.titleLarge,
+    color: colors.textPrimary,
   },
   emptyText: {
-    ...type.bodyMedium,
-    color: color.textSecondary,
+    ...typography.bodyMedium,
+    color: colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 32,
   },
   browseButton: {
-    backgroundColor: color.accent,
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 12,
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.full,
   },
   browseButtonText: {
-    ...type.labelLarge,
-    color: color.accentText,
+    ...typography.labelLarge,
+    color: colors.onPrimary,
   },
 });

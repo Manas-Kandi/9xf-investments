@@ -1,3 +1,6 @@
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
@@ -8,30 +11,28 @@ import {
   StatusBar,
   TextInput,
   TouchableOpacity,
-  Animated,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { colors, spacing, fontSize, borderRadius } from '../../constants/theme';
+
+import { colors, spacing, borderRadius, typography } from '../../constants/theme';
 import { getLiveCampaigns, getUpcomingCampaigns, mockCampaigns } from '@shared/mock-data';
 import type { Campaign } from '@shared/types';
 
-type FilterType = 'all' | 'live' | 'coming_soon' | 'closed';
+type FilterType = 'all' | 'live' | 'coming_soon' | 'vc_backed';
 type SortType = 'newest' | 'most_funded' | 'closing_soon' | 'min_investment';
 
-const FILTERS: { key: FilterType; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'live', label: 'Live' },
-  { key: 'coming_soon', label: 'Coming Soon' },
-  { key: 'closed', label: 'Closed' },
+const FILTERS: { key: FilterType; label: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }[] = [
+  { key: 'all', label: 'All', icon: 'apps' },
+  { key: 'live', label: 'Live', icon: 'lightning-bolt' },
+  { key: 'coming_soon', label: 'Coming soon', icon: 'clock-outline' },
+  { key: 'vc_backed', label: 'VC-backed', icon: 'shield-check' },
 ];
 
 const SORT_OPTIONS: { key: SortType; label: string }[] = [
   { key: 'newest', label: 'Newest' },
-  { key: 'most_funded', label: 'Most Funded' },
-  { key: 'closing_soon', label: 'Closing Soon' },
-  { key: 'min_investment', label: 'Min Investment' },
+  { key: 'most_funded', label: 'Most funded' },
+  { key: 'closing_soon', label: 'Closing soon' },
+  { key: 'min_investment', label: 'Min investment' },
 ];
 
 export default function ExploreScreen() {
@@ -45,13 +46,18 @@ export default function ExploreScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
+    setTimeout(() => setRefreshing(false), 800);
   }, []);
+
+  const stats = useMemo(() => ({
+    live: getLiveCampaigns().length,
+    upcoming: getUpcomingCampaigns().length,
+    backed: mockCampaigns.filter((c) => c.vc_info).length,
+  }), []);
 
   const filteredCampaigns = useMemo(() => {
     let campaigns = [...mockCampaigns];
 
-    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       campaigns = campaigns.filter(
@@ -62,7 +68,6 @@ export default function ExploreScreen() {
       );
     }
 
-    // Apply status filter
     switch (activeFilter) {
       case 'live':
         campaigns = campaigns.filter((c) => c.status === 'live');
@@ -70,12 +75,11 @@ export default function ExploreScreen() {
       case 'coming_soon':
         campaigns = campaigns.filter((c) => c.status === 'draft');
         break;
-      case 'closed':
-        campaigns = campaigns.filter((c) => c.status === 'closed' || c.status === 'paused');
+      case 'vc_backed':
+        campaigns = campaigns.filter((c) => !!c.vc_info);
         break;
     }
 
-    // Apply sorting
     switch (sortBy) {
       case 'newest':
         campaigns.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -101,76 +105,88 @@ export default function ExploreScreen() {
   const renderCampaignCard = (campaign: Campaign) => {
     const progress = (campaign.amount_raised / campaign.target_amount) * 100;
     const isLive = campaign.status === 'live';
+    const isClosed = campaign.status === 'closed' || campaign.status === 'paused';
 
     return (
       <TouchableOpacity
         key={campaign.id}
         style={styles.campaignCard}
         onPress={() => router.push(`/deal/${campaign.slug}`)}
-        activeOpacity={0.7}
+        activeOpacity={0.8}
       >
-        <View style={styles.cardHeader}>
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>{campaign.company_name[0]}</Text>
-          </View>
-          <View style={styles.cardHeaderInfo}>
-            <Text style={styles.companyName}>{campaign.company_name}</Text>
-            <Text style={styles.tagline} numberOfLines={1}>
-              {campaign.tagline}
-            </Text>
-          </View>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: isLive ? colors.success + '20' : colors.textMuted + '20' },
-            ]}
-          >
-            <Text
+        <LinearGradient
+          colors={[colors.surfaceContainer, colors.surfaceContainerHigh]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.cardBackground}
+        >
+          <View style={styles.cardHeader}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.logoText}>{campaign.company_name[0]}</Text>
+            </View>
+            <View style={styles.cardHeaderInfo}>
+              <Text style={styles.companyName}>{campaign.company_name}</Text>
+              <Text style={styles.tagline} numberOfLines={1}>
+                {campaign.tagline}
+              </Text>
+            </View>
+            <View
               style={[
-                styles.statusText,
-                { color: isLive ? colors.success : colors.textMuted },
+                styles.statusBadge,
+                { backgroundColor: isLive ? colors.primary + '22' : isClosed ? colors.error + '22' : colors.textMuted + '22' },
               ]}
             >
-              {isLive ? 'Live' : campaign.status === 'draft' ? 'Coming' : 'Closed'}
-            </Text>
+              <Text
+                style={[
+                  styles.statusText,
+                  { color: isLive ? colors.primary : isClosed ? colors.error : colors.textMuted },
+                ]}
+              >
+                {isLive ? 'Live' : campaign.status === 'draft' ? 'Coming' : 'Closed'}
+              </Text>
+            </View>
           </View>
-        </View>
 
-        <Text style={styles.description} numberOfLines={2}>
-          {campaign.description}
-        </Text>
+          <Text style={styles.description} numberOfLines={2}>
+            {campaign.description}
+          </Text>
 
-        {campaign.vc_info && (
-          <View style={styles.vcBadge}>
-            <Ionicons name="shield-checkmark" size={14} color={colors.success} />
-            <Text style={styles.vcText}>Backed by {campaign.vc_info.name}</Text>
-          </View>
-        )}
+          {campaign.vc_info && (
+            <View style={styles.vcBadge}>
+              <Ionicons name="shield-checkmark" size={14} color={colors.success} />
+              <Text style={styles.vcText}>Backed by {campaign.vc_info.name}</Text>
+            </View>
+          )}
 
-        <View style={styles.progressSection}>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${Math.min(progress, 100)}%` }]} />
+          <View style={styles.progressSection}>
+            <View style={styles.progressLabels}>
+              <Text style={styles.raised}>${(campaign.amount_raised / 1000).toFixed(0)}k raised</Text>
+              <Text style={styles.goal}>${(campaign.target_amount / 1000).toFixed(0)}k goal</Text>
+            </View>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${Math.min(progress, 100)}%` }]} />
+            </View>
           </View>
-          <View style={styles.progressLabels}>
-            <Text style={styles.raised}>${(campaign.amount_raised / 1000).toFixed(0)}k raised</Text>
-            <Text style={styles.goal}>${(campaign.target_amount / 1000).toFixed(0)}k goal</Text>
-          </View>
-        </View>
 
-        <View style={styles.cardFooter}>
-          <View style={styles.footerItem}>
-            <Text style={styles.footerLabel}>Min</Text>
-            <Text style={styles.footerValue}>${campaign.min_investment}</Text>
+          <View style={styles.cardFooter}>
+            <View style={styles.footerItem}>
+              <Text style={styles.footerLabel}>Min</Text>
+              <Text style={styles.footerValue}>${campaign.min_investment}</Text>
+            </View>
+            <View style={styles.footerItem}>
+              <Text style={styles.footerLabel}>Investors</Text>
+              <Text style={styles.footerValue}>{campaign.investor_count || 0}</Text>
+            </View>
+            <View style={styles.footerItem}>
+              <Text style={styles.footerLabel}>Instrument</Text>
+              <Text style={styles.footerValue}>{campaign.instrument || 'SAFE'}</Text>
+            </View>
+            <View style={styles.footerCTA}>
+              <Text style={styles.footerLink}>View</Text>
+              <MaterialCommunityIcons name="chevron-right" size={18} color={colors.textSecondary} />
+            </View>
           </View>
-          <View style={styles.footerItem}>
-            <Text style={styles.footerLabel}>Investors</Text>
-            <Text style={styles.footerValue}>{campaign.investor_count || 0}</Text>
-          </View>
-          <View style={styles.footerItem}>
-            <Text style={styles.footerLabel}>Instrument</Text>
-            <Text style={styles.footerValue}>{campaign.instrument || 'SAFE'}</Text>
-          </View>
-        </View>
+        </LinearGradient>
       </TouchableOpacity>
     );
   };
@@ -178,11 +194,17 @@ export default function ExploreScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      <LinearGradient
+        colors={[colors.surfaceContainerHigh, colors.background]}
+        style={StyleSheet.absoluteFill}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
 
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top + spacing.md },
+          { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.xl },
         ]}
         refreshControl={
           <RefreshControl
@@ -194,18 +216,41 @@ export default function ExploreScreen() {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headline}>Explore</Text>
-          <Text style={styles.subtitle}>{filteredCampaigns.length} opportunities</Text>
+          <View>
+            <Text style={styles.headline}>Discover</Text>
+            <Text style={styles.subtitle}>{filteredCampaigns.length} opportunities curated for you</Text>
+          </View>
+          <TouchableOpacity style={styles.sortPill} onPress={() => setShowSortMenu(!showSortMenu)}>
+            <MaterialCommunityIcons name="sort" size={18} color={colors.textSecondary} />
+            <Text style={styles.sortText}>{SORT_OPTIONS.find((s) => s.key === sortBy)?.label}</Text>
+            <Ionicons name={showSortMenu ? 'chevron-up' : 'chevron-down'} size={16} color={colors.textSecondary} />
+          </TouchableOpacity>
         </View>
 
-        {/* Search Bar */}
+        <View style={styles.statsRow}>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Live deals</Text>
+            <Text style={styles.statValue}>{stats.live}</Text>
+            <Text style={styles.statHint}>Investable now</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>VC-backed</Text>
+            <Text style={styles.statValue}>{stats.backed}</Text>
+            <Text style={styles.statHint}>Trusted partners</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Upcoming</Text>
+            <Text style={styles.statValue}>{stats.upcoming}</Text>
+            <Text style={styles.statHint}>Get early access</Text>
+          </View>
+        </View>
+
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={20} color={colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search companies..."
+            placeholder="Search companies, industries, or tags"
             placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -218,7 +263,6 @@ export default function ExploreScreen() {
           )}
         </View>
 
-        {/* Filter Chips */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -233,6 +277,11 @@ export default function ExploreScreen() {
               ]}
               onPress={() => setActiveFilter(filter.key)}
             >
+              <MaterialCommunityIcons
+                name={filter.icon}
+                size={16}
+                color={activeFilter === filter.key ? colors.onPrimary : colors.textSecondary}
+              />
               <Text
                 style={[
                   styles.filterText,
@@ -243,25 +292,8 @@ export default function ExploreScreen() {
               </Text>
             </TouchableOpacity>
           ))}
-
-          {/* Sort Button */}
-          <TouchableOpacity
-            style={styles.sortButton}
-            onPress={() => setShowSortMenu(!showSortMenu)}
-          >
-            <MaterialCommunityIcons name="sort" size={18} color={colors.textSecondary} />
-            <Text style={styles.sortButtonText}>
-              {SORT_OPTIONS.find((s) => s.key === sortBy)?.label}
-            </Text>
-            <Ionicons
-              name={showSortMenu ? 'chevron-up' : 'chevron-down'}
-              size={16}
-              color={colors.textSecondary}
-            />
-          </TouchableOpacity>
         </ScrollView>
 
-        {/* Sort Menu Dropdown */}
         {showSortMenu && (
           <View style={styles.sortMenu}>
             {SORT_OPTIONS.map((option) => (
@@ -292,23 +324,17 @@ export default function ExploreScreen() {
           </View>
         )}
 
-        {/* Campaign List */}
         <View style={styles.campaignList}>
           {filteredCampaigns.length === 0 ? (
             <View style={styles.emptyState}>
               <Ionicons name="search-outline" size={48} color={colors.textMuted} />
               <Text style={styles.emptyTitle}>No campaigns found</Text>
-              <Text style={styles.emptyText}>
-                Try adjusting your search or filters
-              </Text>
+              <Text style={styles.emptyText}>Try adjusting your search or filters</Text>
             </View>
           ) : (
             filteredCampaigns.map(renderCampaignCard)
           )}
         </View>
-
-        {/* Bottom padding */}
-        <View style={{ height: insets.bottom + 100 }} />
       </ScrollView>
     </View>
   );
@@ -321,27 +347,71 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
+    gap: spacing.md,
   },
   header: {
-    marginBottom: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   headline: {
-    fontSize: fontSize.xxxl,
-    fontWeight: '600',
+    ...typography.headlineMedium,
     color: colors.textPrimary,
+    letterSpacing: -0.25,
   },
   subtitle: {
-    fontSize: fontSize.sm,
-    color: colors.textMuted,
+    ...typography.bodySmall,
+    color: colors.textSecondary,
     marginTop: spacing.xs,
+  },
+  sortPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.surfaceContainer,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.full,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+  },
+  sortText: {
+    ...typography.labelMedium,
+    color: colors.textSecondary,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    gap: spacing.xs,
+  },
+  statLabel: {
+    ...typography.labelSmall,
+    color: colors.textSecondary,
+  },
+  statValue: {
+    ...typography.titleLarge,
+    color: colors.textPrimary,
+  },
+  statHint: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
+    backgroundColor: colors.surfaceContainer,
+    borderRadius: borderRadius.full,
     paddingHorizontal: spacing.md,
-    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
   },
   searchIcon: {
     marginRight: spacing.sm,
@@ -349,53 +419,39 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 48,
-    fontSize: fontSize.md,
+    ...typography.bodyLarge,
     color: colors.textPrimary,
   },
   filtersContainer: {
-    flexDirection: 'row',
     gap: spacing.sm,
-    paddingBottom: spacing.md,
   },
   filterChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.full,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  filterChipActive: {
-    backgroundColor: colors.primary + '15',
-    borderColor: colors.primary,
-  },
-  filterText: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
-    fontWeight: '500',
-  },
-  filterTextActive: {
-    color: colors.primary,
-  },
-  sortButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceContainer,
     borderRadius: borderRadius.full,
-    marginLeft: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
   },
-  sortButtonText: {
-    fontSize: fontSize.sm,
+  filterChipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  filterText: {
+    ...typography.labelMedium,
     color: colors.textSecondary,
-    fontWeight: '500',
+  },
+  filterTextActive: {
+    color: colors.onPrimary,
   },
   sortMenu: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceContainer,
     borderRadius: borderRadius.lg,
-    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
     overflow: 'hidden',
   },
   sortMenuItem: {
@@ -408,10 +464,10 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.borderSubtle,
   },
   sortMenuItemActive: {
-    backgroundColor: colors.primary + '10',
+    backgroundColor: colors.primary + '14',
   },
   sortMenuText: {
-    fontSize: fontSize.md,
+    ...typography.bodyMedium,
     color: colors.textPrimary,
   },
   sortMenuTextActive: {
@@ -420,132 +476,143 @@ const styles = StyleSheet.create({
   },
   campaignList: {
     gap: spacing.md,
+    paddingBottom: spacing.lg,
   },
   campaignCard: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+  },
+  cardBackground: {
     padding: spacing.lg,
+    gap: spacing.md,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   logoContainer: {
     width: 48,
     height: 48,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceContainerHigh,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
   },
   logoText: {
-    color: colors.white,
-    fontSize: fontSize.lg,
-    fontWeight: '700',
+    ...typography.titleMedium,
+    color: colors.textPrimary,
   },
   cardHeaderInfo: {
     flex: 1,
   },
   companyName: {
-    fontSize: fontSize.md,
-    fontWeight: '600',
+    ...typography.titleMedium,
     color: colors.textPrimary,
     marginBottom: 2,
   },
   tagline: {
-    fontSize: fontSize.sm,
+    ...typography.bodySmall,
     color: colors.textSecondary,
   },
   statusBadge: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    borderRadius: borderRadius.sm,
+    borderRadius: borderRadius.full,
   },
   statusText: {
-    fontSize: fontSize.xs,
+    ...typography.labelSmall,
     fontWeight: '600',
   },
   description: {
-    fontSize: fontSize.sm,
+    ...typography.bodySmall,
     color: colors.textSecondary,
     lineHeight: 20,
-    marginBottom: spacing.md,
   },
   vcBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    marginBottom: spacing.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    backgroundColor: colors.surfaceContainerHigh,
+    borderRadius: borderRadius.full,
+    alignSelf: 'flex-start',
   },
   vcText: {
-    fontSize: fontSize.xs,
+    ...typography.labelSmall,
     color: colors.success,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   progressSection: {
-    marginBottom: spacing.md,
-  },
-  progressBar: {
-    height: 6,
-    backgroundColor: colors.surfaceSecondary,
-    borderRadius: 3,
-    overflow: 'hidden',
-    marginBottom: spacing.sm,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 3,
+    gap: spacing.sm,
   },
   progressLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   raised: {
-    fontSize: fontSize.sm,
+    ...typography.bodySmall,
     color: colors.primary,
     fontWeight: '600',
   },
   goal: {
-    fontSize: fontSize.sm,
+    ...typography.bodySmall,
     color: colors.textMuted,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: colors.surfaceContainerHigh,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: colors.primary,
+    borderRadius: 4,
   },
   cardFooter: {
     flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
-    paddingTop: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
   },
   footerItem: {
     flex: 1,
-    alignItems: 'center',
+    gap: 4,
   },
   footerLabel: {
-    fontSize: fontSize.xs,
-    color: colors.textMuted,
-    marginBottom: 2,
+    ...typography.labelSmall,
+    color: colors.textSecondary,
   },
   footerValue: {
-    fontSize: fontSize.sm,
+    ...typography.titleSmall,
     color: colors.textPrimary,
-    fontWeight: '600',
+  },
+  footerCTA: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  footerLink: {
+    ...typography.labelMedium,
+    color: colors.primary,
   },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.xxxl,
+    paddingVertical: spacing.xxl,
   },
   emptyTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: '600',
+    ...typography.titleLarge,
     color: colors.textPrimary,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
   emptyText: {
-    fontSize: fontSize.md,
+    ...typography.bodyMedium,
     color: colors.textMuted,
     textAlign: 'center',
   },
